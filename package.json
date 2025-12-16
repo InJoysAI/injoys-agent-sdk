@@ -1,6 +1,6 @@
 {
     "name": "@injoysai/agent-sdk",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "description": "InJoys Agent SDK - language-agnostic framework for standardizing AI-native software development lifecycle",
     "main": "src/index.js",
     "bin": {
