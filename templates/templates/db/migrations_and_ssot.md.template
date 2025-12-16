@@ -1,0 +1,139 @@
+# 迁移与 SSoT 约束模板 (Migrations and SSoT Template)
+
+> **Metadata**
+> - **Source**: `{{数据库设计文档路径}}`
+> - **Generated At**: `{{生成时间 YYYY-MM-DD HH:mm}}`
+> - **Generator**: `Context-Agent v1.0`
+
+---
+
+## 🎯 SSoT 原则
+
+> **Single Source of Truth**: `schema/postgres.hcl` 是数据库 Schema 的唯一真相源。
+
+### 禁止行为
+
+| ❌ 禁止 | ✅ 正确做法 |
+|--------|-----------|
+| 直接编写 `.sql` 迁移文件 | 修改 `schema/postgres.hcl` → Atlas 生成迁移 |
+| 在生产库手动执行 DDL | 通过 CI/CD Pipeline 执行 `atlas migrate apply` |
+| 多人同时修改 Schema | PR Review 合并 HCL 变更 |
+
+---
+
+## 🔧 Atlas 工作流
+
+### 标准流程
+
+```mermaid
+flowchart LR
+    A[修改 schema/postgres.hcl] --> B[atlas migrate diff]
+    B --> C[Review 迁移 SQL]
+    C --> D[PR 合并]
+    D --> E[CI: atlas migrate apply]
+    E --> F[验证 Schema]
+```
+
+### 常用命令
+
+```bash
+# 生成迁移文件
+atlas migrate diff migration_name \
+  --dir "file://schema/migrations" \
+  --to "file://schema/postgres.hcl" \
+  --dev-url "docker://postgres/15"
+
+# 应用迁移（开发环境）
+atlas migrate apply \
+  --dir "file://schema/migrations" \
+  --url "postgres://user:pass@localhost:5432/dev?sslmode=disable"
+
+# 验证 Schema 状态
+atlas migrate status \
+  --dir "file://schema/migrations" \
+  --url "postgres://..."
+
+# 校验迁移文件完整性
+atlas migrate validate \
+  --dir "file://schema/migrations" \
+  --dev-url "docker://postgres/15"
+```
+
+---
+
+## 🔄 零停机迁移策略
+
+### Expand-Contract 模式
+
+| 阶段 | 操作 | 目的 |
+|------|------|------|
+| **Expand** | 添加新列/表（可空或有默认值） | 新旧代码兼容 |
+| **Migrate** | 后台数据迁移 | 填充新字段 |
+| **Switch** | 应用代码切换到新字段 | 读写新字段 |
+| **Contract** | 删除旧列/表 | 清理 |
+
+### 示例：重命名列
+
+```sql
+-- ❌ 错误：直接重命名会导致宕机
+ALTER TABLE users RENAME COLUMN name TO full_name;
+
+-- ✅ 正确：分阶段
+-- Phase 1: Expand
+ALTER TABLE users ADD COLUMN full_name TEXT;
+UPDATE users SET full_name = name WHERE full_name IS NULL;
+
+-- Phase 2: Switch (应用代码更新后)
+-- Phase 3: Contract
+ALTER TABLE users DROP COLUMN name;
+```
+
+---
+
+## ✅ 向后兼容变更（Safe）
+
+| 变更类型 | 安全性 | 说明 |
+|---------|--------|------|
+| 添加可空列 | ✅ Safe | 不影响现有数据 |
+| 添加有默认值的列 | ✅ Safe | 需注意大表性能 |
+| 添加新表 | ✅ Safe | 无影响 |
+| 添加索引 (CONCURRENTLY) | ✅ Safe | 不阻塞读写 |
+| 添加外键约束 | ⚠️ Caution | 需 NOT VALID + VALIDATE |
+
+---
+
+## ❌ 生产环境禁止操作
+
+| 操作 | 风险 | 替代方案 |
+|------|------|---------|
+| `DROP TABLE` / `DROP COLUMN` | 数据丢失 | 先重命名 + 保留 30 天 |
+| `ALTER TABLE ... RENAME` | 应用中断 | Expand-Contract |
+| `CREATE INDEX` (非 CONCURRENTLY) | 锁表 | `CREATE INDEX CONCURRENTLY` |
+| 修改列类型 | 全表锁 | 添加新列 + 数据迁移 |
+| `TRUNCATE` | 数据丢失 | 禁止，使用 DELETE + VACUUM |
+
+---
+
+## 📋 迁移 Checklist
+
+```markdown
+## 迁移 PR Checklist
+
+- [ ] 修改了 `schema/postgres.hcl`（SSoT）
+- [ ] 运行 `atlas migrate diff` 生成迁移
+- [ ] Review 迁移 SQL 内容
+- [ ] 验证向后兼容性
+- [ ] 大表变更使用 CONCURRENTLY
+- [ ] 回滚脚本准备（如需）
+- [ ] 更新相关文档
+```
+
+---
+
+## AI 引用指南
+
+当 AI 生成数据库变更时：
+1. **禁止直接输出 SQL** — 必须修改 `schema/postgres.hcl`
+2. 遵循 Expand-Contract 模式
+3. 索引变更使用 CONCURRENTLY
+4. 不安全操作需分阶段或人工确认

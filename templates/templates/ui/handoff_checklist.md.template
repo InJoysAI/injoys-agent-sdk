@@ -1,0 +1,25 @@
+# 设计交付检查清单模板 (Handoff Checklist)
+
+> **Metadata**
+> - **Source**: `{{UI 规范文档路径}}`
+> - **Generated At**: `{{生成时间 YYYY-MM-DD HH:mm}}`
+> - **Generator**: `Context-Agent v1.0`
+
+---
+
+## Figma 结构
+
+- [ ] 页面按模块/功能分组
+- [ ] 组件使用统一命名与层级
+- [ ] 状态（hover/pressed/disabled/loading/error）齐全
+
+## 资产输出
+
+- [ ] 图标与图片导出规格明确（尺寸/格式/命名）
+- [ ] 字体与颜色使用 tokens（可追溯）
+
+## 标注与说明
+
+- [ ] 关键交互流程说明（含边界情况）
+- [ ] 响应式断点与栅格说明
+

@@ -1,0 +1,36 @@
+# 交互状态规范模板 (Interaction States Template)
+
+> **Metadata**
+> - **Source**: `{{UI 规范文档路径}}`
+> - **Generated At**: `{{生成时间 YYYY-MM-DD HH:mm}}`
+> - **Generator**: `Context-Agent v1.0`
+
+---
+
+## 状态列表
+
+建议至少覆盖以下状态（按组件实际情况裁剪）：
+- Default / Hover / Pressed / Focused
+- Disabled / Loading
+- Error / Empty
+
+---
+
+## 组件状态矩阵
+
+| 组件 | Default | Hover | Pressed | Focused | Disabled | Loading | Error | Empty |
+|------|---------|-------|---------|---------|----------|---------|-------|-------|
+| Button | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | N/A | N/A |
+| Input | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | N/A |
+
+---
+
+## 状态实现建议
+
+### Button
+
+- Hover: `{{描述 + 样式变化}}`
+- Pressed: `{{描述 + 样式变化}}`
+- Disabled: `{{描述 + 样式变化}}`
+- Loading: `{{Spinner/骨架屏等}}`
+

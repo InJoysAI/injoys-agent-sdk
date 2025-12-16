@@ -1,0 +1,134 @@
+# 运行时视图模板 (Runtime View Template)
+
+> **Metadata**
+> - **Source**: `{{架构设计文档路径}}`
+> - **Generated At**: `{{生成时间 YYYY-MM-DD HH:mm}}`
+> - **Generator**: `Context-Agent v1.0`
+
+---
+
+## 🎯 场景选择原则
+
+仅记录具有**架构显著性**的运行时场景：
+- 核心业务链路
+- 复杂交互逻辑（跨服务事务）
+- 异常与恢复流程
+- 启动/关闭依赖顺序
+
+---
+
+## 📊 场景 1: {{核心业务流程，如：下单支付}}
+
+### 序列图
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant User
+    participant WebApp
+    participant APIGateway
+    participant OrderService
+    participant PaymentService
+    participant Database
+    participant PaymentGateway
+
+    User->>WebApp: 点击下单
+    WebApp->>APIGateway: POST /orders
+    APIGateway->>OrderService: CreateOrder
+    OrderService->>Database: 保存订单 (PENDING)
+    OrderService-->>APIGateway: 返回订单ID
+    APIGateway-->>WebApp: 返回订单信息
+
+    User->>WebApp: 确认支付
+    WebApp->>APIGateway: POST /payments
+    APIGateway->>PaymentService: CreatePayment
+    PaymentService->>PaymentGateway: 发起支付
+    PaymentGateway-->>PaymentService: 支付结果
+    PaymentService->>OrderService: UpdateOrderStatus
+    OrderService->>Database: 更新订单 (PAID)
+    PaymentService-->>WebApp: 支付成功
+```
+
+### 关键决策点
+
+| 步骤 | 决策 | 失败处理 |
+|------|------|---------|
+| 3 | 库存检查 | 库存不足 → 返回错误 |
+| 9 | 支付超时 | 30s 超时 → 标记待查询 |
+| 10 | 支付失败 | 重试 3 次 → 标记失败 |
+
+---
+
+## 📊 场景 2: {{复杂交互，如：分布式事务 Saga}}
+
+### Saga 编排
+
+```mermaid
+sequenceDiagram
+    participant Orchestrator
+    participant OrderService
+    participant InventoryService
+    participant PaymentService
+
+    Orchestrator->>OrderService: 创建订单
+    OrderService-->>Orchestrator: 订单已创建
+
+    Orchestrator->>InventoryService: 预留库存
+    InventoryService-->>Orchestrator: 库存已预留
+
+    Orchestrator->>PaymentService: 扣款
+    alt 扣款成功
+        PaymentService-->>Orchestrator: 扣款成功
+        Orchestrator->>OrderService: 确认订单
+        Orchestrator->>InventoryService: 确认库存
+    else 扣款失败
+        PaymentService-->>Orchestrator: 扣款失败
+        Orchestrator->>InventoryService: 释放库存
+        Orchestrator->>OrderService: 取消订单
+    end
+```
+
+---
+
+## 🔄 状态机: {{核心实体，如：订单状态}}
+
+```mermaid
+stateDiagram-v2
+    [*] --> PENDING: 创建订单
+
+    PENDING --> PAID: 支付成功
+    PENDING --> CANCELLED: 取消/超时
+
+    PAID --> SHIPPED: 发货
+    PAID --> REFUNDING: 申请退款
+
+    SHIPPED --> COMPLETED: 确认收货
+    SHIPPED --> REFUNDING: 申请退款
+
+    REFUNDING --> REFUNDED: 退款成功
+
+    CANCELLED --> [*]
+    COMPLETED --> [*]
+    REFUNDED --> [*]
+```
+
+### 状态流转规则
+
+| 当前状态 | 允许操作 | 目标状态 |
+|---------|---------|---------|
+| PENDING | 支付 | PAID |
+| PENDING | 取消/超时 | CANCELLED |
+| PAID | 发货 | SHIPPED |
+| PAID | 申请退款 | REFUNDING |
+| SHIPPED | 确认收货 | COMPLETED |
+
+---
+
+## ⚠️ 异常与恢复
+
+| 异常场景 | 触发条件 | 恢复策略 |
+|---------|---------|---------|
+| 数据库连接失败 | 连接池耗尽 | 熔断 30s → 重试 |
+| Redis 宕机 | 连接超时 | 降级到数据库 |
+| 支付网关超时 | 30s 无响应 | 查询状态 → 补偿 |
+| 消息队列堆积 | 消费速度 < 生产速度 | 扩容消费者 |

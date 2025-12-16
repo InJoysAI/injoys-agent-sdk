@@ -1,0 +1,233 @@
+# Schema 设计规范模板 (Schema Design Template)
+
+> **Metadata**
+> - **Source**: `{{数据库设计文档路径}}`
+> - **Generated At**: `{{生成时间 YYYY-MM-DD HH:mm}}`
+> - **Generator**: `Context-Agent v1.0`
+
+---
+
+## 🔑 主键策略
+
+### 策略选择
+
+| 场景 | 推荐方案 | 原因 |
+|------|---------|------|
+| 分布式/微服务 | **UUIDv7** | 全局唯一、去中心化生成、顺序性保证 B-Tree 性能 |
+| 单体应用/强顺序需求 | BIGSERIAL | ID 连续、存储紧凑 |
+| 已有 UUIDv4 系统 | 迁移至 UUIDv7 | 避免索引随机 I/O 和页面分裂 |
+
+### UUIDv7 规范
+
+```sql
+-- 应用层生成 UUIDv7（推荐）
+-- 或使用 PostgreSQL 17+ 内置支持
+
+-- 表定义示例
+CREATE TABLE users (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),  -- 替换为 UUIDv7 生成
+    ...
+);
+```
+
+---
+
+## 📊 核心实体 ER 图
+
+```mermaid
+erDiagram
+    USER ||--o{ ORDER : places
+    ORDER ||--|{ ORDER_ITEM : contains
+    ORDER_ITEM }|--|| PRODUCT : references
+    USER ||--o{ PAYMENT : makes
+    PAYMENT ||--|| ORDER : "pays for"
+
+    USER {
+        uuid id PK
+        string email UK
+        string password_hash
+        enum status
+        timestamp created_at
+    }
+
+    ORDER {
+        uuid id PK
+        uuid user_id FK
+        enum status
+        decimal total_amount
+        timestamp created_at
+    }
+
+    PRODUCT {
+        uuid id PK
+        string name
+        decimal price
+        jsonb attributes
+    }
+```
+
+---
+
+## 📋 表设计规范
+
+### 命名约定
+
+| 元素 | 规范 | 示例 |
+|------|------|------|
+| 表名 | 小写复数，snake_case | `users`, `order_items` |
+| 列名 | 小写，snake_case | `user_id`, `created_at` |
+| 主键 | `id` | `id UUID` |
+| 外键 | `{表名单数}_id` | `user_id`, `order_id` |
+| 时间戳 | `{action}_at` | `created_at`, `updated_at` |
+| 布尔 | `is_{state}` / `has_{feature}` | `is_active`, `has_verified` |
+
+### 字段类型指南
+
+| 数据类型 | PostgreSQL 类型 | 备注 |
+|---------|----------------|------|
+| 主键 | `UUID` | UUIDv7 |
+| 金额 | `NUMERIC(precision, scale)` | 避免浮点误差 |
+| 枚举 | `TEXT` + CHECK | 或 CREATE TYPE |
+| 时间戳 | `TIMESTAMPTZ` | 始终使用带时区 |
+| JSON | `JSONB` | 非 JSON |
+| 大文本 | `TEXT` | 无需 VARCHAR(n) |
+
+---
+
+## 🔍 索引策略
+
+### 索引类型选择
+
+| 类型 | 适用场景 | 示例 |
+|------|---------|------|
+| **B-Tree** | 等值/范围查询、排序、唯一约束 | 主键、外键、时间戳 |
+| **GIN** | 数组、JSONB、全文检索 | `@>`, `?`, `@@` 操作 |
+| **BRIN** | 物理顺序存储的大表 | 日志表时间戳 |
+| **GiST** | 几何、范围类型、排他约束 | PostGIS、时间段不重叠 |
+
+### 索引设计原则
+
+```sql
+-- 组合索引：高选择性列在前
+CREATE INDEX idx_orders_user_status ON orders(user_id, status);
+
+-- JSONB 查询优化：提取为生成列
+ALTER TABLE products 
+ADD COLUMN category TEXT GENERATED ALWAYS AS (attributes->>'category') STORED;
+CREATE INDEX idx_products_category ON products(category);
+
+-- 条件索引：减少索引大小
+CREATE INDEX idx_orders_pending ON orders(created_at) 
+WHERE status = 'PENDING';
+```
+
+### 索引维护
+
+| 操作 | 命令 | 频率 |
+|------|------|------|
+| 重建索引 | `REINDEX CONCURRENTLY` | 每月 |
+| 检测冗余 | 查询 `pg_stat_user_indexes` | 每周 |
+| 检测未使用 | `idx_scan = 0` 的索引 | 每月 |
+
+---
+
+## 📦 分区策略
+
+### 分区条件
+
+| 条件 | 阈值 |
+|------|------|
+| 表大小 | > 100GB |
+| 行数 | > 1 亿行 |
+| 删除模式 | 需要定期删除旧数据 |
+
+### 分区类型
+
+| 类型 | 适用场景 | 示例 |
+|------|---------|------|
+| **RANGE** | 时间序列数据 | 按月分区 |
+| **LIST** | 离散值分布 | 按地区/状态 |
+| **HASH** | 均匀分布 | 热点数据分散 |
+
+### pg_partman 配置
+
+```sql
+-- 创建分区父表
+CREATE TABLE orders (
+    id UUID PRIMARY KEY,
+    created_at TIMESTAMPTZ NOT NULL,
+    ...
+) PARTITION BY RANGE (created_at);
+
+-- pg_partman 自动化管理
+SELECT partman.create_parent('public.orders', 'created_at', 'native', 'monthly');
+
+-- 配置预创建和保留期
+UPDATE partman.part_config 
+SET premake = 3,           -- 预创建 3 个月
+    retention = '2 years'  -- 保留 2 年
+WHERE parent_table = 'public.orders';
+```
+
+---
+
+## 📄 JSONB 使用规范
+
+### 使用场景
+
+| ✅ 适合 | ❌ 不适合 |
+|--------|---------|
+| 商品扩展属性（不同品类差异大） | 核心实体字段（用户、订单状态） |
+| 第三方 API 原始响应 | 频繁更新的字段 |
+| 动态表单数据 | 需要外键约束的关系 |
+| 临时/实验性数据 | 高频过滤/排序字段 |
+
+### 优化策略
+
+```sql
+-- 频繁查询字段 → 生成列 + 索引
+ALTER TABLE products 
+ADD COLUMN brand TEXT GENERATED ALWAYS AS (attributes->>'brand') STORED;
+CREATE INDEX idx_products_brand ON products(brand);
+
+-- GIN 索引用于 @> 包含查询
+CREATE INDEX idx_products_attrs ON products USING GIN (attributes);
+```
+
+---
+
+## ⚠️ 约束规则
+
+### 必须约束
+
+| 约束类型 | 用途 | 示例 |
+|---------|------|------|
+| **PRIMARY KEY** | 唯一标识 | `id UUID PRIMARY KEY` |
+| **NOT NULL** | 必填字段 | `email TEXT NOT NULL` |
+| **UNIQUE** | 业务唯一性 | `UNIQUE(email)` |
+| **FOREIGN KEY** | 引用完整性 | `REFERENCES users(id)` |
+
+### 推荐约束
+
+```sql
+-- CHECK 约束：业务规则
+ALTER TABLE orders ADD CONSTRAINT chk_amount_positive 
+CHECK (total_amount >= 0);
+
+-- 排他约束：时间段不重叠
+CREATE TABLE room_bookings (
+    room_id INT,
+    during TSTZRANGE,
+    EXCLUDE USING GIST (room_id WITH =, during WITH &&)
+);
+```
+
+---
+
+## AI 引用指南
+
+当 AI 生成数据库相关代码时：
+1. 主键使用 UUIDv7
+2. 遵循表命名约定
+3. 大表考虑分区策略
+4. JSONB 仅用于扩展属性

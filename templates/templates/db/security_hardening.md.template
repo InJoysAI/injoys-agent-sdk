@@ -1,0 +1,194 @@
+# PostgreSQL 安全加固模板 (Security Hardening Template)
+
+> **Metadata**
+> - **Source**: `{{数据库设计文档路径}}`
+> - **Generated At**: `{{生成时间 YYYY-MM-DD HH:mm}}`
+> - **Generator**: `Context-Agent v1.0`
+
+---
+
+> **⚠️ 权威说明**  
+> 本文件为 **DB 视角**安全约束。最终权威归档于 `architecture/security_policy.md`。
+
+---
+
+## 🔐 认证加固
+
+### 废弃 MD5，强制 SCRAM-SHA-256
+
+```ini
+# postgresql.conf
+password_encryption = scram-sha-256
+```
+
+```bash
+# 更新现有用户密码（使用新加密）
+ALTER USER app_user SET password_encryption = 'scram-sha-256';
+ALTER USER app_user PASSWORD 'new_secure_password';
+```
+
+### 认证方式比较
+
+| 方式 | 安全级别 | 说明 |
+|------|---------|------|
+| `trust` | ❌ 禁止 | 无密码，仅限本地调试 |
+| `md5` | ❌ 废弃 | 易受重放攻击 |
+| `scram-sha-256` | ✅ 推荐 | 现代标准 |
+| `cert` | ✅✅ 最佳 | mTLS 客户端证书 |
+
+---
+
+## 📋 pg_hba.conf 规范
+
+### 生产环境配置原则
+
+| 规则 | 说明 |
+|------|------|
+| **白名单优先** | 仅允许已知应用服务器 IP |
+| **禁止 trust** | 任何环境都不使用 |
+| **强制 hostssl** | 禁止非加密连接 |
+| **按角色分离** | 不同应用使用不同用户 |
+
+### 配置示例
+
+```
+# TYPE  DATABASE        USER            ADDRESS                 METHOD
+
+# 本地连接（仅管理员）
+local   all             postgres                                scram-sha-256
+
+# 应用服务器（严格白名单）
+hostssl app_db          app_user        10.0.1.0/24             scram-sha-256
+hostssl app_db          app_user        10.0.2.0/24             scram-sha-256
+
+# 监控系统（只读账户）
+hostssl all             monitor_user    10.0.10.5/32            scram-sha-256
+
+# 禁止其他所有连接
+hostssl all             all             0.0.0.0/0               reject
+```
+
+---
+
+## 🔒 TLS 配置
+
+### 服务端配置
+
+```ini
+# postgresql.conf
+ssl = on
+ssl_cert_file = '/path/to/server.crt'
+ssl_key_file = '/path/to/server.key'
+ssl_ca_file = '/path/to/ca.crt'
+
+# 最低协议版本
+ssl_min_protocol_version = 'TLSv1.2'
+
+# 推荐密码套件
+ssl_ciphers = 'HIGH:MEDIUM:+3DES:!aNULL'
+```
+
+### mTLS（双向认证）
+
+```
+# pg_hba.conf - 要求客户端证书
+hostssl all             all             0.0.0.0/0               cert clientcert=verify-ca
+```
+
+| 模式 | 说明 |
+|------|------|
+| `clientcert=verify-ca` | 验证客户端证书由指定 CA 签发 |
+| `clientcert=verify-full` | 额外验证 CN 与用户名匹配 |
+
+---
+
+## 👤 最小权限原则
+
+### 角色分离
+
+| 角色 | 权限 | 用途 |
+|------|------|------|
+| `app_user` | 仅 CONNECT + 表 CRUD | 应用程序 |
+| `migration_user` | 临时 DDL 权限 | CI/CD 迁移 |
+| `monitor_user` | pg_monitor | 监控系统 |
+| `backup_user` | pg_read_all_data | 备份任务 |
+| `postgres` | SUPERUSER | 紧急运维 |
+
+### 授权示例
+
+```sql
+-- 应用用户：仅表级 CRUD
+GRANT CONNECT ON DATABASE app_db TO app_user;
+GRANT USAGE ON SCHEMA public TO app_user;
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO app_user;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public 
+  GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO app_user;
+
+-- 禁止 TRUNCATE 和 DDL
+REVOKE TRUNCATE ON ALL TABLES IN SCHEMA public FROM app_user;
+
+-- 监控用户：只读系统视图
+GRANT pg_monitor TO monitor_user;
+```
+
+---
+
+## 🔏 敏感数据处理
+
+### 字段级加密（应用层）
+
+| 数据类型 | 加密方式 | 说明 |
+|---------|---------|------|
+| 密码哈希 | bcrypt/argon2 | 不可逆 |
+| 信用卡号 | AES-256-GCM | 应用层加密 |
+| 个人身份信息 | AES-256-GCM | 按需脱敏 |
+
+### 数据脱敏视图
+
+```sql
+-- 创建脱敏视图供分析/客服使用
+CREATE VIEW users_masked AS
+SELECT 
+    id,
+    CONCAT(LEFT(email, 3), '***@***') AS email_masked,
+    CONCAT(LEFT(phone, 3), '****', RIGHT(phone, 4)) AS phone_masked,
+    created_at
+FROM users;
+
+GRANT SELECT ON users_masked TO analyst_user;
+```
+
+---
+
+## 📊 安全审计
+
+### 开启日志
+
+```ini
+# postgresql.conf
+log_connections = on
+log_disconnections = on
+log_statement = 'ddl'  # 记录所有 DDL
+log_line_prefix = '%m [%p] %u@%d '
+```
+
+### pgAudit 扩展（高合规需求）
+
+```sql
+-- 安装 pgAudit
+CREATE EXTENSION pgaudit;
+
+-- 配置审计
+ALTER SYSTEM SET pgaudit.log = 'write, ddl';
+ALTER SYSTEM SET pgaudit.log_catalog = off;
+```
+
+---
+
+## AI 引用指南
+
+当 AI 生成数据库安全配置时：
+1. 认证必须使用 SCRAM-SHA-256
+2. pg_hba.conf 严格白名单
+3. 强制 TLS 加密
+4. 遵循最小权限原则

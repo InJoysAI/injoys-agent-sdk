@@ -1,0 +1,30 @@
+# 无障碍检查清单模板 (Accessibility Checklist)
+
+> **Metadata**
+> - **Source**: `{{UI 规范文档路径}}`
+> - **Generated At**: `{{生成时间 YYYY-MM-DD HH:mm}}`
+> - **Generator**: `Context-Agent v1.0`
+
+---
+
+目标：对齐 WCAG 2.2 AA（按项目实际要求裁剪）。
+
+## POUR
+
+### Perceivable（可感知）
+- [ ] 文本与背景对比度满足 AA
+- [ ] 图标/状态有非颜色提示（文字/形状）
+
+### Operable（可操作）
+- [ ] 所有交互可键盘操作
+- [ ] 焦点可见且顺序合理
+- [ ] 触控目标 ≥ 44×44px（移动端）
+
+### Understandable（可理解）
+- [ ] 表单错误提示明确且可定位
+- [ ] 文案一致、术语统一
+
+### Robust（健壮）
+- [ ] 语义化 HTML/ARIA 合理使用
+- [ ] 屏幕阅读器可读关键内容
+

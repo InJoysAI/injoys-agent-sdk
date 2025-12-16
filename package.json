@@ -1,0 +1,45 @@
+{
+    "name": "@injoysai/agent-sdk",
+    "version": "0.1.0",
+    "description": "InJoys Agent SDK - language-agnostic framework for standardizing AI-native software development lifecycle",
+    "main": "src/index.js",
+    "bin": {
+        "injoys": "./bin/cli.js",
+        "injoysagent": "./bin/cli.js"
+    },
+    "files": [
+        "bin/",
+        "src/",
+        "templates/",
+        "commands/",
+        "scripts/",
+        "standards/"
+    ],
+    "scripts": {
+        "test": "echo \"No tests yet\" && exit 0"
+    },
+    "keywords": [
+        "ai",
+        "agent",
+        "context",
+        "developer-tools",
+        "openspec",
+        "ssot",
+        "cursor",
+        "claude",
+        "windsurf"
+    ],
+    "author": "InJoysAI",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/injoysai/injoys-agent-sdk.git"
+    },
+    "bugs": {
+        "url": "https://github.com/injoysai/injoys-agent-sdk/issues"
+    },
+    "homepage": "https://github.com/injoysai/injoys-agent-sdk#readme",
+    "engines": {
+        "node": ">=18.0.0"
+    }
+}

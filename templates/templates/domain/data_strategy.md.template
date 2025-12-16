@@ -1,0 +1,87 @@
+# 数据策略模板 (Data Strategy Template)
+
+> **Metadata**
+> - **Source**: `{{SOURCE_PATH}}`
+> - **Generated At**: `{{GENERATED_AT}}`
+> - **Generator**: `Context-Agent v1.0`
+
+---
+
+## 1. 埋点事件列表
+
+| 事件 ID | 事件名称 | 触发时机 | 关键属性 | 业务价值 |
+|---------|---------|---------|---------|---------|
+| `{{EVENT_ID}}` | {{EVENT_NAME}} | {{TRIGGER}} | {{ATTRIBUTES}} | {{BUSINESS_VALUE}} |
+
+---
+
+## 2. 公共属性 (Super Properties)
+
+所有事件自动携带以下属性：
+
+```json
+{
+  "device_id": "唯一设备标识",
+  "network": "Wifi/4G/5G",
+  "app_version": "{{APP_VERSION}}",
+  "os_version": "{{OS_VERSION}}",
+  "timestamp": "ISO 8601 格式"
+}
+```
+
+---
+
+## 3. 数据治理与删除策略
+
+| 治理领域 | 策略 |
+|---------|------|
+| **数据最小化** | {{MINIMIZATION_POLICY}} |
+| **删除传播** | {{DELETION_POLICY}} |
+| **数据导出** | {{EXPORT_POLICY}} |
+| **用途声明** | {{USAGE_POLICY}} |
+| **审计留痕** | {{AUDIT_POLICY}} |
+
+---
+
+## 4. 核心指标定义
+
+| 指标 | 计算公式 | 数据源 |
+|------|---------|--------|
+| {{METRIC_NAME}} | {{FORMULA}} | {{DATA_SOURCE}} |
+
+---
+
+## 5. 埋点实施规范
+
+### 5.1 前端埋点
+
+- 使用 {{ANALYTICS_SDK}} SDK
+- 注册时设置 `identify(user_id)`
+- Super Properties 在 SDK 初始化时设置
+
+### 5.2 后端埋点
+
+- 关键业务事件在后端触发，确保数据完整性
+- 使用 Server-Side SDK 或 HTTP API
+
+### 5.3 埋点校验
+
+- 开发环境使用 Debug Mode
+- 上线前使用 Event Validator 检查事件完整性
+- 定期审计埋点覆盖率
+
+---
+
+## 6. 里程碑与时间线
+
+| 阶段 | 时间 | 交付内容 | 验收标准 |
+|------|------|---------|---------|
+| {{PHASE}} | {{TIMELINE}} | {{DELIVERABLES}} | {{ACCEPTANCE}} |
+
+---
+
+## 变更日志
+
+| 日期 | 版本 | 变更内容 |
+|------|------|---------|
+| {{DATE}} | {{VERSION}} | {{CHANGES}} |

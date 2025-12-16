@@ -1,0 +1,139 @@
+# 系统设计总览模板 (System Design Template)
+
+> **Metadata**
+> - **Source**: `{{架构设计文档路径}}`
+> - **Generated At**: `{{生成时间 YYYY-MM-DD HH:mm}}`
+> - **Generator**: `Context-Agent v1.0`
+
+---
+
+## 📌 系统概述
+
+{{系统一句话描述，例如：
+"InJoysAI 是一个 AI 驱动的创意内容生成平台，支持多模态输入与个性化输出。"
+}}
+
+---
+
+## 🎯 质量目标
+
+| 质量属性 | 目标描述 | 量化指标 |
+|---------|---------|---------|
+| **可用性** | {{e.g. 系统全年可用}} | SLA ≥ 99.9% |
+| **性能** | {{e.g. API 响应快速}} | P99 < 500ms |
+| **安全性** | {{e.g. 数据加密传输}} | TLS 1.2+ |
+| **可扩展性** | {{e.g. 支持水平扩展}} | 10K CCU |
+
+---
+
+## 🗺️ 系统上下文 (C4 Level 1)
+
+```mermaid
+C4Context
+    title System Context Diagram
+
+    Person(user, "用户", "使用应用的终端用户")
+    Person(admin, "管理员", "系统管理人员")
+
+    System(system, "{{系统名称}}", "{{系统核心功能描述}}")
+
+    System_Ext(payment, "支付网关", "处理支付交易")
+    System_Ext(email, "邮件服务", "发送通知邮件")
+    System_Ext(storage, "对象存储", "存储媒体文件")
+
+    Rel(user, system, "使用")
+    Rel(admin, system, "管理")
+    Rel(system, payment, "调用", "HTTPS/REST")
+    Rel(system, email, "调用", "SMTP")
+    Rel(system, storage, "读写", "S3 API")
+```
+
+---
+
+## 🏗️ 核心组件
+
+| 组件 | 职责 | 技术栈 |
+|------|------|--------|
+| **API Gateway** | 路由、认证、限流 | {{e.g. Kong / Nginx}} |
+| **User Service** | 用户管理、认证授权 | {{e.g. Go + PostgreSQL}} |
+| **Content Service** | 内容生成与管理 | {{e.g. Python + Redis}} |
+| **Notification Service** | 消息推送与通知 | {{e.g. Node.js + RabbitMQ}} |
+| **Admin Console** | 后台管理界面 | {{e.g. React + TypeScript}} |
+
+---
+
+## 💾 数据存储
+
+| 存储类型 | 用途 | 技术选型 | 一致性模型 |
+|---------|------|---------|-----------|
+| **主数据库** | 核心业务数据 | {{e.g. PostgreSQL 15}} | 强一致性 |
+| **缓存** | 热点数据、会话 | {{e.g. Redis 7}} | 最终一致性 |
+| **对象存储** | 媒体文件 | {{e.g. S3}} | 最终一致性 |
+| **消息队列** | 异步任务 | {{e.g. RabbitMQ}} | At-least-once |
+
+---
+
+## ⚡ NFR/SLO 指标
+
+| 指标类型 | 指标名 | 目标值 | 测量方式 |
+|---------|--------|--------|---------|
+| **响应时间** | API P50 | < 100ms | Prometheus |
+| **响应时间** | API P99 | < 500ms | Prometheus |
+| **可用性** | Uptime | ≥ 99.9% | 监控告警 |
+| **并发** | CCU | 10,000 | 压力测试 |
+| **吞吐** | QPS | 5,000 | 压力测试 |
+
+---
+
+## 🚀 部署拓扑
+
+```mermaid
+graph TB
+    subgraph "Public Zone"
+        CDN[CDN]
+        LB[Load Balancer]
+    end
+
+    subgraph "Application Zone"
+        API[API Gateway]
+        SVC1[User Service]
+        SVC2[Content Service]
+        SVC3[Notification Service]
+    end
+
+    subgraph "Data Zone"
+        DB[(PostgreSQL)]
+        Cache[(Redis)]
+        MQ[RabbitMQ]
+    end
+
+    CDN --> LB
+    LB --> API
+    API --> SVC1
+    API --> SVC2
+    API --> SVC3
+    SVC1 --> DB
+    SVC1 --> Cache
+    SVC2 --> DB
+    SVC2 --> Cache
+    SVC3 --> MQ
+```
+
+---
+
+## 🔗 外部依赖
+
+| 依赖系统 | 用途 | 协议 | 可用性要求 |
+|---------|------|------|-----------|
+| {{支付网关}} | 支付处理 | HTTPS/REST | 99.9% |
+| {{邮件服务}} | 通知发送 | SMTP | 99% |
+| {{对象存储}} | 文件存储 | S3 API | 99.99% |
+
+---
+
+## AI 引用指南
+
+当 AI 生成架构相关代码时：
+1. 参考本文档的组件职责划分
+2. 遵循 NFR/SLO 指标约束
+3. 使用指定的技术栈

@@ -1,0 +1,36 @@
+# 动效 Token 模板 (Motion Tokens Template)
+
+> **Metadata**
+> - **Source**: `{{UI 规范文档路径}}`
+> - **Generated At**: `{{生成时间 YYYY-MM-DD HH:mm}}`
+> - **Generator**: `Context-Agent v1.0`
+
+---
+
+## Duration Tokens
+
+| Token | 值 | 用途 |
+|-------|----|------|
+| motion-short | {{100ms}} | 微交互 |
+| motion-medium | {{200ms}} | 组件过渡 |
+| motion-long | {{400ms}} | 页面级动画 |
+
+---
+
+## Easing Tokens
+
+| Token | 值 | 用途 |
+|-------|----|------|
+| ease-standard | `{{cubic-bezier(...)}}` | 默认过渡 |
+| ease-emphasized | `{{cubic-bezier(...)}}` | 强调进入/退出 |
+
+---
+
+## Reduced Motion
+
+```css
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+}
+```
+

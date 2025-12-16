@@ -1,0 +1,105 @@
+# 数据架构模板 (Data Architecture Template)
+
+> **Metadata**
+> - **Source**: `{{架构设计文档路径}}`
+> - **Generated At**: `{{生成时间 YYYY-MM-DD HH:mm}}`
+> - **Generator**: `Context-Agent v1.0`
+
+---
+
+## 📊 数据模型分层
+
+### 概念数据模型 (Conceptual)
+
+```mermaid
+erDiagram
+    USER ||--o{ ORDER : places
+    ORDER ||--|{ ORDER_ITEM : contains
+    ORDER_ITEM }|--|| PRODUCT : references
+    USER ||--o{ PAYMENT : makes
+    PAYMENT ||--|| ORDER : "pays for"
+```
+
+### 核心实体
+
+| 实体 | 描述 | 关系 |
+|------|------|------|
+| **User** | 系统用户 | 1:N Order |
+| **Order** | 订单 | N:1 User, 1:N OrderItem |
+| **Product** | 商品 | N:1 OrderItem |
+| **Payment** | 支付记录 | 1:1 Order |
+
+---
+
+## 📋 逻辑数据模型 (Logical)
+
+### User
+
+| 字段 | 类型 | 约束 | 描述 |
+|------|------|------|------|
+| id | UUID | PK | 用户ID |
+| email | VARCHAR(255) | UNIQUE, NOT NULL | 邮箱 |
+| password_hash | VARCHAR(255) | NOT NULL | 密码哈希 |
+| status | ENUM | NOT NULL | 状态 |
+| created_at | TIMESTAMP | NOT NULL | 创建时间 |
+
+### Order
+
+| 字段 | 类型 | 约束 | 描述 |
+|------|------|------|------|
+| id | UUID | PK | 订单ID |
+| user_id | UUID | FK(User) | 用户ID |
+| status | ENUM | NOT NULL | 订单状态 |
+| total_amount | DECIMAL(10,2) | NOT NULL | 总金额 |
+| created_at | TIMESTAMP | NOT NULL | 创建时间 |
+
+---
+
+## 🗄️ 物理数据模型 (Physical)
+
+### 索引设计
+
+| 表 | 索引名 | 字段 | 类型 |
+|----|--------|------|------|
+| users | idx_users_email | email | UNIQUE |
+| orders | idx_orders_user_id | user_id | B-TREE |
+| orders | idx_orders_status | status | B-TREE |
+| orders | idx_orders_created_at | created_at | B-TREE |
+
+### 分区策略
+
+| 表 | 分区键 | 策略 | 保留期 |
+|----|--------|------|--------|
+| orders | created_at | 按月分区 | 3年 |
+| logs | created_at | 按天分区 | 90天 |
+
+---
+
+## 🔄 一致性模型
+
+| 数据存储 | 一致性级别 | 适用场景 |
+|---------|-----------|---------|
+| PostgreSQL | 强一致性 | 核心业务数据 |
+| Redis | 最终一致性 | 缓存、会话 |
+| S3 | 最终一致性 | 文件存储 |
+| Kafka | At-least-once | 事件消息 |
+
+---
+
+## 📦 数据字典
+
+| 字段名 | 数据类型 | 允许值 | 业务定义 | 所有者 |
+|--------|---------|--------|---------|--------|
+| user_status | ENUM | ACTIVE, SUSPENDED, BANNED | 用户账户状态 | 用户中心 |
+| order_status | ENUM | PENDING, PAID, SHIPPED, COMPLETED | 订单生命周期状态 | 订单中心 |
+
+---
+
+## 🔐 数据治理
+
+| 策略 | 描述 |
+|------|------|
+| **所有权** | 每个数据域有明确责任团队 |
+| **保留策略** | 订单数据保留 7 年，日志保留 90 天 |
+| **归档策略** | 超过 1 年的冷数据迁移至 S3 Glacier |
+| **删除权** | GDPR 删除请求在 30 天内执行 |

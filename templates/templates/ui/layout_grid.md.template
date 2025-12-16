@@ -1,0 +1,50 @@
+# 栅格与响应式布局模板 (Layout Grid & Responsive Template)
+
+> **Metadata**
+> - **Source**: `{{UI 规范文档路径}}`
+> - **Generated At**: `{{生成时间 YYYY-MM-DD HH:mm}}`
+> - **Generator**: `Context-Agent v1.0`
+
+---
+
+## 断点 (Breakpoints)
+
+| 名称 | 范围 | 用途 |
+|------|------|------|
+| Mobile | `{{0-599}}` | 手机 |
+| Tablet | `{{600-1023}}` | 平板 |
+| Desktop | `{{1024+}}` | 桌面 |
+
+---
+
+## 栅格配置 (Grid)
+
+| 断点 | 列数 | Margin | Gutter |
+|------|------|--------|--------|
+| Mobile | {{4}} | {{16px}} | {{16px}} |
+| Tablet | {{8}} | {{24px}} | {{24px}} |
+| Desktop | {{12}} | {{32px}} | {{32px}} |
+
+---
+
+## 8pt 间距体系
+
+| Token | 值 |
+|-------|----|
+| spacing-1 | 8px |
+| spacing-2 | 16px |
+| spacing-3 | 24px |
+| spacing-4 | 32px |
+
+---
+
+## CSS 变量示例
+
+```css
+:root {
+  --grid-columns-desktop: 12;
+  --grid-gutter-desktop: 24px;
+  --grid-margin-desktop: 32px;
+}
+```
+

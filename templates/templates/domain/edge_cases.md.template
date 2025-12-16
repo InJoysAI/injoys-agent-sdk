@@ -1,0 +1,122 @@
+# 异常与边缘情况处理模板 (Edge Cases & Exception Handling Template)
+
+> **Metadata**
+> - **Source**: `{{SOURCE_PATH}}`
+> - **Generated At**: `{{GENERATED_AT}}`
+> - **Generator**: `Context-Agent v1.0`
+
+---
+
+## 1. API 速率限制矩阵
+
+| 接口类型 | 限制规则 | 对应模块 | 触发响应 |
+|---------|---------|---------|---------|
+| {{API_TYPE}} | {{LIMIT_RULE}} | {{MODULE}} | {{RESPONSE}} |
+
+### 速率限制流程
+
+```mermaid
+flowchart TD
+    A[用户请求] --> B{检查配额/速率}
+    B -->|未超限| C[正常处理]
+    B -->|超限| D[拦截请求]
+    D --> E["UI提示：已达限制"]
+```
+
+---
+
+## 2. 内容安全审查 (Content Moderation)
+
+| 审查项 | 机制 | 触发响应 |
+|--------|------|---------|
+| **输入审核** | {{INPUT_MODERATION}} | {{RESPONSE}} |
+| **输出审核** | {{OUTPUT_MODERATION}} | {{RESPONSE}} |
+| **拦截内容** | {{BLOCKED_CONTENT}} | {{RESPONSE}} |
+
+---
+
+## 3. 过期链接处理
+
+> **链接有效期**: {{LINK_EXPIRY}}
+
+```mermaid
+flowchart TD
+    A[用户点击链接] --> B{链接是否有效?}
+    B -->|是| C[正常处理]
+    B -->|否| D["显示：链接已失效"]
+    D --> E["提供[重新发送]按钮"]
+```
+
+---
+
+## 4. AI 生成异常处理
+
+| 异常类型 | 场景 | 处理方式 |
+|---------|------|---------|
+| **格式解析失败** | AI 返回格式错误 | {{HANDLING}} |
+| **内容截断** | 超过 Token 限制 | {{HANDLING}} |
+| **响应超时** | 超过 {{TIMEOUT}}s 无响应 | {{HANDLING}} |
+| **服务不可用** | 返回 5xx 错误 | {{HANDLING}} |
+
+### AI 异常处理流程
+
+```mermaid
+flowchart TD
+    A[AI 响应返回] --> B{格式/完整性检查}
+    B -->|Pass| C[正常渲染]
+    B -->|Fail| D{是一次性错误?}
+    D -->|是| E["自动静默重试"]
+    E --> B
+    D -->|否| F["显示错误UI + 重试按钮"]
+```
+
+---
+
+## 5. 网络与连接异常
+
+| 异常类型 | 检测方式 | 处理方式 |
+|---------|---------|---------|
+| **网络断开** | {{DETECTION}} | {{HANDLING}} |
+| **WebSocket 断连** | {{DETECTION}} | {{HANDLING}} |
+| **请求超时** | {{DETECTION}} | {{HANDLING}} |
+
+---
+
+## 6. 支付异常
+
+| 异常类型 | 场景 | 处理方式 |
+|---------|------|---------|
+| **卡被拒绝** | {{SCENARIO}} | {{HANDLING}} |
+| **余额不足** | {{SCENARIO}} | {{HANDLING}} |
+| **验证失败** | {{SCENARIO}} | {{HANDLING}} |
+| **回调丢失** | {{SCENARIO}} | {{HANDLING}} |
+
+---
+
+## 7. 数据同步异常
+
+| 异常类型 | 场景 | 处理方式 |
+|---------|------|---------|
+| **乐观更新冲突** | {{SCENARIO}} | {{HANDLING}} |
+| **离线编辑** | {{SCENARIO}} | {{HANDLING}} |
+| **并发写入** | {{SCENARIO}} | {{HANDLING}} |
+
+---
+
+## 8. UI 响应规范
+
+| 状态 | UI 表现 |
+|------|--------|
+| **Loading** | {{UI_PATTERN}} |
+| **Empty** | {{UI_PATTERN}} |
+| **Error** | {{UI_PATTERN}} |
+| **Timeout** | {{UI_PATTERN}} |
+| **Rate Limited** | {{UI_PATTERN}} |
+
+---
+
+## 变更日志
+
+| 日期 | 版本 | 变更内容 |
+|------|------|---------|
+| {{DATE}} | {{VERSION}} | {{CHANGES}} |

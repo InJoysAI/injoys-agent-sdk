@@ -1,0 +1,29 @@
+# {{project_name}} Rules
+# Generated At: {{generated_at}}
+
+## Project Criterion
+This project follows a project criterion. See: @.context/criterion.md
+
+## Quick Rules
+- Schema changes → Modify {{schema_path}} first
+- API changes → Modify {{api_path}} first
+- Feature changes → Create proposal first with {{proposal_command}}
+
+## Tech Stack Constraints
+{{tech_stack_constraints}}
+
+## MUST NOT
+{{must_not_rules}}
+
+## SSoT Files
+- Data: {{schema_path}}
+- API: {{api_path}}
+- Requirements: openspec/project.md
+
+## Commands
+- /context-init — Initialize Context
+- /context-openspec — Initialize OpenSpec
+- /context-openspec proposal <change-id> — Create proposal
+- /context-start — Implement change
+- /context-check — Check status
+- /context-update — Maintain Context

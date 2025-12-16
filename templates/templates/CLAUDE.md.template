@@ -1,0 +1,38 @@
+# {{project_name}}
+
+> **Generated At**: {{generated_at}}
+
+## Project Criterion
+
+This project follows a project criterion. See: @.context/criterion.md
+
+## Quick Rules
+
+- **Schema changes** → Modify `{{schema_path}}` first, then `atlas schema apply`
+- **API changes** → Modify `{{api_path}}` first, then `tsp compile`
+- **Feature changes** → Create proposal first with `{{proposal_command}}`
+
+## Core Commands
+
+| Command | Purpose |
+|---------|---------|
+| `/context-init` | Initialize Context |
+| `/context-openspec` | Initialize/enhance OpenSpec |
+| `/context-openspec proposal <change-id>` | Create change proposal |
+| `/context-start` | Implement change |
+| `/context-check` | Check status |
+| `/context-update` | Maintain Context |
+
+## Tech Stack Constraints
+
+{{tech_stack_constraints}}
+
+## MUST NOT Rules
+
+{{must_not_rules}}
+
+## Related Docs
+
+- `.context/criterion.md` — Full project criterion
+- `.context/architecture/tech_stack.md` — Tech stack details
+- `openspec/project.md` — Project information

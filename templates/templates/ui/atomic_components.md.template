@@ -1,0 +1,112 @@
+# 原子化设计组件清单 (Atomic Design Components)
+
+> **Metadata**
+> - **Source**: `{{UI 规范文档路径}}`
+> - **Generated At**: `{{生成时间 YYYY-MM-DD HH:mm}}`
+> - **Generator**: `Context-Agent v1.0`
+
+---
+
+## 概述
+
+基于 Brad Frost 原子化设计方法论，将界面组件划分为五个层级：原子 → 分子 → 有机体 → 模板 → 页面。
+
+---
+
+## 1. 原子 (Atoms)
+
+系统中不可再分割的最小功能单元。
+
+### 色彩原子
+
+| Token 名称 | 值 | 用途 |
+|-----------|----|----|
+| `{{color-primary}}` | `{{#HEX}}` | 主品牌色 |
+| `{{color-secondary}}` | `{{#HEX}}` | 次要强调色 |
+| `{{color-surface}}` | `{{#HEX}}` | 背景表面色 |
+| `{{color-error}}` | `{{#HEX}}` | 错误语义色 |
+
+### 字体原子
+
+| Token 名称 | 值 | 用途 |
+|-----------|----|----|
+| `{{font-family-sans}}` | `{{字体名}}` | 无衬线正文字体 |
+| `{{font-size-body}}` | `{{16px}}` | 正文字号 |
+| `{{line-height-body}}` | `{{1.5}}` | 正文行高 |
+
+### 图标原子
+
+| 图标名称 | 尺寸 | 用途 |
+|---------|------|-----|
+| `icon-search` | 24px | 搜索功能 |
+| `icon-close` | 24px | 关闭/取消 |
+| `icon-menu` | 24px | 菜单展开 |
+
+---
+
+## 2. 分子 (Molecules)
+
+多个原子组合形成的最小功能单位。
+
+### 搜索框 (Search Box)
+
+```
+组成原子:
+├── label (标签原子)
+├── input (输入框原子)
+└── button (按钮原子)
+```
+
+**HTML 结构**:
+```html
+<div class="{{search-box-class}}">
+  <label for="search">{{标签文本}}</label>
+  <input type="text" id="search" placeholder="{{占位符}}">
+  <button type="submit">{{按钮文本}}</button>
+</div>
+```
+
+### 表单字段 (Form Field)
+
+```
+组成原子:
+├── label
+├── input / select / textarea
+└── helper-text (可选)
+```
+
+---
+
+## 3. 有机体 (Organisms)
+
+多个分子组合形成的复杂 UI 结构。
+
+### 登录表单 (Login Form)
+
+```
+组成分子:
+├── username field
+├── password field
+└── submit button
+```
+
+---
+
+## 4. 模板 (Templates)
+
+页面级布局骨架，不包含具体内容数据。
+
+### Dashboard 模板
+
+- Header + Sidebar + Content
+
+---
+
+## 5. 页面 (Pages)
+
+具体业务页面，包含真实内容与数据状态。
+
+### 登录页
+
+- 登录表单 + 错误提示 + 加载状态
+

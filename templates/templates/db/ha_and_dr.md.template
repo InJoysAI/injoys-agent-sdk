@@ -1,0 +1,197 @@
+# 高可用与灾难恢复模板 (HA and DR Template)
+
+> **Metadata**
+> - **Source**: `{{数据库设计文档路径}}`
+> - **Generated At**: `{{生成时间 YYYY-MM-DD HH:mm}}`
+> - **Generator**: `Context-Agent v1.0`
+
+---
+
+## 🏗️ 高可用架构
+
+### Patroni 集群
+
+> Patroni + DCS (Etcd/Consul) 是 PostgreSQL HA 的现代标准。
+
+```mermaid
+graph TB
+    subgraph "DCS (Etcd)"
+        ETCD[Leader Key]
+    end
+
+    subgraph "PostgreSQL Cluster"
+        PRIMARY[Primary Node]
+        REPLICA1[Replica 1]
+        REPLICA2[Replica 2]
+    end
+
+    subgraph "Load Balancer"
+        HAPROXY[HAProxy]
+    end
+
+    APP[Application] --> HAPROXY
+    HAPROXY --> PRIMARY
+    HAPROXY -.-> REPLICA1
+    HAPROXY -.-> REPLICA2
+
+    PRIMARY --> ETCD
+    REPLICA1 --> ETCD
+    REPLICA2 --> ETCD
+```
+
+### 关键机制
+
+| 机制 | 说明 |
+|------|------|
+| **Leader 选举** | 通过 DCS 竞争 Leader Key |
+| **租约 (TTL)** | Leader 定期更新，过期触发选举 |
+| **Fencing** | 失去租约立即降级为只读 |
+
+### 流量路由
+
+| 组件 | 配置 |
+|------|------|
+| **HAProxy** | 健康检查 Patroni REST API `/primary` |
+| **主节点** | 返回 HTTP 200 |
+| **从节点** | 返回 HTTP 503 |
+
+---
+
+## 🔄 复制模式
+
+| 模式 | RPO | 延迟 | 适用场景 |
+|------|-----|------|---------|
+| **异步** | > 0 | 最低 | 一般业务 |
+| **同步** | = 0 | 最高 | 金融/核心交易 |
+| **remote_write** | ≈ 0 | 中等 | **推荐折中方案** |
+
+### 配置示例
+
+```ini
+# 折中方案：等待从库确认收到（写入 OS 缓存）
+synchronous_commit = remote_write
+synchronous_standby_names = 'replica1'
+```
+
+---
+
+## 💾 备份策略
+
+### pgBackRest 配置
+
+| 功能 | 说明 |
+|------|------|
+| **并行处理** | 压缩/加密/传输并行化 |
+| **增量恢复** | Delta Restore 仅恢复变化数据 |
+| **S3 原生支持** | 直接对接对象存储 |
+
+### 备份周期
+
+| 类型 | 频率 | 保留期 |
+|------|------|--------|
+| **全量备份** | 每周（周日） | 8 周 |
+| **增量备份** | 每天 | 14 天 |
+| **WAL 归档** | 实时 | 14 天 |
+
+### 配置示例
+
+```ini
+# pgbackrest.conf
+[global]
+repo1-type=s3
+repo1-s3-bucket=db-backups
+repo1-s3-region=ap-northeast-1
+repo1-retention-full=8
+repo1-retention-diff=14
+compress-type=zst
+compress-level=3
+
+[main]
+pg1-path=/var/lib/postgresql/data
+```
+
+---
+
+## ⏱️ PITR (时间点恢复)
+
+### 恢复流程
+
+```mermaid
+sequenceDiagram
+    participant Admin
+    participant pgBackRest
+    participant PostgreSQL
+
+    Admin->>pgBackRest: 1. 停止当前实例
+    Admin->>pgBackRest: 2. restore --target-time="2024-01-15 09:59:00"
+    pgBackRest->>PostgreSQL: 3. 恢复基础备份
+    pgBackRest->>PostgreSQL: 4. 重放 WAL 至目标时间
+    Admin->>PostgreSQL: 5. 启动实例
+```
+
+### 恢复命令
+
+```bash
+# 停止 PostgreSQL
+sudo systemctl stop postgresql
+
+# 恢复到指定时间点
+pgbackrest restore \
+    --stanza=main \
+    --type=time \
+    --target="2024-01-15 09:59:00+08" \
+    --target-action=promote
+
+# 启动 PostgreSQL
+sudo systemctl start postgresql
+```
+
+---
+
+## 🔒 防勒索：不可变备份
+
+### S3 Object Lock
+
+> 合规模式下，任何人（包括 Root）都无法删除备份。
+
+```ini
+# pgbackrest.conf
+repo1-s3-bucket-object-lock=true
+repo1-retention-full-type=time
+repo1-retention-full=30  # 30 天不可变
+```
+
+### 配置要点
+
+| 配置 | 说明 |
+|------|------|
+| **Object Lock Mode** | Compliance（合规模式） |
+| **Retention Period** | 最少 30 天 |
+| **Versioning** | 必须启用 |
+
+---
+
+## 🎯 RTO/RPO 目标
+
+| 指标 | 目标 | 实现方式 |
+|------|------|---------|
+| **RPO** | < 1 分钟 | 实时 WAL 归档 + synchronous_commit |
+| **RTO** | < 15 分钟 | pgBackRest Delta Restore |
+
+### 恢复演练
+
+| 演练类型 | 频率 | 内容 |
+|---------|------|------|
+| 备份验证 | 每周 | 自动恢复测试 + 校验 |
+| 故障转移 | 每季度 | Patroni 手动切换演练 |
+| 全量恢复 | 每半年 | 完整 PITR 流程 |
+
+---
+
+## AI 引用指南
+
+当 AI 设计数据库 HA/DR 时：
+1. 使用 Patroni + DCS 实现 HA
+2. 配置 pgBackRest 实现备份
+3. 启用 S3 Object Lock 防勒索
+4. 定期进行恢复演练

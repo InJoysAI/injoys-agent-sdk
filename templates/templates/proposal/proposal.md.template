@@ -1,0 +1,46 @@
+# Change: {{CHANGE_TITLE}}
+
+## Why
+
+{{WHY_DESCRIPTION}}
+
+## What Changes
+
+### 新增功能
+- {{NEW_FEATURE_1}}
+- {{NEW_FEATURE_2}}
+
+### 修改功能
+- {{MODIFIED_FEATURE_1}}
+- **BREAKING**: {{BREAKING_CHANGE}} (如有)
+
+### 技术实现
+- {{TECH_DETAIL_1}}
+- {{TECH_DETAIL_2}}
+
+## Impact
+
+### 涉及的规范（Specs）
+- **新增**：`specs/{{CAPABILITY}}/spec.md` - {{DESCRIPTION}}
+- **修改**：`specs/{{CAPABILITY}}/spec.md` - {{DESCRIPTION}}
+
+### 涉及的代码
+- **新增**：
+  - `{{FILE_PATH_1}}`
+  - `{{FILE_PATH_2}}`
+
+- **修改**：
+  - `{{FILE_PATH_3}}`
+
+### 依赖关系
+- **依赖**：`{{PREREQUISITE_CHANGE_ID}}`（已完成）
+- **被依赖**：`{{DEPENDENT_CHANGE_ID}}`
+
+### 风险与注意事项
+- {{RISK_1}}
+- {{RISK_2}}
+
+### 验证标准
+- ✅ {{ACCEPTANCE_CRITERIA_1}}
+- ✅ {{ACCEPTANCE_CRITERIA_2}}
+- ✅ {{ACCEPTANCE_CRITERIA_3}}

@@ -1,0 +1,231 @@
+# 性能调优模板 (Performance Tuning Template)
+
+> **Metadata**
+> - **Source**: `{{数据库设计文档路径}}`
+> - **Generated At**: `{{生成时间 YYYY-MM-DD HH:mm}}`
+> - **Generator**: `Context-Agent v1.0`
+
+---
+
+## 🖥️ 基础设施前置条件
+
+### 存储分离
+
+| 目录 | 推荐存储 | 原因 |
+|------|---------|------|
+| `pg_wal/` | 独立 NVMe SSD | WAL 顺序写入，需低延迟 |
+| `base/` | 高性能 SSD | 数据文件随机读写 |
+| 备份目录 | 对象存储 (S3) | 持久化 + 防勒索 |
+
+### 文件系统
+
+| 配置 | 推荐值 | 说明 |
+|------|--------|------|
+| 文件系统类型 | **XFS** | 比 EXT4 更好的并发 I/O |
+| 挂载选项 | `noatime,nodiratime` | 禁用访问时间更新 |
+| 预读 (Read-ahead) | 4KB - 8KB | OLTP 随机访问优化 |
+
+```bash
+# 调整预读
+blockdev --setra 16 /dev/sda  # 16 sectors = 8KB
+```
+
+### Huge Pages
+
+> **> 64GB 内存服务器必须启用**，减少 TLB 压力。
+
+```bash
+# 计算所需 Huge Pages 数量
+shared_buffers_mb=16384  # 16GB
+huge_page_size_mb=2
+nr_hugepages=$((shared_buffers_mb / huge_page_size_mb + 10))
+
+# 配置 sysctl
+echo "vm.nr_hugepages = $nr_hugepages" >> /etc/sysctl.conf
+sysctl -p
+```
+
+### CPU / NUMA
+
+| 配置 | 建议 |
+|------|------|
+| NUMA 策略 | `numactl --interleave=all` 或绑定单节点 |
+| CPU 调度器 | `performance` 模式 |
+
+---
+
+## 💾 内存配置
+
+### 核心参数
+
+| 参数 | 建议值 | 说明 |
+|------|--------|------|
+| `shared_buffers` | RAM 的 25%-40% | PostgreSQL 数据缓存 |
+| `effective_cache_size` | RAM 的 50%-75% | 供优化器估算可用缓存 |
+| `work_mem` | 16MB - 64MB | 每操作排序/Hash 内存 |
+| `maintenance_work_mem` | 1GB - 4GB | VACUUM/CREATE INDEX 内存 |
+| `huge_pages` | `on` | 减少 TLB 压力（大内存服务器） |
+
+### 配置示例（64GB RAM 服务器）
+
+```ini
+# postgresql.conf
+shared_buffers = 16GB
+effective_cache_size = 48GB
+work_mem = 64MB
+maintenance_work_mem = 2GB
+huge_pages = on
+```
+
+### work_mem 陷阱
+
+> ⚠️ `work_mem` 是**每操作级别**，复杂查询可能同时使用多个。  
+> 高并发时慎用高值，避免 OOM。  
+> 对报表查询可在 Session 级别临时调大：`SET work_mem = '1GB';`
+
+---
+
+## 📝 WAL 与 Checkpoint
+
+### 目标：平滑 I/O 峰值
+
+| 参数 | 建议值 | 说明 |
+|------|--------|------|
+| `checkpoint_timeout` | 15-30 min | Checkpoint 时间间隔 |
+| `max_wal_size` | 4GB - 16GB | 触发 Checkpoint 的 WAL 上限 |
+| `checkpoint_completion_target` | 0.9 | 在间隔 90% 时间内均匀刷盘 |
+| `wal_compression` | `on` | 减少 WAL 体积 |
+
+### 配置示例
+
+```ini
+checkpoint_timeout = 15min
+max_wal_size = 8GB
+checkpoint_completion_target = 0.9
+wal_compression = on
+```
+
+---
+
+## 🧹 Autovacuum 调优
+
+### 默认配置过于保守！
+
+| 参数 | 默认值 | 生产建议 | 说明 |
+|------|--------|---------|------|
+| `autovacuum_vacuum_scale_factor` | 0.2 (20%) | **0.02-0.05** | 触发阈值 |
+| `autovacuum_vacuum_cost_limit` | 200 | **1000-2000** | 执行能力 |
+| `autovacuum_vacuum_cost_delay` | 2ms | 2ms | 休眠间隔 |
+| `autovacuum_max_workers` | 3 | 4-6 | 并行 Worker 数 |
+
+### 配置示例
+
+```ini
+autovacuum_vacuum_scale_factor = 0.02
+autovacuum_vacuum_cost_limit = 1500
+autovacuum_max_workers = 4
+```
+
+### 监控 Vacuum 状态
+
+```sql
+-- 检查需要 Vacuum 的表
+SELECT schemaname, relname, n_dead_tup, last_autovacuum
+FROM pg_stat_user_tables
+WHERE n_dead_tup > 10000
+ORDER BY n_dead_tup DESC;
+
+-- 检查事务 ID 回卷风险（> 15 亿需立即处理）
+SELECT datname, age(datfrozenxid) AS xid_age
+FROM pg_database
+ORDER BY xid_age DESC;
+```
+
+---
+
+## 🔌 连接池配置
+
+### PgBouncer 推荐配置
+
+| 参数 | 建议值 | 说明 |
+|------|--------|------|
+| `pool_mode` | **transaction** | 事务级复用（推荐） |
+| `max_client_conn` | 10000+ | 应用层最大连接 |
+| `default_pool_size` | 20-50 | 每数据库连接池大小 |
+
+### PostgreSQL 连接数
+
+```ini
+# 保守设置，让 PgBouncer 处理排队
+max_connections = 300-500
+```
+
+### 连接数公式
+
+```
+最佳活动连接数 ≈ CPU 核心数 × 2 + 磁盘轴数
+```
+
+### 部署模式
+
+| 模式 | 优点 | 缺点 |
+|------|------|------|
+| **Sidecar** (Pod 内) | 低延迟 | 连接数随节点扩容 |
+| **集中式** | 统一管控 | 额外网络跳数 |
+
+---
+
+## 📊 监控指标
+
+### 关键告警阈值
+
+| 维度 | 指标 | 告警阈值 | 含义 |
+|------|------|---------|------|
+| **可用性** | PostgreSQL Up/Down | 状态变化 | 数据库存活 |
+| **性能** | Active Connections | > 80% max_conn | 连接池即将打满 |
+| **性能** | Lock Wait Time | > 5s | 锁争用/死锁 |
+| **复制** | Replication Lag | > 100MB 或 > 10s | 从库延迟 |
+| **风险** | Transaction ID Age | > 15 亿 | **最高危**：需立即 Vacuum |
+| **存储** | Disk Usage | > 85% | 磁盘空间不足 |
+
+### pg_stat_statements 配置
+
+```ini
+# postgresql.conf
+shared_preload_libraries = 'pg_stat_statements'
+pg_stat_statements.track = all
+pg_stat_statements.max = 10000
+```
+
+### 慢查询分析
+
+```sql
+-- 总耗时 Top 10
+SELECT 
+    substring(query, 1, 100) AS query,
+    calls,
+    round(total_exec_time::numeric, 2) AS total_ms,
+    round(mean_exec_time::numeric, 2) AS mean_ms
+FROM pg_stat_statements
+ORDER BY total_exec_time DESC
+LIMIT 10;
+```
+
+### 日志配置
+
+```ini
+log_min_duration_statement = 1000  -- 记录 > 1s 的 SQL
+log_checkpoints = on
+log_connections = on
+log_disconnections = on
+```
+
+---
+
+## AI 引用指南
+
+当 AI 生成数据库配置时：
+1. 根据服务器内存调整 shared_buffers
+2. 激进配置 Autovacuum 避免表膨胀
+3. 使用连接池，勿直连数据库
+4. 启用 pg_stat_statements 监控

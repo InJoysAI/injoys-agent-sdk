@@ -1,0 +1,111 @@
+# 提案路线图模板
+
+> 本模板用于 `/context-openspec plan` 命令生成项目提案总计划。
+> 使用时替换所有 `{{占位符}}` 为实际内容。
+
+---
+
+## 📋 项目信息
+
+| 字段 | 值 |
+|------|-----|
+| 项目名称 | {{PROJECT_NAME}} |
+| 当前阶段 | {{CURRENT_PHASE}} |
+| 生成日期 | {{GENERATED_DATE}} |
+| 基于文档 | {{SOURCE_DOCS}} |
+
+---
+
+## 🗺️ 阶段总览
+
+> ⚠️ **动态生成规则**: Phase 数量和内容应根据 `.context/` 资产实际情况生成，而非固定 3 个。
+> - 若 `.context/db/` 存在 → 需包含数据库相关 Phase
+> - 若 `.context/ui/` 存在 → 需包含 UI 相关 Phase
+> - 复杂项目可能需要 4-6 个 Phase，简单项目可能只需 2 个
+
+| 阶段 | 名称 | 目标 | 预计周期 |
+|------|------|------|----------|
+| {{PHASES_TABLE}} |
+
+---
+
+## 📦 各 Phase 详情
+
+> ⚠️ **原子化提案规则**: 
+> - 每个提案应**只修改一个功能点或一个模块**
+> - 提案粒度应控制在 **1-3 天可完成** 的范围内
+> - 大功能应拆分为多个原子提案
+> - 提案 ID 格式: `feat-模块-功能` 或 `fix-模块-问题`
+
+### Phase {{N}}: {{PHASE_NAME}}
+
+#### 提案 {{N}}.1: {{PROPOSAL_TITLE}}
+
+**Change ID:** `{{CHANGE_ID}}`  
+**优先级:** P0/P1/P2  
+**预计时间:** 1-3 天  
+**状态:** proposed
+
+**范围**（原子化描述）:
+- 只影响: `path/to/module`
+- 修改类型: 新增/修改/删除
+
+**关联 Context 资产**:
+
+> ⚠️ 从 `context-manifest.json` 的 `generated_files` 动态获取，仅列出与本提案相关的资产
+
+| Scope | 关联资产 | 关联说明 |
+|-------|---------|---------|
+| criterion | `.context/criterion.md` | 必须遵守的约束 |
+| {{SCOPE}} | `{{ASSET_PATH}}` | {{RELATION_DESC}} |
+
+示例：
+```
+| domain | `.context/domain/business_rules.md` | BR-001, BR-003 |
+| domain | `.context/domain/edge_cases.md` | 速率限制规则 |
+| architecture | `.context/architecture/api_strategy.md` | API 版本策略 |
+| db | `.context/db/schema_design.md` | users 表 |
+```
+
+**涉及的 Specs**:
+- 新增: `specs/{{CHANGE_ID}}/spec.md`
+- 修改: `（无/具体路径）`
+
+**关键任务**（细粒度）:
+1. {{TASK_1}} （0.5 天）
+2. {{TASK_2}} （0.5 天）
+
+**验证标准**:
+- [ ] {{VERIFICATION_ITEM}}
+
+**依赖**:
+- 前置: `{{DEPENDS_ON}}` 或 无
+- 被依赖: `{{DEPENDENTS}}` 或 无
+
+---
+
+> 💡 **重复上述提案模板，根据实际功能需求生成多个原子化提案**
+
+---
+
+## 🔗 依赖关系图
+
+```mermaid
+graph LR
+    subgraph Phase1["Phase 1: 基础设施"]
+        P1_1[提案 1.1] --> P1_2[提案 1.2]
+    end
+    
+    subgraph Phase2["Phase 2: 核心功能"]
+        P1_2 --> P2_1[提案 2.1]
+    end
+```
+
+> ⚠️ 根据实际提案关系生成依赖图
+
+---
+
+> 💡 **使用提示**:
+> 1. 此文件由 `/context-openspec plan` 命令基于 Context 自动生成
+> 2. 创建具体提案时使用 `/context-openspec proposal <change-id>`
+> 3. 提案应尽量原子化，便于 Review 和实现

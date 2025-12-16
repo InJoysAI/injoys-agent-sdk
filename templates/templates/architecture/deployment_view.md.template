@@ -1,0 +1,106 @@
+# 部署视图模板 (Deployment View Template)
+
+> **Metadata**
+> - **Source**: `{{架构设计文档路径}}`
+> - **Generated At**: `{{生成时间 YYYY-MM-DD HH:mm}}`
+> - **Generator**: `Context-Agent v1.0`
+
+---
+
+## 🗺️ 基础设施映射
+
+| 逻辑容器 | 基础设施节点 | 实例规格 | 伸缩策略 | 网络区域 |
+|---------|-------------|---------|---------|---------|
+| API Gateway | Kubernetes Pod | 2 CPU, 4GB | HPA (CPU > 70%) | Public Subnet |
+| User Service | Kubernetes Pod | 2 CPU, 4GB | HPA (CPU > 70%) | Private Subnet |
+| Content Service | Kubernetes Pod | 4 CPU, 8GB | HPA (CPU > 60%) | Private Subnet |
+| PostgreSQL | AWS RDS | db.r5.large | Multi-AZ Standby | Data Subnet |
+| Redis | AWS ElastiCache | cache.r5.large | 2 节点集群 | Data Subnet |
+
+---
+
+## ☁️ 云架构拓扑
+
+```mermaid
+graph TB
+    subgraph "Internet"
+        USER[用户]
+        CDN[CloudFront CDN]
+    end
+
+    subgraph "AWS Region: ap-northeast-1"
+        subgraph "VPC: 10.0.0.0/16"
+            subgraph "Public Subnet: 10.0.1.0/24"
+                ALB[Application Load Balancer]
+                NAT[NAT Gateway]
+            end
+
+            subgraph "Private Subnet: 10.0.2.0/24"
+                subgraph "EKS Cluster"
+                    API[API Gateway Pod]
+                    SVC1[User Service Pod]
+                    SVC2[Content Service Pod]
+                end
+            end
+
+            subgraph "Data Subnet: 10.0.3.0/24"
+                RDS[(PostgreSQL RDS)]
+                REDIS[(ElastiCache Redis)]
+            end
+        end
+    end
+
+    USER --> CDN
+    CDN --> ALB
+    ALB --> API
+    API --> SVC1
+    API --> SVC2
+    SVC1 --> RDS
+    SVC1 --> REDIS
+    SVC2 --> RDS
+```
+
+---
+
+## 🌐 网络分区
+
+| 子网类型 | CIDR | 用途 | 安全组规则 |
+|---------|------|------|-----------|
+| **Public** | 10.0.1.0/24 | ALB, NAT | 允许 80/443 入站 |
+| **Private** | 10.0.2.0/24 | 应用服务 | 仅允许 ALB 入站 |
+| **Data** | 10.0.3.0/24 | 数据库 | 仅允许 Private 入站 |
+
+---
+
+## 🔄 环境分层
+
+| 环境 | 用途 | 资源规模 | 数据策略 |
+|------|------|---------|---------|
+| **Development** | 开发测试 | 最小化 | 脱敏数据 |
+| **Staging** | 预发布验证 | 生产 50% | 生产快照 |
+| **Production** | 正式环境 | 完整规模 | 真实数据 |
+
+---
+
+## 🛠️ IaC 资源
+
+| 组件 | IaC 工具 | 仓库路径 |
+|------|---------|---------|
+| AWS 基础设施 | Terraform | `infra/terraform/` |
+| Kubernetes 资源 | Helm | `infra/helm/` |
+| CI/CD 流水线 | GitHub Actions | `.github/workflows/` |
+
+---
+
+## 🚀 CI/CD 流水线
+
+```mermaid
+graph LR
+    A[Push Code] --> B[Build & Test]
+    B --> C{Branch?}
+    C -->|main| D[Deploy to Staging]
+    C -->|release/*| E[Deploy to Production]
+    D --> F[E2E Tests]
+    F --> G[Manual Approval]
+    G --> E
+```

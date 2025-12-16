@@ -1,0 +1,85 @@
+{
+    "_comment": "MCP Server Configuration Template (tool-agnostic) - Copy and modify placeholders before use",
+    "_note": "This template is NOT bound to any specific AI tool schema. Adapt as needed for your tool.",
+    "mcpServers": {
+        "postgres-mcp": {
+            "_description": "Database query & analysis (DBA level) - Python package",
+            "_install": "pipx install postgres-mcp",
+            "command": "postgres-mcp",
+            "args": [],
+            "env": {
+                "DATABASE_URL": "postgresql://{{DB_USER}}:{{DB_PASSWORD}}@localhost:5432/{{DB_NAME}}"
+            }
+        },
+        "filesystem-mcp": {
+            "_description": "Project file read/write",
+            "command": "npx",
+            "args": [
+                "-y",
+                "@modelcontextprotocol/server-filesystem",
+                "{{PROJECT_ROOT}}"
+            ],
+            "env": {}
+        },
+        "github-mcp": {
+            "_description": "Code collaboration & history - Official GitHub MCP Server",
+            "command": "npx",
+            "args": [
+                "-y",
+                "@modelcontextprotocol/server-github"
+            ],
+            "env": {
+                "GITHUB_PERSONAL_ACCESS_TOKEN": "{{GITHUB_TOKEN}}"
+            }
+        },
+        "sequential-thinking": {
+            "_description": "Complex task planning",
+            "command": "npx",
+            "args": [
+                "-y",
+                "@modelcontextprotocol/server-sequential-thinking"
+            ]
+        },
+        "memory": {
+            "_description": "Knowledge graph memory",
+            "command": "npx",
+            "args": [
+                "-y",
+                "@modelcontextprotocol/server-memory"
+            ]
+        },
+        "playwright": {
+            "_description": "Browser automation testing - React UI validation",
+            "command": "npx",
+            "args": [
+                "-y",
+                "@playwright/mcp@latest"
+            ]
+        },
+        "context7": {
+            "_description": "Real-time documentation injection - Latest frontend framework APIs",
+            "command": "npx",
+            "args": [
+                "-y",
+                "@upstash/context7-mcp"
+            ]
+        }
+    },
+    "_placeholders": {
+        "DB_USER": "Database username",
+        "DB_PASSWORD": "Database password",
+        "DB_NAME": "Database name",
+        "PROJECT_ROOT": "Absolute path to project root",
+        "GITHUB_TOKEN": "GitHub Personal Access Token (ghp_xxx)"
+    },
+    "_install_instructions": {
+        "postgres-mcp": "pipx install postgres-mcp",
+        "github-mcp": "npx -y @modelcontextprotocol/server-github",
+        "others": "npx auto-installs, no pre-installation required"
+    },
+    "_config_paths": {
+        "claude_desktop": "~/.config/claude/claude_desktop_config.json",
+        "cursor": "~/.cursor/mcp.json",
+        "windsurf": "~/.codeium/windsurf/mcp_config.json"
+    }
+}

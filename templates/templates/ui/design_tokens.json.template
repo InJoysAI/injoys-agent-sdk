@@ -1,0 +1,50 @@
+{
+  "$schema": "https://design-tokens.github.io/community-group/format/",
+  "_meta": {
+    "source": "{{UI 规范文档路径}}",
+    "description": "三层 Design Token 架构模板 (Global → Alias → Component)"
+  },
+  "global": {
+    "_comment": "第一层：全局/基础 Tokens - 原始值，无语义",
+    "color": {
+      "blue": {
+        "500": { "value": "#{{2196F3}}", "type": "color" }
+      },
+      "gray": {
+        "50": { "value": "#{{FAFAFA}}", "type": "color" },
+        "900": { "value": "#{{212121}}", "type": "color" }
+      }
+    },
+    "spacing": {
+      "8": { "value": "8px", "type": "spacing" },
+      "16": { "value": "16px", "type": "spacing" }
+    },
+    "borderRadius": {
+      "sm": { "value": "4px", "type": "borderRadius" },
+      "md": { "value": "8px", "type": "borderRadius" }
+    }
+  },
+  "alias": {
+    "_comment": "第二层：语义 Tokens - 可映射 Light/Dark",
+    "color": {
+      "primary": {
+        "default": { "value": "{global.color.blue.500}", "type": "color" }
+      },
+      "text": {
+        "primary": { "value": "{global.color.gray.900}", "type": "color" }
+      },
+      "surface": {
+        "default": { "value": "{global.color.gray.50}", "type": "color" }
+      }
+    }
+  },
+  "component": {
+    "_comment": "第三层：组件覆写（按需添加）",
+    "button": {
+      "primary": {
+        "background": { "value": "{alias.color.primary.default}", "type": "color" }
+      }
+    }
+  }
+}
+

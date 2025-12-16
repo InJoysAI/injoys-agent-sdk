@@ -1,0 +1,92 @@
+# 容器与组件视图模板 (Container and Component View Template)
+
+> **Metadata**
+> - **Source**: `{{架构设计文档路径}}`
+> - **Generated At**: `{{生成时间 YYYY-MM-DD HH:mm}}`
+> - **Generator**: `Context-Agent v1.0`
+
+---
+
+## 🏗️ 容器视图 (C4 Level 2)
+
+```mermaid
+C4Container
+    title {{系统名称}} - Container Diagram
+
+    Person(user, "用户", "终端用户")
+
+    Container_Boundary(system, "{{系统名称}}") {
+        Container(web, "Web App", "React", "用户界面")
+        Container(api, "API Gateway", "Kong", "路由、认证、限流")
+        Container(svc1, "User Service", "Go", "用户管理")
+        Container(svc2, "Content Service", "Python", "内容处理")
+        ContainerDb(db, "PostgreSQL", "主数据库")
+        ContainerDb(cache, "Redis", "缓存")
+        Container(mq, "RabbitMQ", "消息队列")
+    }
+
+    Rel(user, web, "使用", "HTTPS")
+    Rel(web, api, "调用", "HTTPS")
+    Rel(api, svc1, "路由", "gRPC")
+    Rel(api, svc2, "路由", "gRPC")
+    Rel(svc1, db, "读写", "JDBC")
+    Rel(svc1, cache, "读写", "Redis")
+    Rel(svc2, mq, "发布", "AMQP")
+```
+
+---
+
+## 📦 容器清单
+
+| 容器 | 技术栈 | 职责 | 端口 |
+|------|--------|------|------|
+| **Web App** | React 18 | 用户界面 | 443 |
+| **API Gateway** | Kong | 路由、认证、限流 | 8000 |
+| **User Service** | Go + Gin | 用户管理、认证授权 | 8001 |
+| **Content Service** | Python + FastAPI | 内容处理、AI 调用 | 8002 |
+| **PostgreSQL** | PostgreSQL 15 | 主数据存储 | 5432 |
+| **Redis** | Redis 7 | 缓存、会话 | 6379 |
+| **RabbitMQ** | RabbitMQ 3 | 异步消息 | 5672 |
+
+---
+
+## 🔧 组件视图 (C4 Level 3)
+
+> 仅针对复杂/核心容器展开
+
+### User Service 组件
+
+```mermaid
+C4Component
+    title User Service - Component Diagram
+
+    Container_Boundary(svc, "User Service") {
+        Component(ctrl, "UserController", "Gin Handler", "处理 HTTP 请求")
+        Component(auth, "AuthService", "Service", "认证逻辑")
+        Component(user, "UserService", "Service", "用户 CRUD")
+        Component(repo, "UserRepository", "GORM", "数据访问")
+    }
+
+    Rel(ctrl, auth, "调用")
+    Rel(ctrl, user, "调用")
+    Rel(auth, repo, "查询")
+    Rel(user, repo, "CRUD")
+```
+
+| 组件 | 职责 | 接口 |
+|------|------|------|
+| **UserController** | HTTP 请求处理 | REST API |
+| **AuthService** | 登录、Token 管理 | 内部接口 |
+| **UserService** | 用户 CRUD | 内部接口 |
+| **UserRepository** | 数据访问层 | GORM |
+
+---
+
+## 🔗 接口规范
+
+| 服务 | 规范类型 | 链接 |
+|------|---------|------|
+| User Service | OpenAPI 3.0 | `api/user-service.yaml` |
+| Content Service | OpenAPI 3.0 | `api/content-service.yaml` |
+| Event Schema | AsyncAPI 2.0 | `api/events.yaml` |
+| gRPC | Proto | `proto/*.proto` |

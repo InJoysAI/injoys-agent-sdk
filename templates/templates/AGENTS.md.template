@@ -1,0 +1,38 @@
+# {{project_name}}
+
+> **Generated At**: {{generated_at}}
+
+## 项目准则
+
+本项目遵循项目准则，详见：@.context/criterion.md
+
+## 快速规则提醒
+
+- **Schema 变更** → 先改 `{{schema_path}}`，然后运行 `atlas schema apply`
+- **API 变更** → 先改 `{{api_path}}`，然后运行 `tsp compile`
+- **功能变更** → 先用 `{{proposal_command}}` 创建提案
+
+## 核心命令
+
+| 命令 | 用途 |
+|------|------|
+| `/context-init` | 初始化 Context |
+| `/context-openspec` | 初始化/增强 OpenSpec |
+| `/context-openspec proposal <change-id>` | 创建变更提案 |
+| `/context-start` | 实施变更 |
+| `/context-check` | 检查状态 |
+| `/context-update` | 维护 Context |
+
+## 技术栈约束
+
+{{tech_stack_constraints}}
+
+## 禁止规则
+
+{{must_not_rules}}
+
+## 相关文档
+
+- `.context/criterion.md` — 完整项目准则
+- `.context/architecture/tech_stack.md` — 技术栈详情
+- `openspec/project.md` — 项目信息

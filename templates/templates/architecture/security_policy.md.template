@@ -1,0 +1,144 @@
+# 安全策略模板 (Security Policy Template)
+
+> **Metadata**
+> - **Source**: `{{架构设计文档路径}}`
+> - **Generated At**: `{{生成时间 YYYY-MM-DD HH:mm}}`
+> - **Generator**: `Context-Agent v1.0`
+
+---
+
+## 🔐 认证方案 (Authentication)
+
+### 用户认证
+
+| 方案 | 适用场景 | 实现 |
+|------|---------|------|
+| **OAuth 2.0 + OIDC** | 第三方登录 | {{e.g. Google, GitHub}} |
+| **JWT** | API 认证 | Access Token + Refresh Token |
+| **Session** | Web 会话 | Redis 存储 |
+
+### Token 生命周期
+
+| Token 类型 | 有效期 | 存储位置 |
+|-----------|--------|---------|
+| Access Token | {{e.g. 2小时}} | 内存 / HttpOnly Cookie |
+| Refresh Token | {{e.g. 7天}} | HttpOnly Cookie |
+
+### 服务间认证
+
+| 方案 | 用途 |
+|------|------|
+| **mTLS** | 服务网格内部通信 |
+| **API Key** | 内部服务调用 |
+
+---
+
+## 🛡️ 授权模型 (Authorization)
+
+### RBAC 角色定义
+
+| 角色 | 权限范围 |
+|------|---------|
+| **Admin** | 全系统管理权限 |
+| **User** | 个人资源读写 |
+| **Guest** | 公开资源只读 |
+
+### 权限矩阵
+
+| 资源 | Admin | User | Guest |
+|------|-------|------|-------|
+| 用户管理 | CRUD | R (self) | - |
+| 内容管理 | CRUD | CRUD (own) | R |
+| 系统配置 | CRUD | - | - |
+
+### RLS (Row-Level Security)
+
+```sql
+-- 示例：用户只能访问自己的数据
+CREATE POLICY user_isolation ON content
+  FOR ALL
+  USING (user_id = current_user_id());
+```
+
+---
+
+## 🔒 数据加密
+
+### 传输层加密
+
+| 要求 | 标准 |
+|------|------|
+| **HTTPS** | 强制全站 HTTPS |
+| **TLS 版本** | TLS 1.2+ (推荐 1.3) |
+| **证书** | Let's Encrypt / 企业 CA |
+
+### 存储层加密
+
+| 数据类型 | 加密方式 |
+|---------|---------|
+| **密码** | bcrypt / Argon2 (成本因子 ≥ 10) |
+| **敏感 PII** | AES-256-GCM |
+| **API 密钥** | Vault / KMS 托管 |
+
+---
+
+## 🚨 敏感数据处理
+
+### 数据分类
+
+| 分类 | 示例 | 处理要求 |
+|------|------|---------|
+| **高敏感** | 密码、密钥、CVV | 加密存储，禁止日志 |
+| **中敏感** | 身份证、手机号 | 脱敏展示，访问审计 |
+| **低敏感** | 邮箱、昵称 | 常规保护 |
+
+### 脱敏规则
+
+| 字段 | 脱敏方式 | 示例 |
+|------|---------|------|
+| 手机号 | 中间4位 * | 138****1234 |
+| 身份证 | 中间8位 * | 110***********1234 |
+| 邮箱 | @前部分 * | u***@example.com |
+
+---
+
+## 🛡️ 安全防护
+
+### API 安全
+
+| 防护措施 | 实现 |
+|---------|------|
+| **CSRF** | Double Submit Cookie / SameSite |
+| **XSS** | CSP Header + 输入过滤 |
+| **SQL 注入** | 参数化查询 (ORM) |
+| **限流** | 100 req/min per IP |
+
+### 安全头
+
+```nginx
+X-Content-Type-Options: nosniff
+X-Frame-Options: DENY
+X-XSS-Protection: 1; mode=block
+Content-Security-Policy: default-src 'self'
+Strict-Transport-Security: max-age=31536000
+```
+
+---
+
+## 📋 合规性要求
+
+| 法规 | 要求 | 实现 |
+|------|------|------|
+| **GDPR** | 数据可导出/可删除 | 提供用户数据导出 API |
+| **PCI-DSS** | 不存储 CVV | 使用第三方支付 |
+| **隐私政策** | 用户知情同意 | 注册时弹窗确认 |
+
+---
+
+## AI 引用指南
+
+当 AI 生成安全相关代码时：
+1. 密码必须使用 bcrypt/Argon2 哈希
+2. 敏感数据必须加密存储
+3. API 必须实现认证授权
+4. 日志禁止记录敏感信息
