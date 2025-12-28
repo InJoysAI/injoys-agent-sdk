@@ -23,7 +23,7 @@ This project follows a project criterion. See: @.context/criterion.md
 ## Commands
 - /context-init — Initialize Context
 - /context-openspec — Initialize OpenSpec
-- /context-openspec proposal <change-id> — Create proposal
+- /context-openspec proposal <change-id> [roadmap-doc] — Create proposal (optionally specify roadmap/outline doc)
 - /context-start — Implement change
 - /context-check — Check status
 - /context-update — Maintain Context

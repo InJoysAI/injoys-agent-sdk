@@ -48,7 +48,7 @@ templates/
 |------|------|------|
 | `/context-init` | 初始化 | 环境检查 + 创建目录 + 归档源文档 |
 | `/context-openspec` | 集成 | 生成文档总结 + 填充 project.md + 生成路线图 |
-| `/context-openspec proposal <change-id>` | 设计 | 基于路线图创建提案 → 生成 tasks.md |
+| `/context-openspec proposal <change-id> [roadmap-doc]` | 设计 | 基于路线图/大纲创建提案 → 生成 tasks.md |
 | `/context-start` | 实施 | validate → SSoT-first → codegen → code → archive |
 | `/context-check` | 检查 | 子命令: `env` / `tasks` / `proposal` |
 | `/context-update` | 维护 | 子命令: `add` / `modify` / `delete` / `fix` |
@@ -111,6 +111,12 @@ PRD：@docs/product-overview.md
 - 读取 `openspec/proposal-roadmap.md` 定位条目
 - 创建 `openspec/changes/<提案ID>/`（proposal.md, design.md, tasks.md）
 
+也可以显式指定“提案大纲文档”（例如某个 Phase 文件）：
+
+```
+/context-openspec proposal feat-user-login openspec/proposal-roadmap-Phase3.md
+```
+
 ### 5. 开始实施
 
 ```
@@ -153,4 +159,3 @@ PRD：@docs/product-overview.md
 | 需求层 | `openspec/specs/` | 当前规范 (真理源) |
 
 ---
-

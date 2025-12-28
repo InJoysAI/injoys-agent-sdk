@@ -66,7 +66,7 @@ bash design/context-dev/scripts/install-ai-commands.sh --tools antigravity,curso
 |------|------|
 | `/context-init` | 初始化 `.context/` 目录 |
 | `/context-openspec` | 生成 context 总结 + OpenSpec 集成 |
-| `/context-openspec proposal <change-id>` | 生成提案 |
+| `/context-openspec proposal <change-id> [roadmap-doc]` | 生成提案（可显式指定提案大纲/路线图文件） |
 | `/context-start` | 基于提案开始开发 |
 | `/context-check` | 环境检查 |
 | `/context-update` | 增量更新 context |

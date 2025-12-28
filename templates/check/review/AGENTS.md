@@ -22,6 +22,8 @@
 | **参照物** | 核对的标准来源 | "与代码一致" → 需要读取代码文件 |
 | **深度** | 结构/内容/一致性 | "格式" → 结构校验；"内容" → 内容校验 |
 
+> 若核对事项涉及 OpenSpec（如 `openspec/project.md`、`openspec/proposal-roadmap*.md`、`openspec/changes/<change-id>/*`），也应纳入“范围”。
+
 **若描述模糊**：
 - 主动列出可能的检查项
 - 询问用户想重点关注哪些方面
@@ -40,6 +42,10 @@
 根据 Phase 1 识别的范围，额外读取：
 - 对应的 AGENTS.md 规范（`design/context-dev/<scope>/AGENTS.md`）
 - 用户提及的参照物（源文档、代码文件等）
+
+若核对事项涉及 OpenSpec 路线图/提案大纲：
+- `openspec/proposal-roadmap.md`（索引/总览）
+- `openspec/proposal-roadmap-Phase*.md` / `openspec/proposal-roadmap-Phase-*.md`（分 Phase 大纲，若存在）
 
 ---
 
@@ -139,5 +145,6 @@
 | db | `design/context-dev/db/AGENTS.md` |
 | ui | `design/context-dev/ui/AGENTS.md` |
 | legacy | `design/context-dev/legacy/AGENTS.md` |
+| openspec | `design/context-dev/openspec/AGENTS.md`（以及按需读取 `design/context-dev/openspec/proposal/AGENTS.md` / `design/context-dev/openspec/plan/AGENTS.md`） |
 
 $ARGUMENTS

@@ -107,5 +107,5 @@ graph LR
 
 > 💡 **使用提示**:
 > 1. 此文件由 `/context-openspec plan` 命令基于 Context 自动生成
-> 2. 创建具体提案时使用 `/context-openspec proposal <change-id>`
+> 2. 创建具体提案时使用 `/context-openspec proposal <change-id> [roadmap-doc]`
 > 3. 提案应尽量原子化，便于 Review 和实现

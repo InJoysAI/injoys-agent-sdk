@@ -115,9 +115,9 @@
 | 合规前置 | `age-gate`, `geoblock` | 认证提案必须依赖合规检查 |
 
 **示例**：
-- ❌ `feat-lesson-eprp` 排在 `feat-infra-rls` 之前
-- ❌ `feat-auth-register` 无依赖，但应依赖 `feat-infra-dual-db`
-- ⚠️ 基础设施提案 `feat-infra-typespec` 不在 Phase 1
+ - ❌ `feat-lesson-eprp-session` 排在 `feat-infra-rls` 之前
+ - ❌ `feat-auth-register` 无依赖，但应依赖 `feat-infra-dual-db`
+ - ⚠️ 基础设施提案 `feat-infra-typespec` 不在 Phase 1
 
 ### 4.3 功能覆盖校验
 

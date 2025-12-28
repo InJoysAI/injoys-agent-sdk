@@ -18,7 +18,7 @@ This project follows a project criterion. See: @.context/criterion.md
 |---------|---------|
 | `/context-init` | Initialize Context |
 | `/context-openspec` | Initialize/enhance OpenSpec |
-| `/context-openspec proposal <change-id>` | Create change proposal |
+| `/context-openspec proposal <change-id> [roadmap-doc]` | Create change proposal (optionally specify roadmap/outline doc) |
 | `/context-start` | Implement change |
 | `/context-check` | Check status |
 | `/context-update` | Maintain Context |

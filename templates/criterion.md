@@ -16,7 +16,7 @@
 
 | 维度 | 工具 | 约束规则 |
 |------|------|---------|
-| **需求层** | OpenSpec (`openspec/project.md`) | 功能变更必须先创建提案（`/context-openspec proposal <change-id>`），评审通过后再开发 |
+| **需求层** | OpenSpec (`openspec/project.md`) | 功能变更必须先创建提案（`/context-openspec proposal <change-id> [roadmap-doc]`），评审通过后再开发 |
 | **数据层** | Atlas HCL (`schema/atlas.hcl`, `schema/postgres.hcl`) | Schema 变更必须先修改 HCL，运行 `atlas schema apply` 后再改业务代码 |
 | **API 层** | TypeSpec (`api/main.tsp`, `api/tspconfig.yaml`) | API 变更必须先修改契约，编译后再改业务代码 |
 
@@ -83,7 +83,7 @@ MUST NOT:
 ```
 需求变更
     ↓
-创建提案：/context-openspec proposal <change-id>
+创建提案：/context-openspec proposal <change-id> [roadmap-doc]
     ↓
 验证提案：openspec validate <提案ID>
     ↓

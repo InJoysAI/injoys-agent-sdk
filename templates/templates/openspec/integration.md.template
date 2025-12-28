@@ -29,12 +29,13 @@
 
 When executing OpenSpec workflows, you **MUST** read the following `.context/` assets to ensure proposals and implementations align with project constraints:
 
-### When Creating Proposals (`/context-openspec proposal <change-id>`)
+### When Creating Proposals (`/context-openspec proposal <change-id> [roadmap-doc]`)
 
 1. **Required Reading**:
    - `CONTEXT_ASSET_INDEX` block in this file — Determine which `.context/**` assets exist and must be read for this project
    - `.context/criterion.md` — Understand hard constraints (MUST/MUST NOT)
    - `openspec/project.md` — Project overview
+   - `openspec/proposal-roadmap.md` — Roadmap index/overview (**OR** the user-provided `roadmap-doc`, if passed)
 
 2. **Read As Needed** (if present per `CONTEXT_ASSET_INDEX`):
    - `.context/architecture/tech_stack.md` — Technology stack choices

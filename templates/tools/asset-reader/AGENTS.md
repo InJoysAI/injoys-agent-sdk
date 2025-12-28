@@ -127,7 +127,8 @@ for scope in ["architecture", "domain", "db", "ui", "legacy"]:
 | `.context/criterion.md` | `--criterion` | 项目约束（MUST/MUST NOT） |
 | `.context/openspec/integration.md` | `--integration` | Context 读取规范 |
 | `openspec/project.md` | `--project` | 项目整体情况 |
-| `openspec/proposal-roadmap.md` | `--roadmap` | 规划文档 |
+| `openspec/proposal-roadmap.md` | `--roadmap` | 规划文档（索引/总览） |
+| `openspec/proposal-roadmap-Phase*.md` / `openspec/proposal-roadmap-Phase-*.md` | `--roadmap <path>` | 提案大纲/分 Phase 规划（显式指定要读的 roadmap 文件） |
 | `.context/<scope>/source/*` | `--source <scope>` | 回溯源文档 |
 
 ---
