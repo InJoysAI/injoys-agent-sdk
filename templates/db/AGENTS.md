@@ -58,7 +58,7 @@
 | Partition / 分区 | 分区策略 | `schema_design.md` §分区 |
 | UUID / 主键 / Identity | 主键策略 | `schema_design.md` §主键 |
 | JSONB / JSON / 非结构化 | JSONB 使用 | `schema_design.md` §JSONB |
-| Migration / 迁移 / Atlas / SSoT | 迁移策略 | `migrations_and_ssot.md` |
+| Migration / 迁移 / Goose / SSoT | 迁移策略 | `migrations_and_ssot.md` |
 | Tuning / 调优 / 参数 | 参数配置 | `performance_tuning.md` |
 | Storage / 存储 / WAL / Huge Pages | 基础设施 | `performance_tuning.md` §基础设施 |
 | Connection / 连接池 / PgBouncer | 连接管理 | `performance_tuning.md` §连接池 |
@@ -98,7 +98,7 @@
 必须生成：
 - schema_design.md（Schema/索引/分区）
 - performance_tuning.md（参数/连接池/基础设施）
-- migrations_and_ssot.md（Atlas 迁移/SSoT 约束）
+- migrations_and_ssot.md（Goose 迁移/SSoT 约束）
 
 推荐生成（关键词匹配）：
 - security_hardening.md（检测到：TLS, 认证）
@@ -182,8 +182,8 @@
 生成 Schema 迁移与 SSoT 约束规范。
 
 # Requirements（固定小节，缺失标注 N/A）
-1. **SSoT 原则** — schema/postgres.hcl 为唯一真相源
-2. **Atlas 工作流** — migration diff → apply → verify
+1. **SSoT 原则** — `SSoT/schema/migrations/` 为唯一真相源
+2. **Goose 工作流** — goose create → goose up → verify
 3. **零停机迁移** — 分阶段变更策略（expand-contract）
 4. **兼容性规则** — 向后兼容变更类型
 5. **禁止操作** — 生产环境禁止的 DDL

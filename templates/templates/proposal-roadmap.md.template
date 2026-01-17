@@ -2,6 +2,7 @@
 
 > 本模板用于 `/context-openspec plan` 命令生成项目提案总计划。
 > 使用时替换所有 `{{占位符}}` 为实际内容。
+> - **任务状态**:（proposed/in-progress/done）
 
 ---
 

@@ -42,7 +42,7 @@ check_cmd "Docker" "docker --version" "https://docker.com/"
 echo ""
 
 echo "=== SSoT 工具链 ==="
-check_cmd "Atlas" "atlas version" "curl -sSf https://atlasgo.sh | sh"
+check_cmd "Goose" "goose --version" "go install github.com/pressly/goose/v3/cmd/goose@latest"
 check_cmd "TypeSpec" "tsp --version" "npm install -g @typespec/compiler"
 check_cmd "OpenSpec" "openspec --version" "npm install -g @fission-ai/openspec@latest"
 echo ""

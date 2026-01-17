@@ -8,7 +8,7 @@ This project follows a project criterion. See: @.context/criterion.md
 
 ## Quick Rules
 
-- **Schema changes** → Modify `{{schema_path}}` first, then `atlas schema apply`
+- **Schema changes** → Create Goose migration file in `{{schema_path}}`, then run `goose up`
 - **API changes** → Modify `{{api_path}}` first, then `tsp compile`
 - **Feature changes** → Create proposal first with `{{proposal_command}}`
 

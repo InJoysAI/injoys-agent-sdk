@@ -60,8 +60,8 @@ openspec validate <提案ID>
 
 | Tech Stack | SSoT 需求 |
 |------------|----------|
-| PostgreSQL | 需要 `schema/postgres.hcl` |
-| REST API (Go) | 需要 `api/main.tsp` |
+| PostgreSQL | 需要 `SSoT/schema/migrations/` |
+| REST API (Go) | 需要 `SSoT/api/main.tsp` |
 | Tauri/Rust | 无 SSoT 约束 |
 
 ---

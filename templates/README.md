@@ -42,13 +42,14 @@ templates/
 
 ---
 
-## 核心命令（6 个）
+## 核心命令（7 个）
 
 | 命令 | 阶段 | 用途 |
 |------|------|------|
 | `/context-init` | 初始化 | 环境检查 + 创建目录 + 归档源文档 |
 | `/context-openspec` | 集成 | 生成文档总结 + 填充 project.md + 生成路线图 |
 | `/context-openspec proposal <change-id> [roadmap-doc]` | 设计 | 基于路线图/大纲创建提案 → 生成 tasks.md |
+| `/context-interview` | 设计 | 深度访谈完善技术规格或用户指定文档 |
 | `/context-start` | 实施 | validate → SSoT-first → codegen → code → archive |
 | `/context-check` | 检查 | 子命令: `env` / `tasks` / `proposal` |
 | `/context-update` | 维护 | 子命令: `add` / `modify` / `delete` / `fix` |
@@ -63,8 +64,8 @@ templates/
 |--------|------|
 | `{{project_name}}` | 项目名称 |
 | `{{project_root}}` | 项目根目录绝对路径 |
-| `{{schema_path}}` | Schema 文件路径 (默认 `schema/postgres.hcl`) |
-| `{{api_path}}` | API 定义路径 (默认 `api/main.tsp`) |
+| `{{schema_path}}` | Schema 迁移目录 (默认 `SSoT/schema/migrations/`) |
+| `{{api_path}}` | API 定义路径 (默认 `SSoT/api/main.tsp`) |
 | `{{generated_at}}` | 生成时间戳 |
 
 详见 `templates/templates/README.md`。
@@ -126,7 +127,7 @@ PRD：@docs/product-overview.md
 执行流程：
 1. `openspec validate <提案ID>`
 2. 展示任务列表，等待确认
-3. SSoT-first：修改 `schema/postgres.hcl` → `api/main.tsp` → Codegen
+3. SSoT-first：创建 Goose 迁移 (`SSoT/schema/migrations/`) → 修改 `SSoT/api/main.tsp` → Codegen
 4. 实现业务代码 + 测试
 5. `openspec archive <提案ID> --yes`
 
@@ -149,10 +150,9 @@ PRD：@docs/product-overview.md
 
 | 层 | 文件路径 | 用途 |
 |----|---------|------|
-| 数据层 | `schema/atlas.hcl` | Atlas 项目配置 |
-| 数据层 | `schema/postgres.hcl` | PostgreSQL Schema 定义 |
-| API 层 | `api/tspconfig.yaml` | TypeSpec 配置 |
-| API 层 | `api/main.tsp` | API 契约入口 |
+| 数据层 | `SSoT/schema/migrations/` | Goose SQL 迁移文件目录 |
+| API 层 | `SSoT/api/tspconfig.yaml` | TypeSpec 配置 |
+| API 层 | `SSoT/api/main.tsp` | API 契约入口 |
 | 需求层 | `openspec/project.md` | 项目信息 |
 | 需求层 | `openspec/proposal-roadmap.md` | 提案路线图 |
 | 需求层 | `openspec/changes/` | 变更提案目录 |

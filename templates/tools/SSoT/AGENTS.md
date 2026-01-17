@@ -28,8 +28,8 @@
 
 | SSoT 类型 | 关键词 | 检测结果 |
 |----------|--------|---------|
-| **数据层 (Atlas HCL)** | PostgreSQL, 数据库, Schema, 表设计, Atlas, HCL, 数据模型 | 需要 → `schema/` |
-| **API 层 (TypeSpec)** | REST API, TypeSpec, OpenAPI, 接口规范, tsp, API First | 需要 → `api/` |
+| **数据层 (Goose SQL)** | PostgreSQL, 数据库, Schema, 表设计, 迁移, Goose, 数据模型 | 需要 → `SSoT/schema/migrations/` |
+| **API 层 (TypeSpec)** | REST API, TypeSpec, OpenAPI, 接口规范, tsp, API First | 需要 → `SSoT/api/` |
 
 ### 0.3 遗留项目检测
 
@@ -51,7 +51,7 @@
 === SSoT 需求分析 ===
 基于架构文档检测结果：
 
-✅ 数据层 (Atlas HCL)：需要初始化
+✅ 数据层 (Goose SQL)：需要初始化
    └── 检测到：PostgreSQL, 数据模型, Schema
 
 ✅ API 层 (TypeSpec)：需要初始化
@@ -82,20 +82,19 @@
 
 ---
 
-## Phase 2: Atlas HCL (数据层)
+## Phase 2: Goose 迁移 (数据层)
 
 > ⚠️ **仅当检测到需要数据层时执行**
 
-创建 `{目标项目}/schema/` 目录并生成：
+创建 `{目标项目}/SSoT/schema/migrations/` 目录并生成：
 
-| 文件 | 模板 |
+| 文件 | 内容 |
 |------|------|
-| `schema/atlas.hcl` | `@design/context-dev/tools/SSoT/schema/atlas.hcl` |
-| `schema/postgres.hcl` | `@design/context-dev/tools/SSoT/schema/postgres.hcl` |
+| `SSoT/schema/migrations/00001_init.sql` | Goose 初始化迁移模板 |
 
-`postgres.hcl` 填充规则：
+`00001_init.sql` 填充规则：
 - 从架构文档提取核心数据模型（users, sessions 等）
-- 包含 RLS 策略模板
+- 使用 `-- +goose Up` 和 `-- +goose Down` 注解
 
 ---
 
@@ -103,13 +102,13 @@
 
 > ⚠️ **仅当检测到需要 API 层时执行**
 
-创建 `{目标项目}/api/` 目录并生成：
+创建 `{目标项目}/SSoT/api/` 目录并生成：
 
 | 文件 | 模板 |
 |------|------|
-| `api/tspconfig.yaml` | `@design/context-dev/tools/SSoT/api/tspconfig.yaml` |
-| `api/main.tsp` | `@design/context-dev/tools/SSoT/api/main.tsp` |
-| `api/models/` | 空目录 |
+| `SSoT/api/tspconfig.yaml` | `@design/context-dev/tools/SSoT/api/tspconfig.yaml` |
+| `SSoT/api/main.tsp` | `@design/context-dev/tools/SSoT/api/main.tsp` |
+| `SSoT/api/models/` | 空目录 |
 
 `main.tsp` 填充规则：
 - 从架构文档提取核心 API 端点
@@ -122,11 +121,11 @@
 初始化完成后可执行：
 
 ```bash
-# 验证 Atlas Schema
-atlas schema inspect -u "file://schema/postgres.hcl"
+# 验证 Goose 迁移状态
+goose -dir SSoT/schema/migrations status
 
 # 编译 TypeSpec
-tsp compile api/main.tsp
+tsp compile SSoT/api/main.tsp
 ```
 
 ---
@@ -161,14 +160,13 @@ tsp compile api/main.tsp
 
 检测来源: .context/architecture/source/*.md
 
-📊 数据层 (Atlas HCL): [已初始化 / 跳过]
-   ✅ schema/atlas.hcl
-   ✅ schema/postgres.hcl
+📊 数据层 (Goose SQL): [已初始化 / 跳过]
+   ✅ SSoT/schema/migrations/
 
 🌐 API 层 (TypeSpec): [已初始化 / 跳过]
-   ✅ api/tspconfig.yaml
-   ✅ api/main.tsp
-   ✅ api/models/
+   ✅ SSoT/api/tspconfig.yaml
+   ✅ SSoT/api/main.tsp
+   ✅ SSoT/api/models/
 
 📝 Context 文件更新:
    🔁 .context/criterion.md (Section 1, 5 已更新)

@@ -9,6 +9,7 @@
 | 文件 | 用途 |
 |------|------|
 | `AGENTS.md` | `/context-openspec ui` 的执行规则与 Prompt |
+| `stitch_prompts.md` | 设计生成工具 Prompt（核心） |
 | `design_system.md` | 设计系统（颜色/字体/间距/组件约束） |
 | `design_tokens.json` | Design Tokens（Global/Alias/Component） |
 | `layout_grid.md` | 栅格与响应式断点 |
@@ -18,7 +19,6 @@
 | `accessibility_checklist.md` | 无障碍检查清单 |
 | `handoff_checklist.md` | 交付/标注检查清单 |
 | `platform_guidelines.md` | 多端差异与策略 |
-| `stitch_prompts.md` | 设计生成工具 Prompt（可选） |
 
 ---
 

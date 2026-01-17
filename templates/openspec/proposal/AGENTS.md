@@ -75,7 +75,7 @@ openspec list --specs      # 已有的 specs
 3. 编写 `openspec/changes/<change-id>/proposal.md`、`openspec/changes/<change-id>/tasks.md`
 4. 创建 `openspec/changes/<change-id>/specs/<capability>/spec.md` delta 文件
 5. 若需技术设计，创建 `openspec/changes/<change-id>/design.md`（参考 openspec/AGENTS.md 中的条件）
-6. 增加以 SSoT 为首的步骤：验证是否需要更改 schema/API 合约；如果不需要，则添加明确的“SSoT 未更改”检查，以及 openspec validate 和 openspec archive 任务；如果需要，则包括 schema/postgres.hcl 和 api/main.tsp 的更新以及相应的代码生成（codegen）。
+6. 增加以 SSoT 为首的步骤：验证是否需要更改 schema/API 合约；如果不需要，则添加明确的“SSoT 未更改”检查，以及 openspec validate 和 openspec archive 任务；如果需要，则包括创建 Goose 迁移 (`SSoT/schema/migrations/`) 和 `SSoT/api/main.tsp` 的更新以及相应的代码生成（codegen）。
 7. 如果涉及接口方面的设计，需要同步更新`.context/architecture/api_strategy.md`,添加对应的请求响应示例
 
 **Context 增强**（在 OpenSpec 标准基础上添加）：
@@ -104,8 +104,8 @@ openspec list --specs      # 已有的 specs
 
 | Tech Stack | SSoT 文件 | 检查项 |
 |------------|----------|--------|
-| PostgreSQL | `schema/postgres.hcl` | 数据库相关变更 |
-| REST API (Go) | `api/main.tsp` | API 相关变更 |
+| PostgreSQL | `SSoT/schema/migrations/` | 数据库相关变更 |
+| REST API (Go) | `SSoT/api/main.tsp` | API 相关变更 |
 | Tauri/Rust | N/A | 无 SSoT 约束 |
 
 **若存在 SSoT 约束**，`tasks.md` 必须遵循顺序：

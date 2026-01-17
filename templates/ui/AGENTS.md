@@ -14,6 +14,7 @@
 ├── source/                    # 源文档目录（权威）
 │   └── *.md                   # 完整 UI 规范文档
 ├── design_system.md           # 必须生成
+├── stitch_prompts.md          # 必须生成
 ├── [atomic_components.md]     # 按需生成（Phase 0 检测）
 ├── [layout_grid.md]           # 按需生成（Phase 0 检测）
 ├── [design_tokens.json]       # 按需生成（Phase 0 检测）
@@ -93,6 +94,7 @@
 
 | 检查项 | 关键词 | 若存在则生成 | 优先级 |
 |--------|--------|-------------|--------|
+| Stitch | Stitch, AI 设计 | `stitch_prompts.md` | 重要 |
 | 组件库 | 组件, Component, Atom, 原子化 | `atomic_components.md` | 推荐 |
 | 栅格系统 | Grid, 栅格, 断点, Breakpoint, 响应式 | `layout_grid.md` | 推荐 |
 | 设计 Token | Token, CSS 变量, --color, --spacing | `design_tokens.json` | 推荐 |
@@ -101,7 +103,6 @@
 | 无障碍 | Accessibility, A11y, 对比度, 键盘导航 | `accessibility_checklist.md` | 可选 |
 | 交付规范 | Handoff, 切图, 标注, Figma | `handoff_checklist.md` | 可选 |
 | 多端适配 | iOS, Android, 多端, Platform | `platform_guidelines.md` | 可选 |
-| Stitch | Stitch, AI 设计 | `stitch_prompts.md` | 可选 |
 
 ### 0.3 输出生成计划
 
@@ -127,9 +128,12 @@
 
 ## 模板引用
 
+> 模板路径相对于 `design/context-dev/`
+
 | 输出文件 | 模板路径 |
 |----------|----------|
 | `design_system.md` | `templates/ui/design_system.md.template` |
+| `stitch_prompts.md` | `templates/ui/stitch_prompts.md.template` |
 | `atomic_components.md` | `templates/ui/atomic_components.md.template` |
 | `layout_grid.md` | `templates/ui/layout_grid.md.template` |
 | `design_tokens.json` | `templates/ui/design_tokens.json.template` |
@@ -138,9 +142,7 @@
 | `accessibility_checklist.md` | `templates/ui/accessibility_checklist.md.template` |
 | `handoff_checklist.md` | `templates/ui/handoff_checklist.md.template` |
 | `platform_guidelines.md` | `templates/ui/platform_guidelines.md.template` |
-| `stitch_prompts.md` | `templates/ui/stitch_prompts.md.template` |
 
-> 模板路径相对于 `design/context-dev/`
 
 ---
 

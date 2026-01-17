@@ -28,7 +28,7 @@
 # Requirements
 - 运行脚本并检查以下所有项：
   - **运行时**: Go, Node.js, Python, uv, Docker
-  - **SSoT**: Atlas, TypeSpec, OpenSpec
+  - **SSoT**: Goose, TypeSpec, OpenSpec
   - **CodeGen**: oapi-codegen, orval, datamodel-codegen
 - 输出完整检查报告（✅ / ❌）
 
@@ -89,7 +89,7 @@
 | **运行时** | Python | 3.11 | https://python.org/ |
 | **运行时** | uv | 0.4 | `curl -LsSf https://astral.sh/uv/install.sh \| sh` |
 | **运行时** | Docker | 24 | https://docker.com/ |
-| **SSoT** | Atlas | 0.25 | `curl -sSf https://atlasgo.sh \| sh` |
+| **SSoT** | Goose | 3.0 | `go install github.com/pressly/goose/v3/cmd/goose@latest` |
 | **SSoT** | TypeSpec | 0.60 | `npm install -g @typespec/compiler` |
 | **SSoT** | OpenSpec | 0.1 | `npm install -g @fission-ai/openspec@latest` |
 | **代码生成** | oapi-codegen | 2.0 | `go install github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen@latest` |
@@ -144,7 +144,7 @@
 ✅ Docker: 24.x
 
 === SSoT 工具链 ===
-✅ Atlas: 0.28.x
+✅ Goose: 3.x
 ✅ TypeSpec: 0.63.x
 ✅ OpenSpec: 0.1.x
 

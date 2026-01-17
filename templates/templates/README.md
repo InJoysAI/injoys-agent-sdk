@@ -18,8 +18,8 @@
 |--------|------|------|
 | `{{project_name}}` | 用户输入 | 项目名称 |
 | `{{project_root}}` | 用户输入 | 项目根目录绝对路径 |
-| `{{schema_path}}` | criterion.md | Schema 文件路径 (默认 `schema/postgres.hcl`) |
-| `{{api_path}}` | criterion.md | API 定义路径 (默认 `api/main.tsp`) |
+| `{{schema_path}}` | criterion.md | Schema 迁移目录 (默认 `SSoT/schema/migrations/`) |
+| `{{api_path}}` | criterion.md | API 定义路径 (默认 `SSoT/api/main.tsp`) |
 | `{{proposal_command}}` | criterion.md | 提案命令 (默认 `/context-openspec proposal <change-id> [roadmap-doc]`) |
 | `{{tech_stack_constraints}}` | tech_stack.md | 技术栈约束 (MUST/SHOULD) |
 | `{{must_not_rules}}` | criterion.md | 禁止规则 |

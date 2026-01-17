@@ -1,50 +1,287 @@
-# 设计生成 Prompt 模板（可选）
+# {{Product Name}} — Stitch UI Design Prompts ({{Scope}} / {{Phase}})
 
 > **Metadata**
-> - **Source**: `{{UI 规范文档路径}}`
-> - **Generated At**: `{{生成时间 YYYY-MM-DD HH:mm}}`
-> - **Generator**: `Context-Agent v1.0`
+> - **Source**: `{{UI Spec Source Path}}`
+> - **Generated At**: `{{YYYY-MM-DD HH:mm}}`
+> - **Generator**: `{{Generator Name}}`
 
 ---
 
-## 适用场景
+> **Reference PRD**: `{{PRD Path}}` ({{PRD Version}})
+> **Context**: These prompts are designed for **Google Stitch** to generate high-fidelity UI mockups for the {{Product Name}} {{Scope}}. Each prompt block represents **one screen/state**.
 
-- 0→1 早期布局探索（不可替代最终视觉规范）
-- 设计改版头脑风暴
-- 低保真转高保真（需人工校验与组件化落地）
+> [!IMPORTANT]
+> **Design System Reference**
+>
+> In practice, Stitch may not reliably follow “memory-only” instructions like `Apply Prompt 0.1 tokens.`.
+> To maximize consistency, **inline the same token block** inside each prompt (Global Components + each screen/state prompt).
+>
+> All prompts from 0.2 onwards should include the following block when used in Stitch:
+> ```
+> **🎨 DESIGN SYSTEM TOKENS** (Apply strictly):
+> - Colors: {{Primary}} / {{Secondary}} / {{Surface}} / {{OnSurface}}
+> - Typography: {{Font Family}} (sizes per Prompt 0.1)
+> - Spacing: {{Spacing System}} (e.g. 8pt grid)
+> - Radius: {{Radius Tokens}}
+> - Shadows: {{Elevation Tokens}}
+>
+> **🧩 COMPONENT STRATEGY** (Reuse Global Components):
+> - Use Prompt G.1 for Navigation
+> - Use Prompt G.2 for Buttons/Cards/Modals
+> - Use Prompt G.3 for Forms
+> - Use Prompt G.4 for Data Display
+> - Use Prompt G.5 for Feedback
+> ```
+
+> **How to use these prompts in Google Stitch**
+> - Use **one prompt block per screen/state**.
+> - Start from **Prompt 0.1** (design system context), then generate **Global Components** before module screens.
+> - Reuse components across canvases: copy/paste existing components instead of redrawing; keep names consistent.
+> - After Stitch output, manually validate against `{{UI Guidelines Path}}` and implementation constraints.
+
+> **Prompt ID Convention**
+> - `0.1`: Design System Tokens (session memory / reference)
+> - `G.x`: Global Components (reusable component sheets)
+> - `0.x`: Optional public/unauthenticated module (e.g. landing, first-run)
+> - `1.x+`: Authenticated modules (module number aligns with prompt prefix)
 
 ---
 
-## Prompt 结构模板
+## Global Style Foundation
 
-```markdown
-## 界面目的
-[明确页面类型与业务目标]
+### Prompt 0.1: Design System Context (Memory Instruction)
 
-## 核心组件清单
-- [组件1]: [功能描述]
-- [组件2]: [功能描述]
+> ⚠️ **Usage Note**: This is a read-only reference. You may paste it once per Stitch session to establish global context.
+>
+> **Fallback (Derived from PRD)**:
+> - If you do **not** have a UI spec / design tokens, you may still create Prompt 0.1 from PRD + architecture.
+> - **Do not invent exact numeric tokens** (hex colors / px sizes) unless explicitly provided by source docs.
+> - Use `TBD` / `TODO` placeholders and describe *relative* guidance (e.g. “warm playful palette”, “large rounded corners”, “8pt spacing system”).
 
-## 布局与结构
-[描述信息优先级与排布方式]
+```
+**CONTEXT INSTRUCTION — REFERENCE ONLY**
 
-## 视觉与风格（必须受 design_system 约束）
-- 主题: [浅色/深色]
-- 主色: [品牌色描述]
-- 圆角: [数值]
-- 间距: [8pt 体系]
+Please remember the following design system tokens for {{Product Name}}. Apply these specifications to all subsequent UI generation prompts in this session.
 
-## 数据与状态
-- 示例数据: [描述]
-- 空/错/加载状态: [是否需要 + 表现]
+**PRODUCT**: {{Product Short Description}}
+
+**COLOR TOKENS**:
+- Primary: {{Primary Color Token or TBD}} (CTAs, active states)
+- Secondary: {{Secondary Color Token or TBD}} (highlights, progress)
+- Surface: {{Surface Tokens or TBD}} (backgrounds/cards)
+- On-Surface: {{On Surface Tokens or TBD}} (text)
+- States: Error {{Error or TBD}} | Success {{Success or TBD}} | Warning {{Warning or TBD}}
+
+**TYPOGRAPHY** ({{Font Family}}):
+- Display Large: {{TBD}}
+- Headline Medium: {{TBD}}
+- Title Medium: {{TBD}}
+- Body Large: {{TBD}}
+- Body Medium: {{TBD}}
+- Label Small: {{TBD}}
+
+**SPACING**: {{Spacing Tokens or “8pt grid (TBD exact values)”}}
+
+**BORDER RADIUS**: {{Radius Tokens or TBD}}
+
+**ELEVATION**: {{Elevation Tokens or TBD}}
+
+**LAYOUT**: {{Layout Grid / Breakpoints or TBD}}
+
+**VISUAL STYLE**: {{Style Keywords}}
+
+---
+Acknowledge that you have stored these tokens. For subsequent prompts, I will also inline a “DESIGN SYSTEM TOKENS” block to ensure Stitch applies them.
 ```
 
 ---
 
-## 质量检查清单
+## Global Components (Optional but recommended)
 
-- [ ] 覆盖所有模块，无误解需求
-- [ ] 颜色/字号/间距可由 tokens 表达
-- [ ] 组件可映射到组件库/原子化清单
-- [ ] 无障碍约束未被破坏（对比度/触控目标/可聚焦）
+### Prompt G.1: Navigation (Header/Sidebar)
 
+```
+**🎨 DESIGN SYSTEM TOKENS** (Apply strictly):
+- Colors: {{Primary}} / {{Secondary}} / {{Surface}} / {{OnSurface}}
+- Typography: {{Font Family}} (Headlines {{24-36px}}, Body {{14-16px}})
+- Spacing: {{Spacing System}}
+- Radius: {{Radius Tokens}}
+- Shadows: {{Elevation Tokens}}
+
+**🧩 COMPONENT STRATEGY** (Reuse Global Components):
+- Use Prompt G.1 for Navigation
+
+Design global navigation components for {{Product Name}}:
+- Desktop: {{Sidebar or Header}} with primary nav items, active state, collapse behavior
+- Mobile: {{Drawer or Bottom Nav}} with safe-area padding
+- Include: user/avatar area (if applicable), app logo, primary actions, notifications (optional)
+```
+
+### Prompt G.2: Buttons / Cards / Modals
+
+```
+**🎨 DESIGN SYSTEM TOKENS** (Apply strictly):
+- Colors: {{Primary}} / {{Secondary}} / {{Surface}} / {{OnSurface}}
+- Typography: {{Font Family}} (Headlines {{24-36px}}, Body {{14-16px}})
+- Spacing: {{Spacing System}}
+- Radius: {{Radius Tokens}}
+- Shadows: {{Elevation Tokens}}
+
+**🧩 COMPONENT STRATEGY** (Reuse Global Components):
+- Use Prompt G.2 for Buttons/Cards/Modals
+
+Design a component sheet for Buttons, Cards, Modals:
+- Button variants: primary/secondary/ghost, sizes, disabled/loading
+- Card variants: default/selected/hovered
+- Modal patterns: confirm, form modal, destructive confirm
+```
+
+### Prompt G.3: Forms (Inputs / Select / Toggles)
+
+```
+**🎨 DESIGN SYSTEM TOKENS** (Apply strictly):
+- Colors: {{Primary}} / {{Secondary}} / {{Surface}} / {{OnSurface}}
+- Typography: {{Font Family}} (Headlines {{24-36px}}, Body {{14-16px}})
+- Spacing: {{Spacing System}}
+- Radius: {{Radius Tokens}}
+- Shadows: {{Elevation Tokens}}
+
+**🧩 COMPONENT STRATEGY** (Reuse Global Components):
+- Use Prompt G.3 for Forms
+
+Design a component sheet for Forms:
+- Inputs: default/focus/error/disabled
+- Textarea: character count + max-length helper
+- Select/Dropdown: search + empty option
+- Toggles/Checkbox/Radio: default/checked/disabled
+```
+
+### Prompt G.4: Data Display (Tables / Lists / Badges)
+
+```
+**🎨 DESIGN SYSTEM TOKENS** (Apply strictly):
+- Colors: {{Primary}} / {{Secondary}} / {{Surface}} / {{OnSurface}}
+- Typography: {{Font Family}} (Headlines {{24-36px}}, Body {{14-16px}})
+- Spacing: {{Spacing System}}
+- Radius: {{Radius Tokens}}
+- Shadows: {{Elevation Tokens}}
+
+**🧩 COMPONENT STRATEGY** (Reuse Global Components):
+- Use Prompt G.4 for Data Display
+
+Design a component sheet for Data Display:
+- Tables: header, row hover, sorting, pagination
+- Lists: dense/comfortable variants
+- Badges/Chips/Tags: semantic colors + sizes
+```
+
+### Prompt G.5: Feedback (Toasts / Alerts / Empty States)
+
+```
+**🎨 DESIGN SYSTEM TOKENS** (Apply strictly):
+- Colors: {{Primary}} / {{Secondary}} / {{Surface}} / {{OnSurface}}
+- Typography: {{Font Family}} (Headlines {{24-36px}}, Body {{14-16px}})
+- Spacing: {{Spacing System}}
+- Radius: {{Radius Tokens}}
+- Shadows: {{Elevation Tokens}}
+
+**🧩 COMPONENT STRATEGY** (Reuse Global Components):
+- Use Prompt G.5 for Feedback
+
+Design a component sheet for Feedback:
+- Toasts: success/error/warning/info
+- Alerts: inline banners + dismiss behavior
+- Empty states: illustration placeholder + CTA
+- Loading: skeletons + spinners
+```
+
+---
+
+## Module 0 (Optional): {{Module Name}} ({{Auth State}})
+
+### Prompt 0.2: {{Screen Name}} ({{State Name}})
+
+```
+**🎨 DESIGN SYSTEM TOKENS** (Apply strictly):
+- Colors: {{Primary}} / {{Secondary}} / {{Surface}} / {{OnSurface}}
+- Typography: {{Font Family}} (Headlines {{24-36px}}, Body {{14-16px}})
+- Spacing: {{Spacing System}}
+- Radius: {{Radius Tokens}}
+- Shadows: {{Elevation Tokens}}
+
+**🧩 COMPONENT STRATEGY** (Reuse Global Components):
+- Use Prompt G.1 for Navigation
+- Use Prompt G.2 for Buttons/Cards/Modals
+
+**Interface Purpose**: {{What is this screen for? What is the primary user goal?}}
+
+**Core Components**:
+1. {{Component 1}}
+2. {{Component 2}}
+3. {{Component 3}}
+
+**Layout & Structure**:
+- {{Information hierarchy}}
+- {{Desktop vs mobile layout}}
+
+**Data & States**:
+- Default state: {{...}}
+- Loading state: {{...}}
+- Empty state: {{...}}
+- Error states: {{...}}
+
+**Constraints**:
+- {{Copywriting rules / forbidden terms}}
+- {{Privacy/security constraints}}
+```
+
+---
+
+## Module 1: {{Module Name}}
+
+### Prompt 1.1: {{Screen Name}} ({{State Name}})
+
+```
+**🎨 DESIGN SYSTEM TOKENS** (Apply strictly):
+- Colors: {{Primary}} / {{Secondary}} / {{Surface}} / {{OnSurface}}
+- Typography: {{Font Family}} (Headlines {{24-36px}}, Body {{14-16px}})
+- Spacing: {{Spacing System}}
+- Radius: {{Radius Tokens}}
+- Shadows: {{Elevation Tokens}}
+
+**🧩 COMPONENT STRATEGY** (Reuse Global Components):
+- Use Prompt G.1 for Navigation
+- Use Prompt G.2 for Buttons/Cards/Modals
+- Use Prompt G.3 for Forms
+- Use Prompt G.4 for Data Display
+- Use Prompt G.5 for Feedback
+
+{{Repeat the same prompt block structure as Prompt 0.2.}}
+```
+
+---
+
+## Quality Checklist
+
+- [ ] One prompt block per screen/state (no mixed screens)
+- [ ] All UI states covered (loading/empty/error/disabled)
+- [ ] Tokens-driven styles (colors/typography/spacing/radius)
+- [ ] No leakage of internal technical terms in user-facing copy (if PRD requires)
+- [ ] Components reusable and named consistently
+
+---
+
+## Appendix: Prompt Template Summary
+
+> **PRD Reference**: `{{PRD Path}}` ({{PRD Version}}) | **Total Prompts**: {{~N}}
+
+| Module | Prompt ID | Screen Name | Priority |
+|--------|-----------|-------------|----------|
+| Global | 0.1 | Design System Tokens (Memory) | P0 |
+| Global Comps | G.1 | Navigation | P0 |
+| Global Comps | G.2 | Buttons / Cards / Modals | P0 |
+| Global Comps | G.3 | Forms | P0 |
+| Global Comps | G.4 | Data Display | {{P0/P1}} |
+| Global Comps | G.5 | Feedback | P0 |
+| Module 0 (Optional) | 0.2 | {{Screen Name}} | {{P0/P1/P2}} |
+| Module 1 | 1.1 | {{Screen Name}} | {{P0/P1/P2}} |

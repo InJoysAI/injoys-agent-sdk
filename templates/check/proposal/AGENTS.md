@@ -113,8 +113,8 @@ openspec validate <change-id> --strict
 
 | Tech Stack | `tasks.md` 必须包含 |
 |------------|------------------|
-| PostgreSQL | 修改 `schema/postgres.hcl` 任务 |
-| REST API (Go) | 修改 `api/main.tsp` 任务 |
+| PostgreSQL | 创建 Goose 迁移 `SSoT/schema/migrations/` 任务 |
+| REST API (Go) | 修改 `SSoT/api/main.tsp` 任务 |
 | 启用 Codegen | Codegen 执行任务 |
 | Tauri/Rust | 无 SSoT 约束 |
 | 所有项目 | 测试 + 归档任务（`openspec validate` + `openspec archive`） |

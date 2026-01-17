@@ -9,54 +9,119 @@
 
 ## 🎯 SSoT 原则
 
-> **Single Source of Truth**: `schema/postgres.hcl` 是数据库 Schema 的唯一真相源。
+> **Single Source of Truth**: `SSoT/schema/migrations/` 是数据库 Schema 的唯一真相源。
 
 ### 禁止行为
 
 | ❌ 禁止 | ✅ 正确做法 |
-|--------|-----------|
-| 直接编写 `.sql` 迁移文件 | 修改 `schema/postgres.hcl` → Atlas 生成迁移 |
-| 在生产库手动执行 DDL | 通过 CI/CD Pipeline 执行 `atlas migrate apply` |
-| 多人同时修改 Schema | PR Review 合并 HCL 变更 |
+|--------|-----------| 
+| 直接在数据库执行 DDL | 创建 Goose SQL 迁移文件 |
+| 在生产库手动执行 DDL | 通过 CI/CD Pipeline 执行 `goose up` |
+| 多人同时修改 Schema | PR Review 合并迁移文件 |
 
 ---
 
-## 🔧 Atlas 工作流
+## 🔧 Goose 工作流
 
 ### 标准流程
 
 ```mermaid
 flowchart LR
-    A[修改 schema/postgres.hcl] --> B[atlas migrate diff]
-    B --> C[Review 迁移 SQL]
-    C --> D[PR 合并]
-    D --> E[CI: atlas migrate apply]
-    E --> F[验证 Schema]
+    A[创建迁移文件] --> B[goose create]
+    B --> C[编写 SQL]
+    C --> D[Review 迁移 SQL]
+    D --> E[PR 合并]
+    E --> F[CI: goose up]
+    F --> G[验证 Schema]
 ```
 
 ### 常用命令
 
 ```bash
-# 生成迁移文件
-atlas migrate diff migration_name \
-  --dir "file://schema/migrations" \
-  --to "file://schema/postgres.hcl" \
-  --dev-url "docker://postgres/15"
+# 创建新迁移文件（SQL 格式）
+goose -dir SSoT/schema/migrations create add_users_table sql
 
 # 应用迁移（开发环境）
-atlas migrate apply \
-  --dir "file://schema/migrations" \
-  --url "postgres://user:pass@localhost:5432/dev?sslmode=disable"
+goose -dir SSoT/schema/migrations \
+  postgres "postgres://user:pass@localhost:5432/dev?sslmode=disable" up
 
-# 验证 Schema 状态
-atlas migrate status \
-  --dir "file://schema/migrations" \
-  --url "postgres://..."
+# 查看迁移状态
+goose -dir SSoT/schema/migrations \
+  postgres "postgres://..." status
 
-# 校验迁移文件完整性
-atlas migrate validate \
-  --dir "file://schema/migrations" \
-  --dev-url "docker://postgres/15"
+# 回滚最近一次迁移
+goose -dir SSoT/schema/migrations \
+  postgres "postgres://..." down
+
+# 使用环境变量
+export GOOSE_DRIVER=postgres
+export GOOSE_DBSTRING="postgres://user:pass@localhost:5432/dev?sslmode=disable"
+export GOOSE_MIGRATION_DIR=SSoT/schema/migrations
+goose up
+```
+
+### 迁移文件格式
+
+```sql
+-- +goose Up
+CREATE TABLE users (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    email VARCHAR(255) NOT NULL UNIQUE,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+-- +goose Down
+DROP TABLE users;
+```
+
+### Go 迁移函数（复杂逻辑）
+
+对于需要程序逻辑的复杂迁移，可使用 Go 迁移函数：
+
+```go
+// 文件: SSoT/schema/migrations/00002_seed_data.go
+package migrations
+
+import (
+    "database/sql"
+    "github.com/pressly/goose/v3"
+)
+
+func init() {
+    goose.AddMigration(Up00002, Down00002)
+}
+
+func Up00002(tx *sql.Tx) error {
+    // 复杂数据迁移逻辑
+    _, err := tx.Exec(`INSERT INTO users (email) VALUES ('admin@example.com')`)
+    return err
+}
+
+func Down00002(tx *sql.Tx) error {
+    _, err := tx.Exec(`DELETE FROM users WHERE email = 'admin@example.com'`)
+    return err
+}
+```
+
+### 嵌入式自动迁移
+
+在 Go 应用启动时自动执行迁移：
+
+```go
+import (
+    "embed"
+    "github.com/pressly/goose/v3"
+)
+
+//go:embed SSoT/schema/migrations/*.sql
+var embedMigrations embed.FS
+
+func main() {
+    goose.SetBaseFS(embedMigrations)
+    if err := goose.Up(db, "SSoT/schema/migrations"); err != nil {
+        log.Fatal(err)
+    }
+}
 ```
 
 ---
@@ -79,13 +144,21 @@ atlas migrate validate \
 ALTER TABLE users RENAME COLUMN name TO full_name;
 
 -- ✅ 正确：分阶段
--- Phase 1: Expand
+-- Phase 1: Expand (00003_add_full_name.sql)
+-- +goose Up
 ALTER TABLE users ADD COLUMN full_name TEXT;
 UPDATE users SET full_name = name WHERE full_name IS NULL;
 
+-- +goose Down
+ALTER TABLE users DROP COLUMN full_name;
+
 -- Phase 2: Switch (应用代码更新后)
--- Phase 3: Contract
+-- Phase 3: Contract (00004_drop_name.sql)
+-- +goose Up
 ALTER TABLE users DROP COLUMN name;
+
+-- +goose Down
+ALTER TABLE users ADD COLUMN name TEXT;
 ```
 
 ---
@@ -105,7 +178,7 @@ ALTER TABLE users DROP COLUMN name;
 ## ❌ 生产环境禁止操作
 
 | 操作 | 风险 | 替代方案 |
-|------|------|---------|
+|------|------|---------| 
 | `DROP TABLE` / `DROP COLUMN` | 数据丢失 | 先重命名 + 保留 30 天 |
 | `ALTER TABLE ... RENAME` | 应用中断 | Expand-Contract |
 | `CREATE INDEX` (非 CONCURRENTLY) | 锁表 | `CREATE INDEX CONCURRENTLY` |
@@ -119,12 +192,12 @@ ALTER TABLE users DROP COLUMN name;
 ```markdown
 ## 迁移 PR Checklist
 
-- [ ] 修改了 `schema/postgres.hcl`（SSoT）
-- [ ] 运行 `atlas migrate diff` 生成迁移
+- [ ] 创建了 Goose 迁移文件（`SSoT/schema/migrations/`）
+- [ ] 迁移文件包含 `-- +goose Up` 和 `-- +goose Down`
 - [ ] Review 迁移 SQL 内容
 - [ ] 验证向后兼容性
 - [ ] 大表变更使用 CONCURRENTLY
-- [ ] 回滚脚本准备（如需）
+- [ ] 回滚脚本准备（Down 迁移）
 - [ ] 更新相关文档
 ```
 
@@ -133,7 +206,7 @@ ALTER TABLE users DROP COLUMN name;
 ## AI 引用指南
 
 当 AI 生成数据库变更时：
-1. **禁止直接输出 SQL** — 必须修改 `schema/postgres.hcl`
+1. **禁止直接输出 SQL** — 必须创建 Goose 迁移文件到 `SSoT/schema/migrations/`
 2. 遵循 Expand-Contract 模式
 3. 索引变更使用 CONCURRENTLY
 4. 不安全操作需分阶段或人工确认

@@ -8,7 +8,7 @@
 
 ## 快速规则提醒
 
-- **Schema 变更** → 先改 `{{schema_path}}`，然后运行 `atlas schema apply`
+- **Schema 变更** → 创建 Goose 迁移文件到 `{{schema_path}}`，然后运行 `goose up`
 - **API 变更** → 先改 `{{api_path}}`，然后运行 `tsp compile`
 - **功能变更** → 先用 `{{proposal_command}}` 创建提案
 
