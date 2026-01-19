@@ -67,7 +67,17 @@ openspec list --specs      # 已有的 specs
 
 > ⛔ **执行 OpenSpec 官方提案创建流程**
 
-**参考执行**: `@openspec/AGENTS.md` → "## Creating Change Proposals" 章节
+### 2.0 强约束：必须先读取 OpenSpec 官方规则
+
+> ⛔ **必须实际读取并遵循**：`@openspec/AGENTS.md` → "## Creating Change Proposals"、"## Spec File Format"、"## Troubleshooting"
+
+在继续之前，你必须在输出中给出 **“读取确认”**（缺一不可）：
+1. ✅ 已读取 `openspec/AGENTS.md`
+2. ✅ 将遵循 delta 结构：`## ADDED|MODIFIED|REMOVED|RENAMED Requirements`
+3. ✅ 每条 `### Requirement:` 至少包含 1 个 `#### Scenario:`
+4. ✅ 将运行并通过：`openspec validate <change-id> --strict`
+
+> 若无法读取/无法遵循上述任意一条：⛔ **STOP**（解释原因并提示用户补齐条件）
 
 **执行步骤**：
 1. 选择唯一的 `change-id`（kebab-case, verb-led）
@@ -77,6 +87,123 @@ openspec list --specs      # 已有的 specs
 5. 若需技术设计，创建 `openspec/changes/<change-id>/design.md`（参考 openspec/AGENTS.md 中的条件）
 6. 增加以 SSoT 为首的步骤：验证是否需要更改 schema/API 合约；如果不需要，则添加明确的“SSoT 未更改”检查，以及 openspec validate 和 openspec archive 任务；如果需要，则包括创建 Goose 迁移 (`SSoT/schema/migrations/`) 和 `SSoT/api/main.tsp` 的更新以及相应的代码生成（codegen）。
 7. 如果涉及接口方面的设计，需要同步更新`.context/architecture/api_strategy.md`,添加对应的请求响应示例
+
+### 2.1 必须输出交付物清单（Deliverables）
+
+> ⛔ **必须在创建完成后输出下列清单并逐项打勾**；任何一项缺失：⛔ **STOP**
+
+- [ ] `openspec/changes/<change-id>/proposal.md`
+- [ ] `openspec/changes/<change-id>/tasks.md`
+- [ ] `openspec/changes/<change-id>/specs/<capability>/spec.md`（至少 1 个 capability delta；多 capability 则多文件）
+- [ ] `openspec/changes/<change-id>/design.md`（仅当符合 openspec/AGENTS.md 的条件时；否则明确写“未创建 design.md 的原因”）
+- [ ] 如涉及接口：`.context/architecture/api_strategy.md`（已补充请求/响应示例；否则写明“不涉及接口设计”）
+- [ ] SSoT 相关（按需）：`SSoT/schema/migrations/`、`SSoT/api/main.tsp`、以及 codegen 产物（或写明 “SSoT 未更改”）
+
+### 2.2 逐项自检（Self-check）+ 不通过则 STOP
+
+> ⛔ **必须逐项自检并在失败时立即 STOP**（不要“先继续后补”）
+
+- [ ] `change-id` 唯一且 verb-led（必要时用 `openspec list` 检查；冲突则换名）
+- [ ] 目录结构完整：`openspec/changes/<change-id>/` + `specs/<capability>/`
+- [ ] `proposal.md` 至少包含：`## Why`、`## What Changes`、`## Impact`（且 Impact 里包含 “关联 Context 资产” 表）
+- [ ] `tasks.md` 包含：SSoT 检查/变更（或“SSoT 未更改”）、`openspec validate <change-id> --strict`、以及 `openspec archive <change-id>`（作为后续任务）
+- [ ] 每个 delta spec 文件至少包含 1 个 operation header（`## ADDED|MODIFIED|REMOVED|RENAMED Requirements`）
+- [ ] 每条 `### Requirement:` 至少 1 个 `#### Scenario:`（严格 4 个 `#`；否则将导致解析失败）
+- [ ] 已运行并通过：`openspec validate <change-id> --strict`
+
+> 若 `openspec validate` 失败：先修复提案/格式/缺失项，再重新验证；在验证通过前不得宣称完成。
+
+### 2.3 固定模板（减少重复的写法约束 + 可直接复制）
+
+> 目标：**proposal 只写“为什么/改什么/影响”**；**spec delta 写“行为与验收”**；**tasks 只写“实现步骤”**。避免在多个文件重复同一段长描述。
+
+#### Template: `openspec/changes/<change-id>/proposal.md`
+
+```markdown
+# Change: <一句话描述变更>
+
+## Why
+<1-3 句：问题/机会/约束；不要在这里写详细行为>
+
+## What Changes
+- <高层变更点 1>
+- <高层变更点 2>
+- <如有破坏性变更：**BREAKING**：...>
+
+## Impact
+- Affected specs: <capability 列表，例如 auth, user-profile>
+- Affected code: <关键模块/路径（可粗粒度）>
+
+### 关联 Context 资产
+| Scope | 资产路径 | 关联说明 |
+|-------|---------|---------|
+| criterion | `.context/criterion.md` | 必须遵守的约束 |
+| <scope> | `<asset-path>` | <为什么相关/用来约束什么> |
+```
+
+#### Template: `openspec/changes/<change-id>/tasks.md`
+
+```markdown
+## 0. Pre-check
+- [ ] 0.1 确认是否涉及 SSoT（schema/API）
+- [ ] 0.2 如不涉及：记录“SSoT 未更改”的原因与结论
+
+## 1. SSoT / Contracts（如适用）
+- [ ] 1.1 更新 `SSoT/schema/migrations/`（如适用）
+- [ ] 1.2 更新 `SSoT/api/main.tsp`（如适用）
+- [ ] 1.3 运行 codegen（如适用）
+
+## 2. Implementation
+- [ ] 2.1 <实现步骤 1>
+- [ ] 2.2 <实现步骤 2>
+
+## 3. Verification
+- [ ] 3.1 `openspec validate <change-id> --strict`
+- [ ] 3.2 <必要的测试/验收步骤>
+
+## 4. Post（后续）
+- [ ] 4.1 `openspec archive <change-id>`（上线后单独执行/PR）
+```
+
+#### Template: `openspec/changes/<change-id>/specs/<capability>/spec.md`（delta）
+
+```markdown
+## ADDED Requirements
+### Requirement: <要求名称>
+The system SHALL ...
+
+#### Scenario: <可验收场景名称>
+- **WHEN** ...
+- **THEN** ...
+
+## MODIFIED Requirements
+### Requirement: <原有要求名称（完整粘贴并修改后的版本）>
+The system SHALL ...
+
+#### Scenario: <场景名称>
+- **WHEN** ...
+- **THEN** ...
+```
+
+#### Template: `openspec/changes/<change-id>/design.md`（仅当需要）
+
+```markdown
+## Context
+
+## Goals / Non-Goals
+- Goals:
+- Non-Goals:
+
+## Decisions
+- Decision:
+- Alternatives considered:
+
+## Risks / Trade-offs
+
+## Migration Plan
+
+## Open Questions
+```
 
 **Context 增强**（在 OpenSpec 标准基础上添加）：
 
