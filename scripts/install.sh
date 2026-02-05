@@ -75,6 +75,7 @@ copy_workflows() {
   # The full command set is generated/installed after `/context-init`.
   cp "$tool_dir/context-init.md" "$target_dir/" 2>/dev/null || true
   cp "$tool_dir/context-check.md" "$target_dir/" 2>/dev/null || true
+  cp "$tool_dir/context-interview.md" "$target_dir/" 2>/dev/null || true
 }
 
 # Antigravity
