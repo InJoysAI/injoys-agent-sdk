@@ -35,4 +35,4 @@ This project follows a project criterion. See: @.context/criterion.md
 
 - `.context/criterion.md` — Full project criterion
 - `.context/architecture/tech_stack.md` — Tech stack details
-- `openspec/project.md` — Project information
+- `openspec/config.yaml` — Project information

@@ -27,7 +27,7 @@
 | `db` | `@design/context-dev/db/AGENTS.md` | 生成 db 总结 |
 | `ui` | `@design/context-dev/ui/AGENTS.md` | 生成 ui 总结 |
 | `legacy` | `@design/context-dev/legacy/AGENTS.md` | 生成 legacy 分析 |
-| `project` | `@design/context-dev/openspec/project/AGENTS.md` | 生成 project.md |
+| `project` | `@design/context-dev/openspec/project/AGENTS.md` | 生成 config.yaml |
 | `plan` | `@design/context-dev/openspec/plan/AGENTS.md` | 生成 proposal-roadmap.md（索引/总览；可选存在 proposal-roadmap-Phase*.md 作为分 Phase 细化） |
 | `proposal <change-id> [roadmap-doc]` | `@design/context-dev/openspec/proposal/AGENTS.md` | 创建提案（可显式指定提案大纲/路线图文件） |
 
@@ -54,6 +54,6 @@
 必须向用户报告：
 - ✅ 各总结生成情况（及 Manifest 状态）
 - ✅ `criterion.md` 填充情况
-- ✅ `openspec/project.md` 更新情况
+- ✅ `openspec/config.yaml` 更新情况
 - ✅ `openspec/proposal-roadmap.md` 更新情况
 - ⚠️ 任何跳过的步骤及原因

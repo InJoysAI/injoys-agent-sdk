@@ -9,7 +9,7 @@ Supported subcommands:
 - `tasks <change-id>`: progress report for `openspec/changes/<change-id>/tasks.md`
 - `proposal <change-id>`: proposal quality + Context consistency checks
 - `plan`: roadmap quality + Context consistency checks
-- `project`: project.md quality + Context consistency checks
+- `project`: config.yaml quality + Context consistency checks
 - `review [<scope>]`: Context 生成结果质量校验（domain/architecture/db/ui/legacy）
 
 ---
@@ -73,7 +73,7 @@ Supported subcommands:
 **Execute**: `@design/context-dev/check/project/AGENTS.md`
 
 **详细步骤**见 `project/AGENTS.md`，包括：
-1. 文件存在性校验（`project.md`）
+1. 文件存在性校验（`config.yaml`）
 2. 格式正确性校验（9 个必需章节）
 3. Context 内容一致性校验
 4. 完整性校验（无残留占位符）
@@ -94,7 +94,7 @@ Supported subcommands:
 /context-check review "检查 api_strategy.md 的错误响应格式"
 /context-check review "核对 tech_stack.md 中的版本约束是否最新"
 /context-check review "确认 business_rules.md 覆盖了所有 PRD 业务规则"
-/context-check review "验证 .context 资产与 openspec/project.md 的一致性"
+/context-check review "验证 .context 资产与 openspec/config.yaml 的一致性"
 ```
 
 **执行流程**：

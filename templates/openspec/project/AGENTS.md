@@ -6,7 +6,7 @@
 
 ## 🎯 执行指令
 
-> ⛔ **本命令只生成 `project.md`，不能触发其他文件生成**
+> ⛔ **本命令只生成 `openspec/config.yaml`，不能触发其他文件生成**
 
 依次执行以下步骤：
 
@@ -25,9 +25,32 @@
 
 ---
 
-### Phase 3: 生成 project.md
+### Phase 3: 生成 config.yaml
 
-根据 `openspec/project.md` 的现有结构进行填充，**必须涵盖以下所有内容**：
+生成/更新 `openspec/config.yaml`，用于 OPSX 注入规划上下文：
+
+**格式要求（必须遵循）**：
+
+```yaml
+schema: spec-driven
+
+context: |
+  ...
+
+rules:
+  proposal:
+    - ...
+  specs:
+    - ...
+  design:
+    - ...
+  tasks:
+    - ...
+```
+
+**填充要求**：
+- `schema`: 使用 `spec-driven`
+- `context`: 必须覆盖以下所有内容（内容需精炼，避免冗长）：
 
 | 章节 | 来源 | 必须 |
 |------|------|:----:|
@@ -43,7 +66,11 @@
 | UI Guidelines | design_spec.md | ⚠️ 若存在 |
 | Database Design | schema_design.md | ⚠️ 若存在 |
 
-**输出**: `openspec/project.md`
+`rules` 建议最少包含：
+- `tasks`: 任务拆分粒度、SSoT-first、验证/归档要求
+- `specs`: Given/When/Then 或 WHEN/THEN 场景格式（与团队验收习惯一致）
+
+**输出**: `openspec/config.yaml`
 
 ---
 
@@ -53,7 +80,7 @@
 
 ```
 === OpenSpec Project ===
-✅ openspec/project.md (生成/更新)
+✅ openspec/config.yaml (生成/更新)
 
 从 Manifest 筛选并读取的资产:
 - .context/criterion.md

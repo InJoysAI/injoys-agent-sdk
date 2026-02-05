@@ -1,6 +1,6 @@
 # Integration 幂等增强指令
 
-> 当被 openspec 子命令调用时执行此文件，用于处理 `openspec/AGENTS.md` 的幂等增强。
+> 当被 `/context-openspec`（或其子命令）调用时执行，用于保证 `.context/openspec/integration.md` 存在并保持“资产索引区块”最新。
 
 ---
 
@@ -76,4 +76,3 @@
 ✅ .context/openspec/integration.md (存在/已复制)
 ✅ CONTEXT_ASSET_INDEX 区块已刷新
 ```
-

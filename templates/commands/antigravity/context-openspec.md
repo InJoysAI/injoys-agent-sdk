@@ -1,5 +1,5 @@
 ---
-description: Initialize and enhance OpenSpec with Context assets (generate `project.md` + `proposal-roadmap.md`)
+description: Initialize and enhance OpenSpec with Context assets (generate `config.yaml` + `proposal-roadmap.md`)
 ---
 
 # Context OpenSpec Integration

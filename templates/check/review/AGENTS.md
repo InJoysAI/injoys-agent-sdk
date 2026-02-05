@@ -22,7 +22,7 @@
 | **参照物** | 核对的标准来源 | "与代码一致" → 需要读取代码文件 |
 | **深度** | 结构/内容/一致性 | "格式" → 结构校验；"内容" → 内容校验 |
 
-> 若核对事项涉及 OpenSpec（如 `openspec/project.md`、`openspec/proposal-roadmap*.md`、`openspec/changes/<change-id>/*`），也应纳入“范围”。
+> 若核对事项涉及 OpenSpec（如 `openspec/config.yaml`、`openspec/proposal-roadmap*.md`、`openspec/changes/<change-id>/*`），也应纳入“范围”。
 
 **若描述模糊**：
 - 主动列出可能的检查项

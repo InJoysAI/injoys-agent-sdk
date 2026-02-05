@@ -45,7 +45,7 @@
 ## Phase 2: 规范校验
 
 ```bash
-openspec validate <提案ID>
+node design/context-dev/tools/specflow/specflow.mjs validate <提案ID> --strict
 ```
 
 **结果**：
@@ -110,8 +110,8 @@ openspec validate <提案ID>
 所有任务完成后执行验证：
 
 ```bash
-# OpenSpec 验证
-openspec validate <提案ID>
+# Specflow 验证
+node design/context-dev/tools/specflow/specflow.mjs validate <提案ID> --strict
 
 # 相关测试（根据项目类型）
 go test ./...          # Go
@@ -126,7 +126,7 @@ cargo test             # Rust
 验证通过后，归档变更：
 
 ```bash
-openspec archive <提案ID> --yes
+node design/context-dev/tools/specflow/specflow.mjs archive <提案ID> --yes
 ```
 
 ---
@@ -138,7 +138,7 @@ openspec archive <提案ID> --yes
 提案ID：<提案ID>
 
 ✅ 所有任务已完成（N/N）
-✅ openspec validate 通过
+✅ specflow validate 通过
 ✅ 测试通过
 ✅ 已归档
 

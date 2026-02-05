@@ -28,7 +28,7 @@
 
 | 维度 | 工具 | 约束规则 |
 |------|------|---------|
-| **需求层** | OpenSpec (`openspec/project.md`) | 功能变更必须先创建提案（`/context-openspec proposal <change-id> [roadmap-doc]`），评审通过后再开发 |
+| **需求层** | OpenSpec (`openspec/config.yaml`) | 功能变更必须先创建提案（`/context-openspec proposal <change-id> [roadmap-doc]`），评审通过后再开发 |
 | **数据层** | {{数据层真理源}} | {{数据层变更规则（如：通过 config 模块/通过 HCL/通过迁移脚本）}} |
 | **API 层** | {{API 契约/服务}} | API 变更必须先更新服务端接口（或契约），客户端仅调用 |
 
@@ -184,7 +184,7 @@ MUST NOT:
     ↓
 创建提案：/context-openspec proposal <change-id> [roadmap-doc]
     ↓
-验证提案：openspec validate <提案ID>
+验证提案：specflow validate <提案ID> --strict
     ↓
 更新服务端/契约（如有）
     ↓
@@ -192,7 +192,7 @@ MUST NOT:
     ↓
 运行测试
     ↓
-归档：openspec archive <提案ID> --yes
+归档：specflow archive <提案ID> --yes
 ```
 
 ---
@@ -204,7 +204,7 @@ MUST NOT:
 | 数据层 | `SSoT/schema/migrations/` | Goose SQL 迁移文件目录 |
 | API 层 | `SSoT/api/tspconfig.yaml` | TypeSpec 编译配置 |
 | API 层 | `SSoT/api/main.tsp` | API 契约入口 |
-| 需求层 | `openspec/project.md` | 项目信息 |
+| 需求层 | `openspec/config.yaml` | 项目信息 |
 | 需求层 | `openspec/proposal-roadmap.md` | 提案路线图 |
 | 需求层 | `openspec/specs/` | 当前规范（真理源） |
 | 需求层 | `openspec/changes/` | 变更提案目录 |

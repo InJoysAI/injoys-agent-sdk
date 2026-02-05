@@ -18,7 +18,7 @@ This project follows a project criterion. See: @.context/criterion.md
 ## SSoT Files
 - Data: {{schema_path}}
 - API: {{api_path}}
-- Requirements: openspec/project.md
+- Requirements: openspec/config.yaml
 
 ## Commands
 - /context-init — Initialize Context

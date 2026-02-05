@@ -10,6 +10,18 @@
 
 ---
 
+## Phase 0: Artifact 状态（下一步指引）
+
+输出该变更当前工件状态（用于提示下一步应该写哪个 artifact）：
+
+```bash
+node design/context-dev/tools/specflow/specflow.mjs status <change-id>
+```
+
+> 若 `Ready` 不是 `none`：在报告中明确提示“下一步建议先完成 Ready artifact”。
+
+---
+
 ## Phase 1: 文件完整性校验
 
 检查 `openspec/changes/<change-id>/` 目录：
@@ -30,7 +42,7 @@
 ## Phase 2: OpenSpec 规范校验
 
 ```bash
-openspec validate <change-id> --strict
+node design/context-dev/tools/specflow/specflow.mjs validate <change-id> --strict
 ```
 
 **结果**：
@@ -46,7 +58,7 @@ openspec validate <change-id> --strict
 **必读文件**（`proposal.md` 必须引用）：
 - `.context/criterion.md` — 项目约束
 - `.context/architecture/tech_stack.md` — 技术约束
-- `openspec/project.md` — 项目概况
+- `openspec/config.yaml` — 项目概况
 
 **检查方法**：
 1. 读取 `proposal.md`
@@ -117,7 +129,7 @@ openspec validate <change-id> --strict
 | REST API (Go) | 修改 `SSoT/api/main.tsp` 任务 |
 | 启用 Codegen | Codegen 执行任务 |
 | Tauri/Rust | 无 SSoT 约束 |
-| 所有项目 | 测试 + 归档任务（`openspec validate` + `openspec archive`） |
+| 所有项目 | 测试 + 归档任务（`specflow validate` + `specflow archive`） |
 
 **检查方法**：
 1. 根据 Tech Stack 确定需要检查的 SSoT 任务
@@ -135,6 +147,9 @@ openspec validate <change-id> --strict
 提案ID：<change-id>
 状态：[🟢 通过 | 🟡 需要关注 | 🔴 失败]
 
+📌 Artifact 状态
+   └── specflow status <change-id> → Ready: <proposal|specs|tasks|none>
+
 ✅/⚠️/❌ 文件完整性
    ├── proposal.md [状态]
    ├── tasks.md [状态]
@@ -142,12 +157,12 @@ openspec validate <change-id> --strict
    └── specs/ [状态]
 
 ✅/❌ OpenSpec 验证
-   └── openspec validate <change-id> --strict → [结果]
+   └── specflow validate <change-id> --strict → [结果]
 
 ✅/⚠️/❌ Context 引用
    ├── criterion.md → [状态]
    ├── tech_stack.md → [状态]
-   └── project.md → [状态]
+   └── config.yaml → [状态]
 
 ✅/⚠️/❌ Context 内容一致性
    ├── 技术栈 → [状态]

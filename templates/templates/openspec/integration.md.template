@@ -34,7 +34,7 @@ When executing OpenSpec workflows, you **MUST** read the following `.context/` a
 1. **Required Reading**:
    - `CONTEXT_ASSET_INDEX` block in this file — Determine which `.context/**` assets exist and must be read for this project
    - `.context/criterion.md` — Understand hard constraints (MUST/MUST NOT)
-   - `openspec/project.md` — Project overview
+   - `openspec/config.yaml` — Project config (OPSX injected context)
    - `openspec/proposal-roadmap.md` — Roadmap index/overview (**OR** the user-provided `roadmap-doc`, if passed)
 
 2. **Read As Needed** (if present per `CONTEXT_ASSET_INDEX`):
@@ -75,7 +75,7 @@ Read the following files for specification validation (if present per `CONTEXT_A
 
 | OpenSpec File | Context Data Source |
 |--------------|---------------------|
-| `openspec/project.md` | `.context/criterion.md` + `.context/architecture/tech_stack.md` |
+| `openspec/config.yaml` | `.context/criterion.md` + `.context/architecture/tech_stack.md` |
 | `openspec/proposal-roadmap.md` | `.context/domain/` + `.context/architecture/` |
 | Proposal constraints | `.context/criterion.md` (MUST/MUST NOT) |
 | Business logic validation | `.context/domain/business_rules.md` |
@@ -88,7 +88,7 @@ Read the following files for specification validation (if present per `CONTEXT_A
 
 1. **Read Context Before Proposals**: Before creating any proposal, you MUST read `.context/criterion.md`
 2. **SSoT First**: Database and API changes MUST modify SSoT files first, then generate code
-3. **Keep In Sync**: After `.context/` content changes, run `/context-openspec` to sync `project.md`
+3. **Keep In Sync**: After `.context/` content changes, run `/context-openspec` to sync `config.yaml`
 
 ---
 
@@ -99,13 +99,13 @@ Read the following files for specification validation (if present per `CONTEXT_A
 "I want to add an endpoint to update user nickname"
 
 # AI Execution Flow
-1. Read .context/criterion.md and openspec/project.md
+1. Read .context/criterion.md and openspec/config.yaml
 2. Check for relevant constraints
 3. Create openspec/changes/feat-update-nickname/proposal.md
 4. After review approval, create Goose migration in `SSoT/schema/migrations/` and modify `SSoT/api/main.tsp`
 5. Run codegen commands to generate code
 6. Implement business logic
-7. Archive the change: openspec archive feat-update-nickname --yes
+7. Archive the change: node design/context-dev/tools/specflow/specflow.mjs archive feat-update-nickname --yes
 ```
 
 <!-- CONTEXT_OPENSPEC_INTEGRATION:END -->

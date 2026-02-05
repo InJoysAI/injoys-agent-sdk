@@ -47,7 +47,7 @@ templates/
 | 命令 | 阶段 | 用途 |
 |------|------|------|
 | `/context-init` | 初始化 | 环境检查 + 创建目录 + 归档源文档 |
-| `/context-openspec` | 集成 | 生成文档总结 + 填充 project.md + 生成路线图 |
+| `/context-openspec` | 集成 | 生成文档总结 + 填充 config.yaml + 生成路线图 |
 | `/context-openspec proposal <change-id> [roadmap-doc]` | 设计 | 基于路线图/大纲创建提案 → 生成 tasks.md |
 | `/context-interview` | 设计 | 深度访谈完善技术规格或用户指定文档 |
 | `/context-start` | 实施 | validate → SSoT-first → codegen → code → archive |
@@ -100,8 +100,8 @@ PRD：@docs/product-overview.md
 ```
 
 - 创建 `openspec/` 目录结构
-- 增强 `openspec/AGENTS.md`（仅首次追加）
-- 生成 `openspec/project.md` + `openspec/proposal-roadmap.md`
+- 确保 OpenSpec 已初始化（必要时运行 `openspec init --tools ...` / `openspec update`）
+- 生成 `openspec/config.yaml` + `openspec/proposal-roadmap.md`
 
 ### 4. 创建提案
 
@@ -125,11 +125,11 @@ PRD：@docs/product-overview.md
 ```
 
 执行流程：
-1. `openspec validate <提案ID>`
+1. `node design/context-dev/tools/specflow/specflow.mjs validate <提案ID> --strict`
 2. 展示任务列表，等待确认
 3. SSoT-first：创建 Goose 迁移 (`SSoT/schema/migrations/`) → 修改 `SSoT/api/main.tsp` → Codegen
 4. 实现业务代码 + 测试
-5. `openspec archive <提案ID> --yes`
+5. `node design/context-dev/tools/specflow/specflow.mjs archive <提案ID> --yes`
 
 ### 6. 检查状态
 
@@ -153,7 +153,7 @@ PRD：@docs/product-overview.md
 | 数据层 | `SSoT/schema/migrations/` | Goose SQL 迁移文件目录 |
 | API 层 | `SSoT/api/tspconfig.yaml` | TypeSpec 配置 |
 | API 层 | `SSoT/api/main.tsp` | API 契约入口 |
-| 需求层 | `openspec/project.md` | 项目信息 |
+| 需求层 | `openspec/config.yaml` | 项目信息 |
 | 需求层 | `openspec/proposal-roadmap.md` | 提案路线图 |
 | 需求层 | `openspec/changes/` | 变更提案目录 |
 | 需求层 | `openspec/specs/` | 当前规范 (真理源) |

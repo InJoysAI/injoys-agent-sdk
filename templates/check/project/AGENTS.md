@@ -16,7 +16,7 @@
 
 | 文件 | 必需 | 说明 |
 |------|:----:|------|
-| `openspec/project.md` | ✅ | Project 文件 |
+| `openspec/config.yaml` | ✅ | Project 配置文件 |
 | `.context/context-manifest.json` | ✅ | 用于读取 Context 资产 |
 
 **结果**：
@@ -64,19 +64,19 @@
 
 ### 3.2 内容校验
 
-根据读取的资产**动态校验**  `openspec/project.md` 内容：
+根据读取的资产**动态校验** `openspec/config.yaml` 内容：
 
 | 校验项 | 来源 | 校验规则 |
 |--------|------|---------|
-| Purpose 一致性 | `criterion.md` | project.md 的 Purpose 必须与 criterion.md 一致 |
+| Purpose 一致性 | `criterion.md` | config.yaml 的 context 必须与 criterion.md 一致 |
 | Tech Stack 完整性 | `tech_stack.md` | 必须覆盖所有 MUST 级别的技术 |
-| 约束一致性 | `criterion.md` | Constraints 必须反映 MUST/MUST NOT 规则 |
+| 约束一致性 | `criterion.md` | context 必须反映 MUST/MUST NOT 规则 |
 | Domain 覆盖 | `business_rules.md` | 必须涵盖核心业务规则 |
 
 **示例**：
-- ❌ `tech_stack.md` 要求 Rust stable，但 `project.md` 中未体现
-- ❌ `criterion.md` 有 MUST NOT 规则，但 `project.md` 的 Constraints 未包含
-- ⚠️ `project.md` 缺少 Git Workflow 章节
+- ❌ `tech_stack.md` 要求 Rust stable，但 `config.yaml` 中未体现
+- ❌ `criterion.md` 有 MUST NOT 规则，但 `config.yaml` 的 context 未包含
+- ⚠️ `config.yaml` 缺少 Git Workflow 约定
 
 ---
 
@@ -96,11 +96,11 @@
 
 ```
 🔍 Project 检查报告
-文件：openspec/project.md
+文件：openspec/config.yaml
 状态：[🟢 通过 | 🟡 需要关注 | 🔴 失败]
 
 ✅/❌ 文件存在性
-   └── project.md [状态]
+   └── config.yaml [状态]
 
 ✅/⚠️/❌ 格式正确性
    ├── Purpose [状态]

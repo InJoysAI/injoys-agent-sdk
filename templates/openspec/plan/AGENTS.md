@@ -6,7 +6,7 @@
 
 ## 🎯 执行指令
 
-> ⛔ **本命令只生成 `proposal-roadmap.md`，不能触发 `project.md` 生成**
+> ⛔ **本命令只生成 `proposal-roadmap.md`，不能触发 `config.yaml` 生成**
 
 依次执行以下步骤：
 
@@ -116,7 +116,7 @@ feat-legacy-deprecate     # 废弃旧代码
 **规则**：
 - 不得残留任何 `{{...}}` 占位符
 - 路线图应与 criterion.md 约束保持一致
-- **❌ 禁止同时生成 project.md**
+- **❌ 禁止同时生成 config.yaml**
 
 ---
 
