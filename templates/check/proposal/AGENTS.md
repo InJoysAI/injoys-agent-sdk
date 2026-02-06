@@ -129,7 +129,7 @@ node design/context-dev/tools/specflow/specflow.mjs validate <change-id> --stric
 | REST API (Go) | 修改 `SSoT/api/main.tsp` 任务 |
 | 启用 Codegen | Codegen 执行任务 |
 | Tauri/Rust | 无 SSoT 约束 |
-| 所有项目 | 测试 + 归档任务（`specflow validate` + `specflow archive`） |
+| 所有项目 | 测试 + 归档任务（`node design/context-dev/tools/specflow/specflow.mjs validate <change-id> --strict` + `node design/context-dev/tools/specflow/specflow.mjs archive <change-id> --yes`） |
 
 **检查方法**：
 1. 根据 Tech Stack 确定需要检查的 SSoT 任务
@@ -148,7 +148,7 @@ node design/context-dev/tools/specflow/specflow.mjs validate <change-id> --stric
 状态：[🟢 通过 | 🟡 需要关注 | 🔴 失败]
 
 📌 Artifact 状态
-   └── specflow status <change-id> → Ready: <proposal|specs|tasks|none>
+   └── node design/context-dev/tools/specflow/specflow.mjs status <change-id> → Ready: <proposal|specs|tasks|none>
 
 ✅/⚠️/❌ 文件完整性
    ├── proposal.md [状态]
@@ -157,7 +157,7 @@ node design/context-dev/tools/specflow/specflow.mjs validate <change-id> --stric
    └── specs/ [状态]
 
 ✅/❌ OpenSpec 验证
-   └── specflow validate <change-id> --strict → [结果]
+   └── node design/context-dev/tools/specflow/specflow.mjs validate <change-id> --strict → [结果]
 
 ✅/⚠️/❌ Context 引用
    ├── criterion.md → [状态]

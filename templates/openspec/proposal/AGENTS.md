@@ -115,8 +115,8 @@ node design/context-dev/tools/specflow/specflow.mjs templates
 2. 创建目录结构：`openspec/changes/<change-id>/`
 3. 编写 `openspec/changes/<change-id>/proposal.md`、`openspec/changes/<change-id>/tasks.md`
 4. 创建 `openspec/changes/<change-id>/specs/<capability>/spec.md` delta 文件
-5. 若需要技术设计/架构决策，创建 `openspec/changes/<change-id>/design.md`（以 `specflow instructions design --change <change-id>` 的要求为准）
-6. 增加以 SSoT 为首的步骤：验证是否需要更改 schema/API 合约；如果不需要，则添加明确的“SSoT 未更改”检查，以及 specflow validate 和 specflow archive 任务；如果需要，则包括创建 Goose 迁移 (`SSoT/schema/migrations/`) 和 `SSoT/api/main.tsp` 的更新以及相应的代码生成（codegen）。
+5. 若需要技术设计/架构决策，创建 `openspec/changes/<change-id>/design.md`（以 `node design/context-dev/tools/specflow/specflow.mjs instructions design --change <change-id>` 的要求为准）
+6. 增加以 SSoT 为首的步骤：验证是否需要更改 schema/API 合约；如果不需要，则添加明确的“SSoT 未更改”检查，以及 `node design/context-dev/tools/specflow/specflow.mjs validate <change-id> --strict` + `node design/context-dev/tools/specflow/specflow.mjs archive <change-id> --yes` 的任务；如果需要，则包括创建 Goose 迁移 (`SSoT/schema/migrations/`) 和 `SSoT/api/main.tsp` 的更新以及相应的代码生成（codegen）。
 7. 如果涉及接口方面的设计，需要同步更新`.context/architecture/api_strategy.md`,添加对应的请求响应示例
 
 ### 2.2 必须输出交付物清单（Deliverables）
@@ -126,7 +126,7 @@ node design/context-dev/tools/specflow/specflow.mjs templates
 - [ ] `openspec/changes/<change-id>/proposal.md`
 - [ ] `openspec/changes/<change-id>/tasks.md`
 - [ ] `openspec/changes/<change-id>/specs/<capability>/spec.md`（至少 1 个 capability delta；多 capability 则多文件）
-- [ ] `openspec/changes/<change-id>/design.md`（仅当 `specflow instructions design --change <change-id>` 要求/建议且确有设计决策需要记录；否则明确写“未创建 design.md 的原因”）
+- [ ] `openspec/changes/<change-id>/design.md`（仅当 `node design/context-dev/tools/specflow/specflow.mjs instructions design --change <change-id>` 要求/建议且确有设计决策需要记录；否则明确写“未创建 design.md 的原因”）
 - [ ] 如涉及接口：`.context/architecture/api_strategy.md`（已补充请求/响应示例；否则写明“不涉及接口设计”）
 - [ ] SSoT 相关（按需）：`SSoT/schema/migrations/`、`SSoT/api/main.tsp`、以及 codegen 产物（或写明 “SSoT 未更改”）
 
@@ -137,12 +137,12 @@ node design/context-dev/tools/specflow/specflow.mjs templates
 - [ ] `change-id` 唯一且 verb-led（必要时用 `ls openspec/changes/` 检查；冲突则换名）
 - [ ] 目录结构完整：`openspec/changes/<change-id>/` + `specs/<capability>/`
 - [ ] `proposal.md` 至少包含：`## Why`、`## What Changes`、`## Impact`（且 Impact 里包含 “关联 Context 资产” 表）
-- [ ] `tasks.md` 包含：SSoT 检查/变更（或“SSoT 未更改”）、`specflow validate <change-id> --strict`、以及 `specflow archive <change-id>`（作为后续任务）
+- [ ] `tasks.md` 包含：SSoT 检查/变更（或“SSoT 未更改”）、`node design/context-dev/tools/specflow/specflow.mjs validate <change-id> --strict`、以及 `node design/context-dev/tools/specflow/specflow.mjs archive <change-id> --yes`（作为后续任务）
 - [ ] 每个 delta spec 文件至少包含 1 个 operation header（`## ADDED|MODIFIED|REMOVED|RENAMED Requirements`）
 - [ ] 每条 `### Requirement:` 至少 1 个 `#### Scenario:`（严格 4 个 `#`；否则将导致解析失败）
 - [ ] 已运行并通过：`node design/context-dev/tools/specflow/specflow.mjs validate <change-id> --strict`
 
-> 若 `specflow validate` 失败：先修复提案/格式/缺失项，再重新验证；在验证通过前不得宣称完成。
+> 若 `node design/context-dev/tools/specflow/specflow.mjs validate <change-id> --strict` 失败：先修复提案/格式/缺失项，再重新验证；在验证通过前不得宣称完成。
 
 ### 2.4 固定模板（减少重复的写法约束 + 可直接复制）
 
@@ -245,7 +245,7 @@ node design/context-dev/tools/specflow/specflow.mjs validate <change-id> --stric
 
 ## ✅ 完成后
 
-> ⛔ **只有 specflow validate 通过后才能报告完成**
+> ⛔ **只有 `node design/context-dev/tools/specflow/specflow.mjs validate <change-id> --strict` 通过后才能报告完成**
 
 报告结果：
 

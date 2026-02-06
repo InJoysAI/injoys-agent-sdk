@@ -26,7 +26,7 @@ node design/context-dev/tools/specflow/specflow.mjs --help
 ```
 
 - ✅ 若成功 → 继续检查 3
-- ❌ 若失败 → **⛔ STOP**，告知用户：`缺少 Node.js 或 Specflow 工具未安装在仓库中`
+- ❌ 若失败 → **⛔ STOP**，告知用户：`缺少 Node.js 工具未安装在仓库中`
 
 ### 检查 3: Init Check
 

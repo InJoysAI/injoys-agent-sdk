@@ -184,7 +184,7 @@ MUST NOT:
     ↓
 创建提案：/context-openspec proposal <change-id> [roadmap-doc]
     ↓
-验证提案：specflow validate <提案ID> --strict
+验证提案：node design/context-dev/tools/specflow/specflow.mjs validate <提案ID> --strict
     ↓
 更新服务端/契约（如有）
     ↓
@@ -192,7 +192,7 @@ MUST NOT:
     ↓
 运行测试
     ↓
-归档：specflow archive <提案ID> --yes
+归档：node design/context-dev/tools/specflow/specflow.mjs archive <提案ID> --yes
 ```
 
 ---

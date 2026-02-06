@@ -32,11 +32,11 @@ description: Implement an OpenSpec change (validate → SSoT → code → test �
 
 **详细步骤**见 `start/AGENTS.md`，包括：
 1. 读取并记住提案内容（proposal.md, design.md）
-2. 规范校验（`specflow validate --strict`）
+2. 规范校验（`node design/context-dev/tools/specflow/specflow.mjs validate <提案ID> --strict`）
 3. 检查 SSoT 需求（根据 tech_stack.md）
 4. 展示任务列表并确认
 5. 按顺序执行任务（SSoT 先行）
-6. 验证（测试 + specflow validate）
-7. 归档（`specflow archive --yes`）
+6. 验证（测试 + `node design/context-dev/tools/specflow/specflow.mjs validate <提案ID> --strict`）
+7. 归档（`node design/context-dev/tools/specflow/specflow.mjs archive <提案ID> --yes`）
 
 $ARGUMENTS

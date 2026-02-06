@@ -138,7 +138,7 @@ node design/context-dev/tools/specflow/specflow.mjs archive <提案ID> --yes
 提案ID：<提案ID>
 
 ✅ 所有任务已完成（N/N）
-✅ specflow validate 通过
+✅ node design/context-dev/tools/specflow/specflow.mjs validate <提案ID> --strict 通过
 ✅ 测试通过
 ✅ 已归档
 
