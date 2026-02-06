@@ -28,7 +28,7 @@
 # Requirements
 - 运行脚本并检查以下所有项：
   - **运行时**: Go, Node.js, Python, uv, Docker
-  - **SSoT**: Goose, TypeSpec, OpenSpec
+  - **SSoT**: Goose, TypeSpec, Specflow
   - **CodeGen**: oapi-codegen, orval, datamodel-codegen
 - 输出完整检查报告（✅ / ❌）
 
@@ -91,7 +91,7 @@
 | **运行时** | Docker | 24 | https://docker.com/ |
 | **SSoT** | Goose | 3.0 | `go install github.com/pressly/goose/v3/cmd/goose@latest` |
 | **SSoT** | TypeSpec | 0.60 | `npm install -g @typespec/compiler` |
-| **SSoT** | OpenSpec | 0.1 | `npm install -g @fission-ai/openspec@latest` |
+| **SSoT** | Specflow | - | `node design/context-dev/tools/specflow/specflow.mjs --help` |
 | **代码生成** | oapi-codegen | 2.0 | `go install github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen@latest` |
 | **代码生成** | orval | 7.0 | `npm install -g orval` |
 | **代码生成** | datamodel-codegen | 0.25 | `uv tool install datamodel-code-generator` |

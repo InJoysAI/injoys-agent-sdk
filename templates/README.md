@@ -100,7 +100,7 @@ PRD：@docs/product-overview.md
 ```
 
 - 创建 `openspec/` 目录结构
-- 确保 OpenSpec 已初始化（必要时运行 `openspec init --tools ...` / `openspec update`）
+- 确保 `openspec/` 目录结构存在
 - 生成 `openspec/config.yaml` + `openspec/proposal-roadmap.md`
 
 ### 4. 创建提案

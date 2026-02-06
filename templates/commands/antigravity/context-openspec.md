@@ -22,11 +22,11 @@ ls -la .context/criterion.md
 ### 检查 2: CLI Check
 
 ```bash
-openspec --version
+node design/context-dev/tools/specflow/specflow.mjs --help
 ```
 
 - ✅ 若成功 → 继续检查 3
-- ❌ 若失败 → **⛔ STOP**，告知用户：`请执行 npm install -g @fission-ai/openspec@latest`
+- ❌ 若失败 → **⛔ STOP**，告知用户：`缺少 Node.js 或 Specflow 工具未安装在仓库中`
 
 ### 检查 3: Init Check
 
@@ -35,18 +35,11 @@ ls -la openspec/
 ```
 
 - ✅ 若目录存在 → 继续第 2 步
-- ❌ 若目录不存在 → **⛔ 必须 STOP**，向用户询问：
-
-> "请选择 OpenSpec 要配置的 AI 工具（可多选，逗号分隔）：
-> 1. Antigravity  2. Claude  3. Codex  4. Cursor  5. Qoder  6. Windsurf  7. 全部"
-
-**等待用户回复后**，执行：
+- ❌ 若目录不存在 → 直接创建：
 
 ```bash
-openspec init --tools {用户选择}
+mkdir -p openspec/changes openspec/specs openspec/changes/archive
 ```
-
-> ⚠️ **保护规则**: 不得覆盖项目根 `AGENTS.md`。
 
 ---
 

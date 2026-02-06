@@ -44,7 +44,13 @@ echo ""
 echo "=== SSoT 工具链 ==="
 check_cmd "Goose" "goose --version" "go install github.com/pressly/goose/v3/cmd/goose@latest"
 check_cmd "TypeSpec" "tsp --version" "npm install -g @typespec/compiler"
-check_cmd "OpenSpec" "openspec --version" "npm install -g @fission-ai/openspec@latest"
+if command -v node &> /dev/null && [ -f "design/context-dev/tools/specflow/specflow.mjs" ]; then
+  echo -e "${GREEN}✅${NC} Specflow: available (design/context-dev/tools/specflow/specflow.mjs)"
+else
+  echo -e "${RED}❌${NC} Specflow: 不可用"
+  echo -e "   ${YELLOW}检查项:${NC} Node.js 已安装且仓库包含 design/context-dev/tools/specflow/specflow.mjs"
+  MISSING+=("Specflow")
+fi
 echo ""
 
 echo "=== 代码生成工具 ==="

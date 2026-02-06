@@ -55,8 +55,8 @@
 ### 1.3 检查现有变更
 
 ```bash
-openspec list              # 已有的 changes
-openspec list --specs      # 已有的 specs
+ls openspec/changes/       # 已有的 changes
+ls openspec/specs/         # 已有的 specs（capabilities）
 ```
 
 检查相关代码或文档（如涉及的模块）

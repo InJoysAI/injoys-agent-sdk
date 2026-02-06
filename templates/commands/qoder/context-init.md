@@ -22,4 +22,4 @@ description: Initialize project Context (archive sources + skeleton)
 ./design/context-dev/scripts/context-gen.sh -i
 ```
 
-Note: Context summarization + OpenSpec initialization/enhancement is handled by `/context-openspec`.
+Note: Context summarization + Specflow setup (creating `openspec/` directories + generating config/roadmap/proposals) is handled by `/context-openspec`.
