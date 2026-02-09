@@ -39,7 +39,59 @@ node design/context-dev/tools/specflow/specflow.mjs status <change-id>
 
 ---
 
-## Phase 2: OpenSpec 规范校验
+## Phase 2: Roadmap 对齐核对（强制）
+
+> ⛔ **必须核对** `openspec/proposal-roadmap.md` 中对应 `<change-id>` 的提案大纲条目，不能只做 Context 资产检查。
+
+### 2.1 提取 roadmap 主条目
+
+从 `openspec/proposal-roadmap.md` 中按 `Change ID: <change-id>` 精确定位条目并提取。
+
+**核心必提取字段（必须）**：
+- `business_goal`
+- `in_scope` / `out_of_scope`
+- `dependencies`
+- `acceptance_criteria`
+- `key_tasks`
+- `risks`
+
+**扩展建议提取字段（若条目存在）**：
+- `milestones`
+- `coverage_scope`
+- `gate_vs_non_gate`
+- `change_management`
+- `ops_support`
+- `kpi`
+- `risk_acceptance_policy`
+
+**结果**：
+- ❌ 未找到 `<change-id>` 对应条目 → 失败（提示先更新 roadmap 或确认 change-id）
+- ✅ 找到条目 → 继续
+
+### 2.2 核对 proposal/tasks/spec 覆盖性
+
+对照 `openspec/changes/<change-id>/` 中工件进行分级核对：
+
+**核心核对（必须通过）**：
+1. `proposal.md` 是否覆盖 `business_goal`、`in_scope/out_of_scope`、`dependencies`、`risks`
+2. `tasks.md` 是否覆盖 `key_tasks`（可拆分细化，但不得缺失核心任务）
+3. `specs/*/spec.md` 的 Scenario 是否覆盖 `acceptance_criteria` 核心验收点
+
+**扩展核对（建议通过）**：
+1. `proposal.md`/`tasks.md` 是否体现 `milestones` 与 `coverage_scope`
+2. `proposal.md` 是否体现 `gate_vs_non_gate` 与 `change_management`
+3. `tasks.md` 是否体现 `ops_support`（例如 CI/日志/运维处置项）
+4. 提案文档是否体现 `kpi`（至少有记录或追踪方式）
+5. 若 roadmap 条目包含 `risk_acceptance_policy`，提案是否有对应处理说明
+
+**结果**：
+- ❌ 任一“核心核对”项缺失或明显偏离 roadmap 条目 → 失败
+- ⚠️ “核心核对”通过，但“扩展核对”存在缺失或偏差 → 需要关注
+- ✅ 已对齐 → 继续
+
+---
+
+## Phase 3: OpenSpec 规范校验
 
 ```bash
 node design/context-dev/tools/specflow/specflow.mjs validate <change-id> --strict
@@ -51,7 +103,7 @@ node design/context-dev/tools/specflow/specflow.mjs validate <change-id> --stric
 
 ---
 
-## Phase 3: Context 引用一致性
+## Phase 4: Context 引用一致性
 
 检查 `proposal.md` 中声明的 Context 引用：
 
@@ -76,11 +128,11 @@ node design/context-dev/tools/specflow/specflow.mjs validate <change-id> --stric
 
 ---
 
-## Phase 4: Context 内容一致性校验
+## Phase 5: Context 内容一致性校验
 
 > ⛔ **必须执行此步骤**，不得跳过。
 
-### 4.1 读取 Context 资产
+### 5.1 读取 Context 资产
 
 **执行**: `@design/context-dev/tools/asset-reader/AGENTS.md`
 
@@ -89,7 +141,7 @@ node design/context-dev/tools/specflow/specflow.mjs validate <change-id> --stric
 > - 按 scope 遍历：architecture, domain, db, ui, legacy
 > - 跳过 README.md、openspec/、source/
 
-### 4.2 内容校验
+### 5.2 内容校验
 
 根据 `asset-reader` 读取的资产**动态校验**提案内容：
 
@@ -119,7 +171,7 @@ node design/context-dev/tools/specflow/specflow.mjs validate <change-id> --stric
 
 ---
 
-## Phase 5: SSoT 先行任务检查
+## Phase 6: SSoT 先行任务检查
 
 读取 `.context/architecture/tech_stack.md` 判断项目 SSoT 类型：
 
@@ -138,7 +190,7 @@ node design/context-dev/tools/specflow/specflow.mjs validate <change-id> --stric
 
 ---
 
-## Phase 6: 生成检查报告
+## Phase 7: 生成检查报告
 
 输出检查报告（✅/⚠️/❌），并给出最小修复建议：
 
@@ -155,6 +207,14 @@ node design/context-dev/tools/specflow/specflow.mjs validate <change-id> --stric
    ├── tasks.md [状态]
    ├── design.md [状态]
    └── specs/ [状态]
+
+✅/⚠️/❌ Roadmap 对齐（openspec/proposal-roadmap.md）
+   ├── change-id 条目存在性 → [状态]
+   ├── 核心字段提取（business_goal/in_scope/out_of_scope/dependencies/acceptance_criteria/key_tasks/risks）→ [状态]
+   ├── 核心核对：proposal 覆盖目标/范围/依赖/风险 → [状态]
+   ├── 核心核对：tasks 覆盖 key_tasks → [状态]
+   ├── 核心核对：specs Scenario 覆盖 acceptance_criteria → [状态]
+   └── 扩展核对（milestones/coverage_scope/gate_vs_non_gate/change_management/ops_support/kpi/risk_acceptance_policy）→ [状态]
 
 ✅/❌ OpenSpec 验证
    └── node design/context-dev/tools/specflow/specflow.mjs validate <change-id> --strict → [结果]

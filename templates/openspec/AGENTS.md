@@ -29,7 +29,7 @@
 | `legacy` | `@design/context-dev/legacy/AGENTS.md` | 生成 legacy 分析 |
 | `project` | `@design/context-dev/openspec/project/AGENTS.md` | 生成 config.yaml |
 | `plan` | `@design/context-dev/openspec/plan/AGENTS.md` | 生成 proposal-roadmap.md（索引/总览；可选存在 proposal-roadmap-Phase*.md 作为分 Phase 细化） |
-| `proposal <change-id> [roadmap-doc]` | `@design/context-dev/openspec/proposal/AGENTS.md` | 创建提案（可显式指定提案大纲/路线图文件） |
+| `proposal <change-id> [roadmap-doc]` | `@design/context-dev/openspec/proposal/AGENTS.md` | 创建提案（必须携带 `openspec/proposal-roadmap.md` 中 `<change-id>` 条目；`roadmap-doc` 仅补充） |
 
 ---
 

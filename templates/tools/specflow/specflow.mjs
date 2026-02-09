@@ -124,8 +124,10 @@ function artifactStatus(changeId) {
   const hasProposal = fileExists(paths.proposal) && readText(paths.proposal).trim().length > 0;
   const deltaSpecs = findDeltaSpecs(changeId);
   const hasAnyDelta = deltaSpecs.length > 0;
-  const hasTasks = fileExists(paths.tasks) && readText(paths.tasks).trim().length > 0;
+  const tasksText = fileExists(paths.tasks) ? readText(paths.tasks) : "";
+  const hasTasks = tasksText.trim().length > 0;
   const hasDesign = fileExists(paths.design) && readText(paths.design).trim().length > 0;
+  const taskStats = getTaskCheckboxStats(tasksText);
 
   const artifacts = [
     { id: "proposal", required: true, done: hasProposal },
@@ -146,8 +148,24 @@ function artifactStatus(changeId) {
   }
 
   const isComplete = requiredOrder.every((id) => doneMap.get(id));
+  const executionComplete = taskStats.total > 0 && taskStats.unchecked === 0;
 
-  return { changeId, artifacts, ready, isComplete };
+  return { changeId, artifacts, ready, isComplete, executionComplete, taskStats };
+}
+
+function getTaskCheckboxStats(tasksText) {
+  const lines = String(tasksText || "").split(/\r?\n/);
+  let total = 0;
+  let checked = 0;
+  let unchecked = 0;
+  for (const line of lines) {
+    const m = line.match(/^\s*-\s+\[([ xX\/])\]\s+/);
+    if (!m) continue;
+    total += 1;
+    if (m[1].toLowerCase() === "x") checked += 1;
+    else unchecked += 1;
+  }
+  return { total, checked, unchecked };
 }
 
 function hasPlaceholders(text) {
@@ -462,7 +480,10 @@ function cmdStatus({ args, flags }) {
     process.stdout.write(`${mark} ${a.id}${extra}\n`);
   }
   process.stdout.write(`Ready: ${status.ready ?? "none"}\n`);
-  process.stdout.write(`Complete: ${status.isComplete ? "yes" : "no"}\n`);
+  process.stdout.write(`ArtifactsComplete: ${status.isComplete ? "yes" : "no"}\n`);
+  process.stdout.write(
+    `ExecutionComplete: ${status.executionComplete ? "yes" : "no"} (checked ${status.taskStats.checked}/${status.taskStats.total}, unchecked ${status.taskStats.unchecked})\n`,
+  );
 }
 
 function cmdInstructions({ args, flags }) {

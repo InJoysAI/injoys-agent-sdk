@@ -20,10 +20,11 @@
 | config.yaml | `openspec/config.yaml` 存在 | ⛔ STOP，先运行 `/context-openspec project` |
 | proposal-roadmap.md | `openspec/proposal-roadmap.md` 存在 | ⛔ STOP，先运行 `/context-openspec plan` |
 | proposal-roadmap-Phase*.md（可选） | `openspec/proposal-roadmap-Phase*.md` 或 `openspec/proposal-roadmap-Phase-*.md` 存在 | 若存在，则作为补充规划文档一并读取 |
+| roadmap 条目匹配结果 | 能在 `openspec/proposal-roadmap.md` 中精确定位到目标 `<change-id>` 条目（或经用户确认按“新建提案”处理） | ⛔ STOP，先确认是“新建提案”还是“使用既有 roadmap 条目” |
 
 **命令参数**：
-- `/context-openspec proposal <change-id>`：默认使用 `openspec/proposal-roadmap.md`（并补充读取 Phase 文件，若存在）
-- `/context-openspec proposal <change-id> <roadmap-doc>`：显式指定“提案大纲文档”，如 `openspec/proposal-roadmap-Phase3.md` 或 `openspec/proposal-roadmap-Phase-0.5.md`
+- `/context-openspec proposal <change-id>`：创建提案时，必须携带 `openspec/proposal-roadmap.md` 中该 `<change-id>` 的条目内容
+- `/context-openspec proposal <change-id> <roadmap-doc>`：在上条基础上，额外读取 `<roadmap-doc>` 作为补充信息（不能替代 `openspec/proposal-roadmap.md` 的主条目）
   - `roadmap-doc` 期望是一个**具体文件路径**（不建议传 `*` 通配符；若用户传了通配符，需先让用户确认要读取哪些具体文件）
 
 
@@ -40,17 +41,88 @@
 **额外读取**（proposal 专用）：
 - `.context/openspec/integration.md` — Context 读取规范
 - `openspec/config.yaml` — 项目整体情况（OPSX 注入上下文）
-- `openspec/proposal-roadmap.md` — 规划文档（索引/总览）
+- `openspec/proposal-roadmap.md` — 规划文档（索引/总览，且必须提取 `<change-id>` 对应条目正文）
 - `openspec/proposal-roadmap-Phase*.md` / `openspec/proposal-roadmap-Phase-*.md` — 分 Phase 规划（若存在，视为更细粒度计划）
 
-### 1.2 匹配提案
+### 1.2 匹配提案（强制）
 
-根据用户输入（如 "用户登录模块"）**模糊匹配**对应的提案条目：
+根据命令参数 `<change-id>` 执行“先精确后模糊”匹配：
 - 匹配范围：
-  - 若用户提供了 `roadmap-doc` 参数 → **优先在该文件中匹配**
-  - 否则先在 `openspec/proposal-roadmap.md` 匹配；若存在 `openspec/proposal-roadmap-Phase*.md`/`openspec/proposal-roadmap-Phase-*.md`，再在这些文档中补充匹配
-- 匹配规则：名称包含关键词 OR Change ID 匹配
-- 若无法匹配 → 向用户确认是新建提案还是选择已有提案
+  - 第一步（必做）：在 `openspec/proposal-roadmap.md` 中按 `<change-id>` 精确匹配目标条目
+  - 第二步（可选补充）：若用户提供了 `roadmap-doc`，再在该文件中匹配同 `<change-id>` 或同主题条目用于补充
+  - 第三步（可选补充）：若存在 `openspec/proposal-roadmap-Phase*.md`/`openspec/proposal-roadmap-Phase-*.md`，补充匹配
+- 匹配规则：
+  - 主规则（必须）：`Change ID` 精确匹配 `<change-id>`
+  - 补救规则（仅在精确匹配失败时）：名称关键词模糊匹配，并向用户确认是否接受该映射
+- 若仍无法匹配 → 向用户确认是新建提案还是选择已有提案；在确认前 ⛔ STOP
+
+### 1.2.1 生成「Roadmap 提案快照」（强制）
+
+> ⛔ 本步骤是 proposal 输入的一部分，不是可选说明。
+> 没有快照或快照字段不完整，禁止进入 Phase 2。
+
+从匹配到的 roadmap 条目中抽取并输出以下信息（缺失字段用 `N/A` 标注，并提示用户确认）：
+
+**核心必提取字段（必须）**：
+- `roadmap_source_primary`（固定为 `openspec/proposal-roadmap.md`）
+- `roadmap_source_supplement`（若无补充文件则 `N/A`）
+- `phase`（如 Phase 0 / 1 / 2）
+- `change_id`
+- `title`
+- `business_goal`
+- `in_scope` / `out_of_scope`
+- `dependencies`
+- `acceptance_criteria`
+- `key_tasks`
+- `risks`
+- `related_context_assets`
+
+**扩展建议提取字段（若条目存在）**：
+- `milestones`
+- `coverage_scope`
+- `gate_vs_non_gate`
+- `change_management`
+- `ops_support`
+- `kpi`
+- `risk_acceptance_policy`
+
+输出格式（建议）：
+
+```markdown
+### Roadmap 提案快照（必须对齐）
+| 字段 | 内容 |
+|------|------|
+| roadmap_source_primary | openspec/proposal-roadmap.md |
+| roadmap_source_supplement | ... |
+| phase | ... |
+| change_id | ... |
+| title | ... |
+| business_goal | ... |
+| in_scope | ... |
+| out_of_scope | ... |
+| dependencies | ... |
+| acceptance_criteria | ... |
+| key_tasks | ... |
+| risks | ... |
+| related_context_assets | ... |
+| milestones | ... |
+| coverage_scope | ... |
+| gate_vs_non_gate | ... |
+| change_management | ... |
+| ops_support | ... |
+| kpi | ... |
+| risk_acceptance_policy | ... |
+```
+
+### 1.2.2 生成「提案输入上下文包」（强制）
+
+> ⛔ 创建提案前，必须输出并使用该上下文包；否则禁止进入 Phase 2。
+
+上下文包必须包含两部分：
+1. `Context Assets Payload`：来自 `.context/*` 与 `openspec/config.yaml` 的关键信息摘要
+2. `Roadmap Entry Payload`：来自 `openspec/proposal-roadmap.md` 的 `<change-id>` 条目要点（核心必含：`business_goal`、`in_scope/out_of_scope`、`dependencies`、`acceptance_criteria`、`key_tasks`、`risks`；若条目存在扩展字段也应携带）
+
+若提供了 `<roadmap-doc>`，可在 `Roadmap Entry Payload` 中追加补充字段，但不得覆盖主来源结论。
 
 ### 1.3 检查现有变更
 
@@ -78,7 +150,22 @@ ls openspec/specs/         # 已有的 specs（capabilities）
 
 **fallback**（若无法使用 OPSX 命令）：继续执行下方的手工创建流程（创建目录结构与交付物）。
 
-### 2.0.1 输出“工件写作指引”（proposal/specs/tasks）
+### 2.0.1 将 roadmap 快照绑定到提案内容（强制）
+
+> ⛔ 必须把 **1.2.1 Roadmap 提案快照** 映射到提案工件；禁止只“读取不落地”。
+
+映射规则：
+1. `proposal.md > Why` 必须覆盖 `business_goal`
+2. `proposal.md > What Changes` 必须覆盖 `in_scope`，并明确排除 `out_of_scope`
+3. `proposal.md > Impact` 必须包含依赖关系（`dependencies`）与风险（`risks`）
+4. `tasks.md` 必须包含对 `key_tasks` 的可执行拆解（允许细化，不允许偏离）
+5. 若 roadmap 条目存在扩展字段，`proposal.md`/`tasks.md` 应尽量体现：`milestones`、`coverage_scope`、`gate_vs_non_gate`、`change_management`、`ops_support`、`kpi`、`risk_acceptance_policy`
+6. `tasks.md` 中的 validate/archive 必须以普通 checkbox 文本行出现（不能仅放在代码块）
+7. `specs/*/spec.md` 的 Scenario 必须可追溯到 `acceptance_criteria`
+
+若映射冲突（roadmap 与用户新要求冲突）：先向用户确认取舍，确认前 ⛔ STOP。
+
+### 2.0.2 输出“工件写作指引”（proposal/specs/tasks）
 
 > ⛔ 当用户准备开始编写 `proposal.md` / `specs/*/spec.md` / `tasks.md` 时，必须先输出对应的 instructions，避免漏文件/漏顺序/漏规则。
 
@@ -129,6 +216,7 @@ node design/context-dev/tools/specflow/specflow.mjs templates
 - [ ] `openspec/changes/<change-id>/design.md`（仅当 `node design/context-dev/tools/specflow/specflow.mjs instructions design --change <change-id>` 要求/建议且确有设计决策需要记录；否则明确写“未创建 design.md 的原因”）
 - [ ] 如涉及接口：`.context/architecture/api_strategy.md`（已补充请求/响应示例；否则写明“不涉及接口设计”）
 - [ ] SSoT 相关（按需）：`SSoT/schema/migrations/`、`SSoT/api/main.tsp`、以及 codegen 产物（或写明 “SSoT 未更改”）
+- [ ] Roadmap 对齐证明：输出 `Roadmap 提案快照`，并给出 proposal/tasks/specs 的字段映射说明
 
 ### 2.3 逐项自检（Self-check）+ 不通过则 STOP
 
@@ -140,7 +228,17 @@ node design/context-dev/tools/specflow/specflow.mjs templates
 - [ ] `tasks.md` 包含：SSoT 检查/变更（或“SSoT 未更改”）、`node design/context-dev/tools/specflow/specflow.mjs validate <change-id> --strict`、以及 `node design/context-dev/tools/specflow/specflow.mjs archive <change-id> --yes`（作为后续任务）
 - [ ] 每个 delta spec 文件至少包含 1 个 operation header（`## ADDED|MODIFIED|REMOVED|RENAMED Requirements`）
 - [ ] 每条 `### Requirement:` 至少 1 个 `#### Scenario:`（严格 4 个 `#`；否则将导致解析失败）
+- [ ] 已输出 `Roadmap 提案快照`（来源文件、phase、目标、范围、依赖、验收、关键任务、风险、关联资产）
+- [ ] 已输出 `提案输入上下文包`，且包含 `Context Assets Payload` + `Roadmap Entry Payload`
+- [ ] `Roadmap Entry Payload` 明确来自 `openspec/proposal-roadmap.md` 的 `<change-id>` 条目（`roadmap-doc` 仅补充不替代）
+- [ ] `Roadmap Entry Payload` 已覆盖核心必提取字段；若 roadmap 条目存在扩展字段，已在 payload 中体现或标注 `N/A`
+- [ ] `tasks.md` 的 validate/archive 为普通 checkbox 文本行（非仅代码块），可被 specflow 检测
+- [ ] `proposal.md` 的 Why/What Changes/Impact 与 `Roadmap 提案快照` 对齐（若有偏差，已写明偏差原因并获用户确认）
+- [ ] `tasks.md` 至少覆盖 roadmap 的全部 `key_tasks`（可细化拆分，不得缺失）
+- [ ] `specs/*/spec.md` 的 Scenario 至少覆盖 roadmap `acceptance_criteria` 的核心验收点
+- [ ] 若 roadmap 条目存在扩展字段（milestones/coverage_scope/gate_vs_non_gate/change_management/ops_support/kpi/risk_acceptance_policy），proposal/tasks 已体现或已说明暂不纳入原因
 - [ ] 已运行并通过：`node design/context-dev/tools/specflow/specflow.mjs validate <change-id> --strict`
+- [ ] 若 `Roadmap Entry Payload` 与 proposal/tasks/specs 任一项不一致，已获得用户明确确认；未确认则 ⛔ STOP
 
 > 若 `node design/context-dev/tools/specflow/specflow.mjs validate <change-id> --strict` 失败：先修复提案/格式/缺失项，再重新验证；在验证通过前不得宣称完成。
 
@@ -161,6 +259,7 @@ node design/context-dev/tools/specflow/specflow.mjs templates
 **硬约束**：
 - 必须包含 `## Why` / `## What Changes` / `## Impact`
 - `Impact` 必须包含 “关联 Context 资产” 表（至少包含 `.context/criterion.md`）
+- 必须新增 `### 提案大纲对齐（Roadmap Alignment）` 小节，最少包含：`roadmap_source_primary`、`roadmap_source_supplement`、`phase`、`business_goal`、`dependencies`、`acceptance_criteria`
 - 禁止残留任何 `{{...}}` 占位符（写入文件前必须全部替换为实际内容）
 
 #### Template: `openspec/changes/<change-id>/tasks.md`
@@ -169,8 +268,9 @@ node design/context-dev/tools/specflow/specflow.mjs templates
 
 **硬约束**：
 - 必须是可执行的 Markdown checkbox 列表（`- [ ] ...`）
-- 必须包含验证步骤：`node design/context-dev/tools/specflow/specflow.mjs validate <change-id> --strict`
-- 必须包含归档步骤：`node design/context-dev/tools/specflow/specflow.mjs archive <change-id> --yes`
+- 必须包含验证步骤：`- [ ] 运行 node design/context-dev/tools/specflow/specflow.mjs validate <change-id> --strict`（普通 checkbox 文本行，不可仅放在代码块）
+- 必须包含归档步骤：`- [ ] 运行 node design/context-dev/tools/specflow/specflow.mjs archive <change-id> --yes`（普通 checkbox 文本行，不可仅放在代码块）
+- 必须包含 `Roadmap 对齐任务`（对应 roadmap 的 `key_tasks`；可以拆分为更细粒度子任务）
 - 禁止残留任何 `{{...}}` 占位符（写入文件前必须全部替换为实际内容）
 
 #### Template: `openspec/changes/<change-id>/specs/<capability>/spec.md`（delta）
@@ -181,6 +281,7 @@ node design/context-dev/tools/specflow/specflow.mjs templates
 - 必须至少包含 1 个 operation header：`## ADDED|MODIFIED|REMOVED|RENAMED Requirements`
 - 每条 `### Requirement:` 必须至少包含 1 个 `#### Scenario:`
 - Scenario 建议包含 `**WHEN**` 与 `**THEN**`（严格模式下缺失会报错/警告，取决于规则）
+- Scenario 必须能追溯到 roadmap 的 `acceptance_criteria`（在 Requirement 或 Scenario 文本中体现该验收语义）
 - 禁止残留任何 `{{...}}` 占位符（写入文件前必须全部替换为实际内容）
 
 #### Template: `openspec/changes/<change-id>/design.md`（仅当需要）
@@ -262,6 +363,13 @@ $ node design/context-dev/tools/specflow/specflow.mjs validate <change-id> --str
 关联的 Context 资产:
 - .context/domain/business_rules.md
 - .context/architecture/security_policy.md
+
+Roadmap 对齐:
+- source_primary: openspec/proposal-roadmap.md
+- source_supplement: <roadmap-doc or N/A>
+- phase: <phase>
+- matched change: <change-id>
+- alignment: Why/What/Impact/tasks/specs 已逐项对齐（如有偏差已说明）
 
 下一步:
 - 开始实现: /context-start <change-id>
