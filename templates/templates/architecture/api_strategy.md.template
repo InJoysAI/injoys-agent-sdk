@@ -1,129 +1,165 @@
-# API 策略模板 (API Strategy Template)
+# API 文档模板
 
-> **Metadata**
-> - **Source**: `{{架构设计文档路径}}`
-> - **Generated At**: `{{生成时间 YYYY-MM-DD HH:mm}}`
-> - **Generator**: `Context-Agent v1.0`
+## 1. 接口名称
 
----
+### 1.1 接口描述
 
-## 📡 协议标准
+{{接口用途与边界}}
 
-| 场景 | 协议 | 规范 |
-|------|------|------|
-| **公开 API** | REST | OpenAPI 3.0 |
-| **内部服务** | gRPC | Proto3 |
-| **异步事件** | AMQP | AsyncAPI 2.0 |
-| **实时通信** | WebSocket | - |
+### 1.2 请求方法
 
----
+{{METHOD}} {{PATH}}
 
-## 🔢 版本策略
+### 1.3 输入参数
 
-| 策略 | 格式 | 示例 |
-|------|------|------|
-| **URI Versioning** | `/api/v{major}/*` | `/api/v1/users` |
-| **Header Versioning** | `Accept-Version: v1` | 备用方案 |
+**Path 参数**
 
-### 版本生命周期
+| 参数名称 | 必选 | 类型 | 描述 |
+| -------- | ---- | ---- | ---- |
+| id | 是 | String | 资源 ID |
 
-| 版本状态 | 描述 | 支持期限 |
-|---------|------|---------|
-| **Current** | 当前主版本 | 持续支持 |
-| **Deprecated** | 废弃版本 | 6个月过渡期 |
-| **Sunset** | 已下线 | 不再支持 |
+**Query 参数**
 
----
+| 参数名称 | 必选 | 类型 | 描述 |
+| -------- | ---- | ---- | ---- |
+| page | 否 | Number | 页码 |
+| page_size | 否 | Number | 每页条数 |
 
-## 🔗 URL 规范
+**Body 参数**
 
-### 命名规则
+| 参数名称 | 必选 | 类型 | 描述 |
+| -------- | ---- | ---- | ---- |
+| name | 是 | String | 资源名称 |
 
-| 规则 | 示例 |
-|------|------|
-| 资源用复数名词 | `/users`, `/orders` |
-| 使用 kebab-case | `/user-profiles` |
-| 嵌套资源 | `/users/{id}/orders` |
-| 动作使用动词 | `/orders/{id}/cancel` |
+### 1.4 输出参数
 
-### 标准端点
+| 参数名称 | 类型 | 描述 |
+| -------- | ---- | ---- |
+| code | String | 业务码 |
+| message | String | 返回消息 |
+| data | Object | 返回数据 |
+| requestId | String | 请求 ID |
 
-| 操作 | HTTP 方法 | URL | 描述 |
-|------|----------|-----|------|
-| 列表 | GET | `/resources` | 获取资源列表 |
-| 创建 | POST | `/resources` | 创建资源 |
-| 获取 | GET | `/resources/{id}` | 获取单个资源 |
-| 更新 | PUT/PATCH | `/resources/{id}` | 更新资源 |
-| 删除 | DELETE | `/resources/{id}` | 删除资源 |
+### 1.5 请求示例
 
----
+**输入示例**
 
-## ❌ 错误码规范
+```bash
+curl -X {{METHOD}} -H'Content-Type: application/json' -H'Authorization: Bearer <token>' -d'{}' {{BASE_URL}}{{PATH}}
+```
 
-### 错误响应格式
+**输出示例**
 
 ```json
 {
-  "error": {
-    "code": "USER_NOT_FOUND",
-    "message": "用户不存在",
-    "details": {
-      "user_id": "123"
-    },
-    "trace_id": "abc-123-def"
-  }
+  "code": "000001",
+  "message": "success",
+  "data": {},
+  "requestId": "req-uuid-123"
 }
 ```
 
-### 错误码分类
+**错误返回示例**
 
-| HTTP 状态码 | 错误类型 | 示例 |
-|------------|---------|------|
-| 400 | 请求错误 | INVALID_PARAMETER |
-| 401 | 认证失败 | UNAUTHORIZED |
-| 403 | 权限不足 | FORBIDDEN |
-| 404 | 资源不存在 | NOT_FOUND |
-| 409 | 冲突 | CONFLICT |
-| 429 | 限流 | RATE_LIMITED |
-| 500 | 服务器错误 | INTERNAL_ERROR |
-
----
-
-## 🔄 幂等性
-
-| 场景 | 实现方式 |
-|------|---------|
-| **创建订单** | 客户端生成 Idempotency-Key |
-| **支付请求** | 服务端检查 request_id 去重 |
-| **消息处理** | 基于 message_id 幂等消费 |
-
----
-
-## ⚡ 限流策略
-
-| 端点类型 | 限制 | 窗口 |
-|---------|------|------|
-| 公开 API | 100 req/min | 滑动窗口 |
-| 认证接口 | 10 req/min | 固定窗口 |
-| 内部服务 | 无限制 | - |
-
-### 限流响应
-
-```http
-HTTP/1.1 429 Too Many Requests
-Retry-After: 60
-X-RateLimit-Limit: 100
-X-RateLimit-Remaining: 0
-X-RateLimit-Reset: 1609459200
+```json
+{
+  "code": "040001",
+  "message": "Invalid parameter",
+  "data": null,
+  "requestId": "req-uuid-456"
+}
 ```
 
----
+**分页返回示例**
 
-## 🔐 认证矩阵
+```json
+{
+  "code": "000001",
+  "message": "success",
+  "data": {
+    "page": 1,
+    "page_size": 20,
+    "total": 100,
+    "items": []
+  },
+  "requestId": "req-uuid-789"
+}
+```
 
-| 端点 | 认证方式 | 所需权限 |
-|------|---------|---------|
-| `GET /users/me` | Bearer Token | user:read |
-| `PUT /users/{id}` | Bearer Token | user:write (own) |
-| `GET /admin/users` | Bearer Token | admin:users:read |
-| `POST /internal/sync` | API Key | internal |
+## 2. 响应格式规范
+
+### 2.1 成功响应 (200 OK)
+
+```json
+{
+  "code": "{{success_code}}",
+  "message": "{{success_message}}",
+  "data": {},
+  "requestId": "{{request_id}}"
+}
+```
+
+### 2.2 错误响应 (4xx/5xx)
+
+```json
+{
+  "code": "{{error_code}}",
+  "message": "{{error_message}}",
+  "data": null,
+  "requestId": "{{request_id}}"
+}
+```
+
+### 2.3 字段说明
+
+| 字段 | 类型 | 必需 | 说明 |
+|------|------|------|------|
+| `code` | string | ✅ | 业务码（格式由项目定义） |
+| `message` | string | ✅ | 用户可读提示 |
+| `data` | object | ❌ | 成功时返回业务数据 |
+| `requestId` | string | ❌ | 请求追踪 ID |
+
+### 2.4 国际化处理（可选）
+
+- 语言来源：{{Accept-Language / 用户设置}}
+- 回退语言：{{默认语言}}
+- 翻译方式：{{本地化表 / i18n 服务}}
+
+### 2.5 HTTP 状态码映射
+
+| HTTP 状态码 | 适用场景 |
+|-------------|----------|
+| `200` | 成功 |
+| `400` | 输入校验错误、业务逻辑错误 |
+| `401` | 未授权、Token 失效 |
+| `403` | 禁止访问、权限不足 |
+| `404` | 资源不存在 |
+| `409` | 状态冲突 |
+| `429` | 速率限制 |
+| `500` | 服务内部错误 |
+
+## 3. 安全规范
+
+### 3.1 Token / 认证
+
+- 认证方式：{{Bearer Token / API Key / Session / OAuth2}}
+- Token 生命周期：{{过期/刷新/撤销策略}}
+- 权限模型：{{RBAC / ABAC / 自定义}}
+
+### 3.2 请求安全
+
+- 传输安全：{{HTTPS / mTLS / 内网}}
+- CORS：{{允许来源策略}}
+- 限流/防刷：{{按 IP / 用户 / Token}}
+
+### 3.3 数据安全
+
+- 敏感字段：{{需要脱敏/加密的字段}}
+- 存储加密：{{是否加密，算法}}
+- 审计日志：{{是否开启，保留时长}}
+
+### 3.4 自定义安全条目（可扩展）
+
+| 条目 | 内容 |
+|------|------|
+| {{security_item}} | {{security_detail}} |

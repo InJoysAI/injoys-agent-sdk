@@ -58,6 +58,7 @@ node design/context-dev/tools/specflow/specflow.mjs validate <提案ID> --strict
 
 读取 `.context/architecture/tech_stack.md` 判断项目 SSoT 类型：
 
+例如：
 | Tech Stack | SSoT 需求 |
 |------------|----------|
 | PostgreSQL | 需要 `SSoT/schema/migrations/` |
@@ -91,6 +92,10 @@ node design/context-dev/tools/specflow/specflow.mjs validate <提案ID> --strict
 
 - 按 `tasks.md` 中的顺序执行
 - 若涉及 SSoT → 先改 SSoT 文件 → Codegen → 业务代码
+- 若涉及 API 契约（如 `SSoT/api/main.tsp`）→ **必须优先使用 SSoT 代码生成产物**
+  - 服务端接口层（controller/handler/route）与服务层应优先消费 generated types/models
+  - 禁止在业务代码中重复手写与契约等价的 DTO（除非有明确注释说明“非契约扩展字段”）
+  - 具体生成目录与接入位置按项目技术栈确定（例如 TS/Go/Rust 等）
 - 确保代码符合 `proposal.md` 中的验收标准
 
 ### 5.2 任务状态更新
@@ -113,11 +118,18 @@ node design/context-dev/tools/specflow/specflow.mjs validate <提案ID> --strict
 # Specflow 验证
 node design/context-dev/tools/specflow/specflow.mjs validate <提案ID> --strict
 
+# SSoT 生成产物使用检查（API 契约相关提案必须执行）
+# 目标：确保接口层/服务层已消费 generated artifacts，而非手写重复 DTO
+# 注：检查命令与路径按项目语言和目录结构调整（不限 TypeScript）
+
 # 相关测试（根据项目类型）
 go test ./...          # Go
 npm test               # Node.js
 cargo test             # Rust
 ```
+
+**结果**：
+- 若 API 契约相关提案中未检出 generated artifacts 使用 → 视为未完成，回到 Phase 5 修复
 
 ---
 
