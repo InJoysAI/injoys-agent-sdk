@@ -61,9 +61,9 @@ node design/context-dev/tools/specflow/specflow.mjs validate <提案ID> --strict
 例如：
 | Tech Stack | SSoT 需求 |
 |------------|----------|
-| PostgreSQL | 需要 `SSoT/schema/migrations/` |
-| REST API (Go) | 需要 `SSoT/api/main.tsp` |
-| Tauri/Rust | 无 SSoT 约束 |
+| SQL/Relational DB（e.g. PostgreSQL） | 需要 `SSoT/schema/migrations/` |
+| REST API | 需要 `SSoT/api/main.tsp` |
+| 无 REST API | 无 SSoT 约束 |
 
 ---
 

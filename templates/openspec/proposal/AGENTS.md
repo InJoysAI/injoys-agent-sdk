@@ -318,9 +318,9 @@ node design/context-dev/tools/specflow/specflow.mjs templates
 
 | Tech Stack | SSoT 文件 | 检查项 |
 |------------|----------|--------|
-| PostgreSQL | `SSoT/schema/migrations/` | 数据库相关变更 |
-| REST API (Go) | `SSoT/api/main.tsp` | API 相关变更 |
-| Tauri/Rust | N/A | 无 SSoT 约束 |
+| SQL/Relational DB（e.g. PostgreSQL） | `SSoT/schema/migrations/` | 数据库相关变更 |
+| REST API | `SSoT/api/main.tsp` | API 相关变更 |
+| 无 REST API | N/A | 无 SSoT 约束 |
 
 **若存在 SSoT 约束**，`tasks.md` 必须遵循顺序：
 1. 修改 SSoT 文件（schema/api）

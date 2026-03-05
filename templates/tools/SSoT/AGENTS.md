@@ -18,6 +18,11 @@
 
 **读取**：`.context/architecture/source/` 目录下的架构文档
 
+读取优先级（必须遵循）：
+1. 优先读取用户确认的“权威架构设计文档”（已归档到 `.context/architecture/source/`）
+2. 若存在 `docs/architecture.md`（已归档到 `.context/architecture/source/`）且用户确认其为权威输入 → 优先读取
+3. 其余 `.context/architecture/source/*.md` → 作为补充
+
 若不存在，尝试读取：
 - `.context/architecture/tech_stack.md`（若已生成）
 - `.context/architecture/system_design.md`（若已生成）
@@ -28,7 +33,7 @@
 
 | SSoT 类型 | 关键词 | 检测结果 |
 |----------|--------|---------|
-| **数据层 (Goose SQL)** | PostgreSQL, 数据库, Schema, 表设计, 迁移, Goose, 数据模型 | 需要 → `SSoT/schema/migrations/` |
+| **数据层 (Goose SQL)** | SQL, Relational DB, PostgreSQL, 数据库, Schema, 表设计, 迁移, Goose, 数据模型 | 需要 → `SSoT/schema/migrations/` |
 | **API 层 (TypeSpec)** | REST API, TypeSpec, OpenAPI, 接口规范, tsp, API First | 需要 → `SSoT/api/` |
 
 ### 0.3 遗留项目检测
@@ -52,7 +57,7 @@
 基于架构文档检测结果：
 
 ✅ 数据层 (Goose SQL)：需要初始化
-   └── 检测到：PostgreSQL, 数据模型, Schema
+   └── 检测到：SQL/Relational DB, 数据模型, Schema
 
 ✅ API 层 (TypeSpec)：需要初始化
    └── 检测到：REST API, TypeSpec

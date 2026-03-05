@@ -77,6 +77,11 @@
 
 **读取**：`.context/architecture/source/` 目录下的所有文件
 
+读取优先级（必须遵循）：
+1. 优先读取用户确认的“权威架构设计文档”（已归档到 `.context/architecture/source/`）
+2. 若存在 `docs/architecture.md`（已归档到 `.context/architecture/source/`）且用户确认其为权威输入 → 优先读取
+3. 其余 `.context/architecture/source/*.md` → 作为补充
+
 ### 0.2 关键词分析
 
 **依次检查以下关键词，记录是否存在**：

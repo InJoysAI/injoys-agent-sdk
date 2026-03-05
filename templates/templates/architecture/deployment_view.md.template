@@ -11,11 +11,11 @@
 
 | 逻辑容器 | 基础设施节点 | 实例规格 | 伸缩策略 | 网络区域 |
 |---------|-------------|---------|---------|---------|
-| API Gateway | Kubernetes Pod | 2 CPU, 4GB | HPA (CPU > 70%) | Public Subnet |
-| User Service | Kubernetes Pod | 2 CPU, 4GB | HPA (CPU > 70%) | Private Subnet |
-| Content Service | Kubernetes Pod | 4 CPU, 8GB | HPA (CPU > 60%) | Private Subnet |
-| PostgreSQL | AWS RDS | db.r5.large | Multi-AZ Standby | Data Subnet |
-| Redis | AWS ElastiCache | cache.r5.large | 2 节点集群 | Data Subnet |
+| {{网关容器名称}} | {{计算形态}} | {{网关实例规格}} | {{网关伸缩策略}} | {{网关网络区域}} |
+| {{服务A名称}} | {{计算形态}} | {{服务A实例规格}} | {{服务A伸缩策略}} | {{服务A网络区域}} |
+| {{服务B名称}} | {{计算形态}} | {{服务B实例规格}} | {{服务B伸缩策略}} | {{服务B网络区域}} |
+| {{主数据库名称}} | {{数据库托管形态}} | {{数据库实例规格}} | {{数据库高可用策略}} | {{数据库网络区域}} |
+| {{缓存名称}} | {{缓存托管形态}} | {{缓存实例规格}} | {{缓存高可用策略}} | {{缓存网络区域}} |
 
 ---
 
@@ -25,27 +25,27 @@
 graph TB
     subgraph "Internet"
         USER[用户]
-        CDN[CloudFront CDN]
+        CDN[{{CDN组件名称}}]
     end
 
-    subgraph "AWS Region: ap-northeast-1"
-        subgraph "VPC: 10.0.0.0/16"
-            subgraph "Public Subnet: 10.0.1.0/24"
-                ALB[Application Load Balancer]
-                NAT[NAT Gateway]
+    subgraph "{{云区域名称}}"
+        subgraph "{{网络边界名称}}"
+            subgraph "{{公网区域名称}}"
+                ALB[{{入口负载均衡名称}}]
+                NAT[{{出网组件名称}}]
             end
 
-            subgraph "Private Subnet: 10.0.2.0/24"
-                subgraph "EKS Cluster"
-                    API[API Gateway Pod]
-                    SVC1[User Service Pod]
-                    SVC2[Content Service Pod]
+            subgraph "{{应用网络区域名称}}"
+                subgraph "{{计算集群名称}}"
+                    API[{{网关容器名称}}]
+                    SVC1[{{服务A名称}}]
+                    SVC2[{{服务B名称}}]
                 end
             end
 
-            subgraph "Data Subnet: 10.0.3.0/24"
-                RDS[(PostgreSQL RDS)]
-                REDIS[(ElastiCache Redis)]
+            subgraph "{{数据网络区域名称}}"
+                DB[({{主数据库名称}})]
+                CACHE[({{缓存名称}})]
             end
         end
     end
@@ -55,9 +55,9 @@ graph TB
     ALB --> API
     API --> SVC1
     API --> SVC2
-    SVC1 --> RDS
-    SVC1 --> REDIS
-    SVC2 --> RDS
+    SVC1 --> DB
+    SVC1 --> CACHE
+    SVC2 --> DB
 ```
 
 ---
@@ -66,9 +66,9 @@ graph TB
 
 | 子网类型 | CIDR | 用途 | 安全组规则 |
 |---------|------|------|-----------|
-| **Public** | 10.0.1.0/24 | ALB, NAT | 允许 80/443 入站 |
-| **Private** | 10.0.2.0/24 | 应用服务 | 仅允许 ALB 入站 |
-| **Data** | 10.0.3.0/24 | 数据库 | 仅允许 Private 入站 |
+| **{{公网区域名称}}** | {{公网CIDR}} | {{公网用途}} | {{公网安全规则}} |
+| **{{应用网络区域名称}}** | {{应用CIDR}} | {{应用用途}} | {{应用安全规则}} |
+| **{{数据网络区域名称}}** | {{数据CIDR}} | {{数据用途}} | {{数据安全规则}} |
 
 ---
 

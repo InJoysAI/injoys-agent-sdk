@@ -55,9 +55,9 @@ C4Context
 | 组件 | 职责 | 技术栈 |
 |------|------|--------|
 | **API Gateway** | 路由、认证、限流 | {{e.g. Kong / Nginx}} |
-| **User Service** | 用户管理、认证授权 | {{e.g. Go + PostgreSQL}} |
-| **Content Service** | 内容生成与管理 | {{e.g. Python + Redis}} |
-| **Notification Service** | 消息推送与通知 | {{e.g. Node.js + RabbitMQ}} |
+| **User Service** | 用户管理、认证授权 | {{SERVICE_A_STACK_EXAMPLE}} |
+| **Content Service** | 内容生成与管理 | {{SERVICE_B_STACK_EXAMPLE}} |
+| **Notification Service** | 消息推送与通知 | {{NOTIFICATION_STACK_EXAMPLE}} |
 | **Admin Console** | 后台管理界面 | {{e.g. React + TypeScript}} |
 
 ---
@@ -66,10 +66,10 @@ C4Context
 
 | 存储类型 | 用途 | 技术选型 | 一致性模型 |
 |---------|------|---------|-----------|
-| **主数据库** | 核心业务数据 | {{e.g. PostgreSQL 15}} | 强一致性 |
-| **缓存** | 热点数据、会话 | {{e.g. Redis 7}} | 最终一致性 |
+| **主数据库** | 核心业务数据 | {{PRIMARY_DB_EXAMPLE}} | 强一致性 |
+| **缓存** | 热点数据、会话 | {{CACHE_EXAMPLE}} | 最终一致性 |
 | **对象存储** | 媒体文件 | {{e.g. S3}} | 最终一致性 |
-| **消息队列** | 异步任务 | {{e.g. RabbitMQ}} | At-least-once |
+| **消息队列** | 异步任务 | {{MESSAGE_BUS_EXAMPLE}} | At-least-once |
 
 ---
 
@@ -102,9 +102,9 @@ graph TB
     end
 
     subgraph "Data Zone"
-        DB[(PostgreSQL)]
-        Cache[(Redis)]
-        MQ[RabbitMQ]
+        DB[({{主数据库名称}})]
+        Cache[({{缓存名称}})]
+        MQ[{{消息系统名称}}]
     end
 
     CDN --> LB

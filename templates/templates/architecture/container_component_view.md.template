@@ -16,22 +16,22 @@ C4Container
     Person(user, "用户", "终端用户")
 
     Container_Boundary(system, "{{系统名称}}") {
-        Container(web, "Web App", "React", "用户界面")
-        Container(api, "API Gateway", "Kong", "路由、认证、限流")
-        Container(svc1, "User Service", "Go", "用户管理")
-        Container(svc2, "Content Service", "Python", "内容处理")
-        ContainerDb(db, "PostgreSQL", "主数据库")
-        ContainerDb(cache, "Redis", "缓存")
-        Container(mq, "RabbitMQ", "消息队列")
+        Container(web, "{{前端容器名称}}", "{{前端技术栈}}", "{{前端职责}}")
+        Container(api, "{{网关容器名称}}", "{{网关技术栈}}", "{{网关职责}}")
+        Container(svc1, "{{服务A名称}}", "{{服务A技术栈}}", "{{服务A职责}}")
+        Container(svc2, "{{服务B名称}}", "{{服务B技术栈}}", "{{服务B职责}}")
+        ContainerDb(db, "{{主数据库名称}}", "{{主数据库职责}}")
+        ContainerDb(cache, "{{缓存名称}}", "{{缓存职责}}")
+        Container(mq, "{{消息系统名称}}", "{{消息系统职责}}")
     }
 
     Rel(user, web, "使用", "HTTPS")
     Rel(web, api, "调用", "HTTPS")
-    Rel(api, svc1, "路由", "gRPC")
-    Rel(api, svc2, "路由", "gRPC")
-    Rel(svc1, db, "读写", "JDBC")
-    Rel(svc1, cache, "读写", "Redis")
-    Rel(svc2, mq, "发布", "AMQP")
+    Rel(api, svc1, "路由", "{{网关到服务A协议}}")
+    Rel(api, svc2, "路由", "{{网关到服务B协议}}")
+    Rel(svc1, db, "读写", "{{服务A到数据库协议}}")
+    Rel(svc1, cache, "读写", "{{服务A到缓存协议}}")
+    Rel(svc2, mq, "发布", "{{服务B到消息系统协议}}")
 ```
 
 ---
@@ -40,13 +40,13 @@ C4Container
 
 | 容器 | 技术栈 | 职责 | 端口 |
 |------|--------|------|------|
-| **Web App** | React 18 | 用户界面 | 443 |
-| **API Gateway** | Kong | 路由、认证、限流 | 8000 |
-| **User Service** | Go + Gin | 用户管理、认证授权 | 8001 |
-| **Content Service** | Python + FastAPI | 内容处理、AI 调用 | 8002 |
-| **PostgreSQL** | PostgreSQL 15 | 主数据存储 | 5432 |
-| **Redis** | Redis 7 | 缓存、会话 | 6379 |
-| **RabbitMQ** | RabbitMQ 3 | 异步消息 | 5672 |
+| **{{前端容器名称}}** | {{前端技术栈}} | {{前端职责}} | {{前端端口}} |
+| **{{网关容器名称}}** | {{网关技术栈}} | {{网关职责}} | {{网关端口}} |
+| **{{服务A名称}}** | {{服务A技术栈}} | {{服务A职责}} | {{服务A端口}} |
+| **{{服务B名称}}** | {{服务B技术栈}} | {{服务B职责}} | {{服务B端口}} |
+| **{{主数据库名称}}** | {{主数据库技术栈}} | {{主数据库职责}} | {{主数据库端口}} |
+| **{{缓存名称}}** | {{缓存技术栈}} | {{缓存职责}} | {{缓存端口}} |
+| **{{消息系统名称}}** | {{消息系统技术栈}} | {{消息系统职责}} | {{消息系统端口}} |
 
 ---
 
@@ -61,10 +61,10 @@ C4Component
     title User Service - Component Diagram
 
     Container_Boundary(svc, "User Service") {
-        Component(ctrl, "UserController", "Gin Handler", "处理 HTTP 请求")
-        Component(auth, "AuthService", "Service", "认证逻辑")
-        Component(user, "UserService", "Service", "用户 CRUD")
-        Component(repo, "UserRepository", "GORM", "数据访问")
+        Component(ctrl, "{{控制器组件名}}", "{{控制器技术栈}}", "{{控制器职责}}")
+        Component(auth, "{{认证组件名}}", "{{认证组件技术栈}}", "{{认证组件职责}}")
+        Component(user, "{{领域服务组件名}}", "{{领域服务技术栈}}", "{{领域服务职责}}")
+        Component(repo, "{{数据访问组件名}}", "{{数据访问技术栈}}", "{{数据访问职责}}")
     }
 
     Rel(ctrl, auth, "调用")
@@ -75,10 +75,10 @@ C4Component
 
 | 组件 | 职责 | 接口 |
 |------|------|------|
-| **UserController** | HTTP 请求处理 | REST API |
-| **AuthService** | 登录、Token 管理 | 内部接口 |
-| **UserService** | 用户 CRUD | 内部接口 |
-| **UserRepository** | 数据访问层 | GORM |
+| **{{控制器组件名}}** | {{控制器职责}} | {{控制器接口类型}} |
+| **{{认证组件名}}** | {{认证组件职责}} | {{认证组件接口类型}} |
+| **{{领域服务组件名}}** | {{领域服务职责}} | {{领域服务接口类型}} |
+| **{{数据访问组件名}}** | {{数据访问职责}} | {{数据访问接口类型}} |
 
 ---
 
@@ -86,7 +86,7 @@ C4Component
 
 | 服务 | 规范类型 | 链接 |
 |------|---------|------|
-| User Service | OpenAPI 3.0 | `api/user-service.yaml` |
-| Content Service | OpenAPI 3.0 | `api/content-service.yaml` |
-| Event Schema | AsyncAPI 2.0 | `api/events.yaml` |
-| gRPC | Proto | `proto/*.proto` |
+| {{服务A名称}} | {{服务A规范类型}} | `{{服务A规范路径}}` |
+| {{服务B名称}} | {{服务B规范类型}} | `{{服务B规范路径}}` |
+| {{事件规范名称}} | {{事件规范类型}} | `{{事件规范路径}}` |
+| {{RPC规范名称}} | {{RPC规范类型}} | `{{RPC规范路径}}` |

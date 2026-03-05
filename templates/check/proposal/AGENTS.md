@@ -177,10 +177,10 @@ node design/context-dev/tools/specflow/specflow.mjs validate <change-id> --stric
 
 | Tech Stack | `tasks.md` 必须包含 |
 |------------|------------------|
-| PostgreSQL | 创建 Goose 迁移 `SSoT/schema/migrations/` 任务 |
-| REST API (Go) | 修改 `SSoT/api/main.tsp` 任务 |
+| SQL/Relational DB（e.g. PostgreSQL） | 创建 Goose 迁移 `SSoT/schema/migrations/` 任务 |
+| REST API | 修改 `SSoT/api/main.tsp` 任务 |
 | 启用 Codegen | Codegen 执行任务 |
-| Tauri/Rust | 无 SSoT 约束 |
+| 无 REST API | 无 SSoT 约束 |
 | 所有项目 | 测试 + 归档任务（`node design/context-dev/tools/specflow/specflow.mjs validate <change-id> --strict` + `node design/context-dev/tools/specflow/specflow.mjs archive <change-id> --yes`） |
 
 **检查方法**：

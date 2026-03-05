@@ -15,7 +15,7 @@
 |------|---------|------|
 | **OAuth 2.0 + OIDC** | 第三方登录 | {{e.g. Google, GitHub}} |
 | **JWT** | API 认证 | Access Token + Refresh Token |
-| **Session** | Web 会话 | Redis 存储 |
+| **Session** | Web 会话 | {{会话存储技术}} 存储 |
 
 ### Token 生命周期
 
