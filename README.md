@@ -14,7 +14,7 @@ It unifies two core capabilities:
 
 ## Features
 
-- **6 Core Commands**: `/context-init`, `/context-openspec`, `/context-openspec proposal <change-id> [roadmap-doc]`, `/context-start`, `/context-check`, `/context-update`
+- **7 Core Commands**: `/context-init`, `/context-openspec`, `/context-openspec proposal <change-id> [roadmap-doc]`, `/context-interview`, `/context-start`, `/context-check`, `/context-update`
 - **Multi-Agent Support**: Ready-to-use commands for **Antigravity**, **Claude Code**, **Cursor**, **Windsurf**, **Codex**, and **Qoder**.
 - **SSoT Integration**: Templates for integrating Single Source of Truth (SSoT) definitions for Schema (Atlas) and API (TypeSpec).
 
@@ -76,8 +76,8 @@ cd injoys-agent-sdk
 
 See [ROADMAP.md](ROADMAP.md) for our development plan.
 
-**Current**: v0.1.0 - Template-based foundation with multi-agent support + initial Node.js CLI (npm publish pending)  
-**Next**: v0.2.0 - Publish to npm + expand CLI and programmatic API
+**Current**: v0.2.0 - Published to npm with `injoys` CLI distribution and initial programmatic API  
+**Next**: v0.3.0 - Interactive CLI wizard with AI tool auto-detection and context file selection
 
 ## License
 

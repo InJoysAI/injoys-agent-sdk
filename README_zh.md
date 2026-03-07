@@ -14,7 +14,7 @@
 
 ## 功能特性
 
--   **6 个核心命令**：`/context-init`、`/context-openspec`、`/context-openspec proposal <change-id> [roadmap-doc]`、`/context-start`、`/context-check`、`/context-update`
+-   **7 个核心命令**：`/context-init`、`/context-openspec`、`/context-openspec proposal <change-id> [roadmap-doc]`、`/context-interview`、`/context-start`、`/context-check`、`/context-update`
 -   **多 Agent 支持**：开箱即用的命令，支持 **Antigravity**、**Claude Code**、**Cursor**、**Windsurf**、**Codex** 和 **Qoder**。
 -   **SSoT 集成**：提供 Schema (Atlas) 和 API (TypeSpec) 的单一数据源（SSoT）集成模板。
 
@@ -76,8 +76,8 @@ cd injoys-agent-sdk
 
 详见 [ROADMAP_zh.md](ROADMAP_zh.md)。
 
-**当前版本**: v0.1.0 - 模板化基础架构，支持多 Agent + 初版 Node.js CLI（npm 发布待完成）  
-**下一版本**: v0.2.0 - 发布到 npm + 扩展 CLI 与编程接口
+**当前版本**: v0.2.0 - 已发布到 npm，并提供 `injoys` CLI 分发与初版编程接口  
+**下一版本**: v0.3.0 - 交互式 CLI 向导，支持 AI 工具自动检测与上下文文件选择
 
 ## 许可证
 
