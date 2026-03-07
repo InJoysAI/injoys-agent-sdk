@@ -8,11 +8,19 @@
 
 - Node.js 18+
 - Git
-- AI coding tool (Antigravity / Claude Code / Cursor / Windsurf)
+- AI coding tool (Antigravity / Claude Code / Cursor / Windsurf / Codex / Qoder)
 
 ---
 
 ## Step 1: Install injoys-agent-sdk
+
+### Method 1: NPX
+
+```bash
+npx @injoysai/agent-sdk init
+```
+
+### Method 2: One-Click Install
 
 ```bash
 # Run in your project root directory
@@ -23,7 +31,7 @@ By default, the installer bootstraps only `/context-init` and `/context-check`. 
 
 After installation, you'll see:
 - `design/context-dev/` — Context generation framework
-- `.agent/workflows/` — AI commands (Antigravity)
+- AI tool command/workflow directories for your supported editor or agent
 
 ---
 
@@ -89,6 +97,12 @@ Architecture: @docs/system-architecture.md
 **Review the proposal**:
 ```
 /context-check proposal feat-user-login
+```
+
+**Optional refinement**:
+```
+/context-interview
+Topic: business rules for user authentication
 ```
 
 ---

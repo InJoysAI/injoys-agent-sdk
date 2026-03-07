@@ -8,11 +8,19 @@
 
 - Node.js 18+
 - Git
-- AI 编程工具（Antigravity / Claude Code / Cursor / Windsurf）
+- AI 编程工具（Antigravity / Claude Code / Cursor / Windsurf / Codex / Qoder）
 
 ---
 
 ## 第一步：安装 injoys-agent-sdk
+
+### 方式 1: NPX
+
+```bash
+npx @injoysai/agent-sdk init
+```
+
+### 方式 2: 一键安装
 
 ```bash
 # 在你的项目根目录执行
@@ -23,7 +31,7 @@ curl -fsSL https://raw.githubusercontent.com/injoysai/injoys-agent-sdk/main/scri
 
 安装完成后，你会看到：
 - `design/context-dev/` — 上下文生成框架
-- `.agent/workflows/` — AI 命令（Antigravity）
+- 适配当前编辑器或 Agent 的 AI 命令 / 工作流目录
 
 ---
 
@@ -89,6 +97,12 @@ PRD：@docs/product-overview.md
 **审查提案**：
 ```
 /context-check proposal feat-user-login
+```
+
+**可选补充完善**：
+```
+/context-interview
+主题: 用户认证的业务规则
 ```
 
 ---
