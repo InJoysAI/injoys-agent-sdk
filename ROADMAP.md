@@ -9,7 +9,7 @@ This document outlines the development roadmap for InJoys Agent SDK.
 **Template-Based Foundation**
 
 - [x] Context generation framework (.context/ structure)
-- [x] Multi-agent support (Antigravity, Claude Code, Cursor, Windsurf)
+- [x] Multi-agent support (Antigravity, Claude Code, Cursor, Windsurf, Codex, Qoder)
 - [x] Project Criterion and rule templates
 - [x] SSoT integration templates (Atlas HCL, TypeSpec)
 - [x] Shell-based installation script
@@ -24,18 +24,18 @@ This document outlines the development roadmap for InJoys Agent SDK.
 
 **NPM Package Support**
 
-- [ ] Publish to npm as `@injoysai/agent-sdk`
-- [ ] Package and distribute `injoys` CLI via npm
-- [ ] CLI command: `add`
-- [ ] `npx @injoysai/agent-sdk init` one-liner support
-- [ ] Programmatic API for Node.js integration
+- [x] Publish to npm as `@injoysai/agent-sdk`
+- [x] Package and distribute `injoys` CLI via npm
+- [x] CLI command: `add`
+- [x] `npx @injoysai/agent-sdk init` one-liner support
+- [x] Programmatic API for Node.js integration
 
 ### v0.3.0 (Q2 2026)
 
 **Interactive CLI Wizard**
 
 - [ ] Interactive `init` with prompts for project type
-- [ ] Auto-detect existing AI tool (Cursor/Claude/Windsurf)
+- [ ] Auto-detect existing AI tool (Antigravity/Claude/Cursor/Windsurf/Codex/Qoder)
 - [ ] Context file selection wizard
 - [ ] Hash calculation and manifest generation
 

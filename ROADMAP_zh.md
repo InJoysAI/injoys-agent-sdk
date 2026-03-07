@@ -9,7 +9,7 @@
 **模板化基础架构**
 
 - [x] 上下文生成框架 (.context/ 结构)
-- [x] 多 Agent 支持 (Antigravity, Claude Code, Cursor, Windsurf)
+- [x] 多 Agent 支持 (Antigravity, Claude Code, Cursor, Windsurf, Codex, Qoder)
 - [x] 项目准则和规则模板
 - [x] SSoT 集成模板 (Atlas HCL, TypeSpec)
 - [x] Shell 安装脚本
@@ -24,18 +24,18 @@
 
 **NPM 包支持**
 
-- [ ] 发布到 npm (`@injoysai/agent-sdk`)
-- [ ] 通过 npm 打包并分发 `injoys` CLI
-- [ ] CLI 命令: `add`
-- [ ] `npx @injoysai/agent-sdk init` 一键支持
-- [ ] Node.js 编程接口
+- [x] 发布到 npm (`@injoysai/agent-sdk`)
+- [x] 通过 npm 打包并分发 `injoys` CLI
+- [x] CLI 命令: `add`
+- [x] `npx @injoysai/agent-sdk init` 一键支持
+- [x] Node.js 编程接口
 
 ### v0.3.0 (2026年Q2)
 
 **交互式 CLI 向导**
 
 - [ ] 交互式 `init` 项目类型选择
-- [ ] 自动检测现有 AI 工具 (Cursor/Claude/Windsurf)
+- [ ] 自动检测现有 AI 工具 (Antigravity/Claude/Cursor/Windsurf/Codex/Qoder)
 - [ ] 上下文文件选择向导
 - [ ] Hash 计算和 Manifest 生成
 

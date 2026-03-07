@@ -72,7 +72,7 @@ PRD：@docs/product-overview.md
 
 ---
 
-## 第四步：创建提案 (`/context-openspec proposal <change-id>`)
+## 第四步：创建提案 (`/context-openspec proposal <change-id> [roadmap-doc]`)
 
 ```
 /context-openspec proposal feat-user-login
@@ -80,7 +80,8 @@ PRD：@docs/product-overview.md
 
 **AI 会**：
 1. 读取 `openspec/proposal-roadmap.md` 定位条目
-2. 创建 `openspec/changes/feat-user-login/`
+2. 如有提供，再读取补充的 `roadmap-doc` 以丰富提案范围或大纲
+3. 创建 `openspec/changes/feat-user-login/`
    - `proposal.md` — 范围、边界、验收标准
    - `tasks.md` — 任务清单
    - `design.md` — 技术设计（如需）
@@ -186,7 +187,7 @@ curl -fsSL https://raw.githubusercontent.com/injoysai/injoys-agent-sdk/main/scri
 /context-openspec
 
 # 4. 创建提案
-/context-openspec proposal feat-user-login
+/context-openspec proposal feat-user-login [roadmap-doc]
 
 # 5. 审查（人工确认 proposal.md）
 # ...

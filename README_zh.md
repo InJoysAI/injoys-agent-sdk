@@ -14,7 +14,7 @@
 
 ## 功能特性
 
--   **6 个核心命令**：`/context-init`、`/context-openspec`、`/context-openspec proposal <change-id>`、`/context-start`、`/context-check`、`/context-update`
+-   **6 个核心命令**：`/context-init`、`/context-openspec`、`/context-openspec proposal <change-id> [roadmap-doc]`、`/context-start`、`/context-check`、`/context-update`
 -   **多 Agent 支持**：开箱即用的命令，支持 **Antigravity**、**Claude Code**、**Cursor**、**Windsurf**、**Codex** 和 **Qoder**。
 -   **SSoT 集成**：提供 Schema (Atlas) 和 API (TypeSpec) 的单一数据源（SSoT）集成模板。
 
@@ -56,8 +56,8 @@ cd injoys-agent-sdk
 2.  **生成总结** (`/context-openspec`)：
     从文档生成结构化总结并集成 OpenSpec。
 
-3.  **创建提案** (`/context-openspec proposal <change-id>`)：
-    基于路线图条目创建变更提案。
+3.  **创建提案** (`/context-openspec proposal <change-id> [roadmap-doc]`)：
+    基于匹配到的路线图条目创建变更提案，并可额外传入补充路线图或提案大纲文档。
 
 4.  **实施变更** (`/context-start <proposalId>`)：
     按 SSoT 优先工作流执行任务。

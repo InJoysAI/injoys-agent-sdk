@@ -62,8 +62,9 @@ cd injoys-agent-sdk
 
 | Directory | Description |
 |-----------|-------------|
-| `templates/` | Context generation templates (core) |
-| `templates/commands/` | AI tool command definitions |
+| `templates/` | Core instruction assets for context generation, OpenSpec flows, checks, and tool integrations |
+| `templates/templates/` | Reusable document and AI entry file templates generated into target projects |
+| `templates/commands/` | AI tool command definitions installed into supported editors/tools |
 | `scripts/` | Installation and helper scripts |
 | `docs/` | Documentation |
 

@@ -62,8 +62,9 @@ cd injoys-agent-sdk
 
 | 目录 | 说明 |
 |------|------|
-| `templates/` | 上下文生成模板（核心） |
-| `templates/commands/` | AI 工具命令定义 |
+| `templates/` | 用于上下文生成、OpenSpec 流程、检查与工具集成的核心指令资产 |
+| `templates/templates/` | 会生成到目标项目中的可复用文档模板与 AI 入口文件模板 |
+| `templates/commands/` | 安装到受支持编辑器/工具中的 AI 命令定义 |
 | `scripts/` | 安装和辅助脚本 |
 | `docs/` | 文档 |
 

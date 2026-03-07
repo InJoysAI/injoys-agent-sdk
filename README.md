@@ -14,7 +14,7 @@ It unifies two core capabilities:
 
 ## Features
 
-- **6 Core Commands**: `/context-init`, `/context-openspec`, `/context-openspec proposal <change-id>`, `/context-start`, `/context-check`, `/context-update`
+- **6 Core Commands**: `/context-init`, `/context-openspec`, `/context-openspec proposal <change-id> [roadmap-doc]`, `/context-start`, `/context-check`, `/context-update`
 - **Multi-Agent Support**: Ready-to-use commands for **Antigravity**, **Claude Code**, **Cursor**, **Windsurf**, **Codex**, and **Qoder**.
 - **SSoT Integration**: Templates for integrating Single Source of Truth (SSoT) definitions for Schema (Atlas) and API (TypeSpec).
 
@@ -56,8 +56,8 @@ cd injoys-agent-sdk
 2.  **Generate Summaries** (`/context-openspec`):
     Generate structured summaries from docs and integrate with OpenSpec.
 
-3.  **Create Proposal** (`/context-openspec proposal <change-id>`):
-    Create a change proposal based on roadmap items.
+3.  **Create Proposal** (`/context-openspec proposal <change-id> [roadmap-doc]`):
+    Create a change proposal based on the matching roadmap item, with an optional supplemental roadmap or outline document.
 
 4.  **Implement Changes** (`/context-start <proposalId>`):
     Execute tasks following SSoT-first workflow.

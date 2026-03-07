@@ -72,7 +72,7 @@ Architecture: @docs/system-architecture.md
 
 ---
 
-## Step 4: Create Proposal (`/context-openspec proposal <change-id>`)
+## Step 4: Create Proposal (`/context-openspec proposal <change-id> [roadmap-doc]`)
 
 ```
 /context-openspec proposal feat-user-login
@@ -80,7 +80,8 @@ Architecture: @docs/system-architecture.md
 
 **AI will**:
 1. Read `openspec/proposal-roadmap.md` to locate the item
-2. Create `openspec/changes/feat-user-login/`
+2. Optionally read the supplemental `roadmap-doc` to enrich the proposal scope or outline
+3. Create `openspec/changes/feat-user-login/`
    - `proposal.md` — Scope, boundaries, acceptance criteria
    - `tasks.md` — Task checklist
    - `design.md` — Technical design (if needed)
@@ -186,7 +187,7 @@ curl -fsSL https://raw.githubusercontent.com/injoysai/injoys-agent-sdk/main/scri
 /context-openspec
 
 # 4. Create proposal
-/context-openspec proposal feat-user-login
+/context-openspec proposal feat-user-login [roadmap-doc]
 
 # 5. Review (human confirms proposal.md)
 # ...
