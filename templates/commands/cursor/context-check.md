@@ -5,7 +5,7 @@ description: Check OpenSpec change status (env/tasks/proposal/plan/project/revie
 # Context Check
 
 Supported subcommands:
-- `env`: toolchain + MCP configuration checks
+- `env`: project environment checks (provider-based, optional)
 - `tasks <change-id>`: progress report for `openspec/changes/<change-id>/tasks.md`
 - `proposal <change-id>`: proposal quality + Context consistency checks
 - `plan`: roadmap quality + Context consistency checks
@@ -16,12 +16,13 @@ Supported subcommands:
 
 ## env
 
-**Execute**: `@design/context-dev/check/devenv/AGENTS.md`
+**Provider 查找**（在项目根目录）：
 
-> 该模块会：
-> - 执行 `check-toolchain.sh` 检查系统工具链
-> - 执行 `check-mcp.sh` 检查 MCP 配置
+1. `Makefile` 中存在 `check-env` target → 执行 `make check-env`
+2. `scripts/check-env.sh` 存在 → 执行 `bash scripts/check-env.sh`
+3. 均不存在 → 跳过，输出提示
 
+> 💡 参考实现：`design/context-dev/check/devenv/`（含工具链和 MCP 检查脚本）
 ---
 
 ## tasks

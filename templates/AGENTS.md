@@ -11,25 +11,39 @@
 
 ---
 
-### Step 1: 环境检查
-
-**执行**: `@design/context-dev/check/devenv/AGENTS.md`
-
-**⚠️ Step 1 完成后必须继续 Step 2**
-
----
-
-### Step 2: 确认目标项目
+### Step 1: 确认目标项目
 
 **检查用户是否已提供参数**（如 `/context-init PRD: xx; 架构: xx; 项目路径: xx`）：
 
 | 参数 | 必需 | 缺失时询问 |
-|------|:----:|-----------| 
+|------|:----:|-----------|
 | 项目路径 | ✅ | "请提供目标项目的根目录路径（绝对路径）" |
 | PRD | ✅ | 在 Step 3 由 docs 模块询问 |
 | 架构文档 | ✅ | 在 Step 3 由 docs 模块询问 |
 
 > 若用户已提供全部参数，**跳过询问直接执行**。
+
+**⚠️ Step 1 完成后必须继续 Step 2**
+
+---
+
+### Step 2: 环境检查（可选，Provider 机制）
+
+> 在 Step 1 确定的**目标项目根目录**中查找 env-check provider。
+> 若无 provider，**不阻断**，输出提示后继续 Step 3。
+
+**查找优先级**：
+
+1. 项目根目录存在 `Makefile` 且包含 `check-env` target → 执行 `make check-env`
+2. 项目根目录存在 `scripts/check-env.sh` → 执行 `bash scripts/check-env.sh`
+3. 均不存在 → 输出提示并继续：
+
+```
+ℹ️ 未找到环境检查入口，继续初始化。
+   可创建 Makefile check-env 或 scripts/check-env.sh 配置项目环境检查。
+```
+
+> 💡 **参考实现**: 如需环境检查示例，参见 `design/context-dev/check/devenv/`（含工具链和 MCP 检查脚本）。
 
 **⚠️ Step 2 完成后必须继续 Step 3**
 
@@ -114,7 +128,8 @@
 
 | 模块 | 路径 | 用途 |
 |------|------|------|
-| 环境检查 | `@design/context-dev/check/devenv/AGENTS.md` | 检查工具链 |
+| 环境检查 (Provider) | 项目自定义 `Makefile check-env` 或 `scripts/check-env.sh` | 项目级环境检查（可选） |
+| 环境检查 (参考实现) | `@design/context-dev/check/devenv/` | 工具链 + MCP 检查示例 |
 | 文档收集与生成 | `@design/context-dev/tools/docs/AGENTS.md` | 收集源文件并生成 .context/ |
 | Manifest | `@design/context-dev/tools/manifest/AGENTS.md` | 记录文件变化 |
 | AI 配置 | `@design/context-dev/tools/ai-config/AGENTS.md` | 配置 AI 工具 |

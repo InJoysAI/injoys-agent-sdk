@@ -1,6 +1,10 @@
 # DevEnv Check 指令
 
-> 当 `/context-check env` 被调用时执行此文件。
+> ⚠️ **Reference Implementation**: 此文件是环境检查的**参考实现**。
+> 框架入口已改为 Provider 机制（查找项目自定义 `Makefile check-env` 或 `scripts/check-env.sh`），
+> 不再直接调用此文件。项目可将此目录中的脚本复制到 `scripts/check-env.sh` 作为自定义实现。
+
+> 当 `/context-check env` 被调用时，若项目配置了 provider 则执行 provider；否则可参考此文件。
 
 ---
 

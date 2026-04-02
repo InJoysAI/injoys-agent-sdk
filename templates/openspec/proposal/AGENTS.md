@@ -205,6 +205,38 @@ node design/context-dev/tools/specflow/specflow.mjs templates
 5. 若需要技术设计/架构决策，创建 `openspec/changes/<change-id>/design.md`（以 `node design/context-dev/tools/specflow/specflow.mjs instructions design --change <change-id>` 的要求为准）
 6. 增加以 SSoT 为首的步骤：验证是否需要更改 schema/API 合约；如果不需要，则添加明确的“SSoT 未更改”检查，以及 `node design/context-dev/tools/specflow/specflow.mjs validate <change-id> --strict` + `node design/context-dev/tools/specflow/specflow.mjs archive <change-id> --yes` 的任务；如果需要，则包括创建 Goose 迁移 (`SSoT/schema/migrations/`) 和 `SSoT/api/main.tsp` 的更新以及相应的代码生成（codegen）。
 7. 如果涉及接口方面的设计，需要同步更新`.context/architecture/api_strategy.md`,添加对应的请求响应示例
+8. 如果涉及自定义错误码，必须遵循本项目的错误码 SSoT 流程（详见下方 §2.1.1）
+
+### 2.1.1 错误码（当提案涉及新错误场景时）
+
+> 若 roadmap 条目的 `key_tasks` / `acceptance_criteria` 或提案业务分析中涉及可失败操作（新增 IPC 命令、API 端点、文件读写等可能返回"不存在"、"格式无效"、"操作失败"等错误的场景），则必须定义对应错误码。否则跳过本节，在交付物清单注明"不涉及新错误码"。
+
+**格式**：遵循 `.context/architecture/source/errcode_guidelines.md` 的 `MMTXXX` 6 位数字码（`MM`=模块 `T`=类型 `XXX`=序号）。已分配模块编号见 `tools/errcodes/shared/` 下的 `*-error-codes.yaml` 头部注释；新模块顺序分配下一个可用编号。
+
+**SSoT 三步**：
+
+1. **定义** — 在 `tools/errcodes/shared/*-error-codes.yaml` 中新增条目（`code`/`key`/`http`/`message_zh`/`message_en`/`module`）
+2. **生成** — 运行 `make errcode-gen`，自动产出各语言常量文件（⛔ 生成文件禁止手动编辑；具体输出路径见 `Makefile` 中 `errcode-gen` target）
+3. **验证** — `make errcode-gen` 无报错，生成的代码通过编译检查
+
+**代码使用** — 必须通过生成的常量引用错误码，禁止硬编码字符串。示例：
+
+```rust
+// Rust — 通过 codes:: 常量 + get_error_message() 构造错误
+use crate::error::{codes, get_error_message};
+return Err(AppError::new(codes::SessionNotFound, get_error_message(codes::SessionNotFound, "zh")));
+```
+
+> 其他语言（Go 等）同理：导入生成的常量包，通过常量名引用。各语言的生成产物路径与 API 见 `Makefile` 和 `tools/errcodes/README.md`。
+
+**提案体现**：
+
+| 文件 | 需要补充的内容 |
+|------|--------------|
+| `design.md` | Decision：模块编号分配与使用方式 |
+| `spec.md` | "错误响应格式"Requirement + 错误码表；错误 Scenario 引用具体错误码 |
+| `tasks.md` | "错误码定义（SSoT）"任务：YAML → `make errcode-gen` → 常量引用 |
+| `proposal.md` | 验证标准含 `make errcode-gen` 通过 |
 
 ### 2.2 必须输出交付物清单（Deliverables）
 
@@ -215,6 +247,7 @@ node design/context-dev/tools/specflow/specflow.mjs templates
 - [ ] `openspec/changes/<change-id>/specs/<capability>/spec.md`（至少 1 个 capability delta；多 capability 则多文件）
 - [ ] `openspec/changes/<change-id>/design.md`（仅当 `node design/context-dev/tools/specflow/specflow.mjs instructions design --change <change-id>` 要求/建议且确有设计决策需要记录；否则明确写“未创建 design.md 的原因”）
 - [ ] 如涉及接口：`.context/architecture/api_strategy.md`（已补充请求/响应示例；否则写明“不涉及接口设计”）
+- [ ] 如涉及错误码：`tools/errcodes/shared/*-error-codes.yaml` 已新增对应模块错误码，`make errcode-gen` 通过（否则写明"不涉及新错误码"）
 - [ ] SSoT 相关（按需）：`SSoT/schema/migrations/`、`SSoT/api/main.tsp`、以及 codegen 产物（或写明 “SSoT 未更改”）
 - [ ] Roadmap 对齐证明：输出 `Roadmap 提案快照`，并给出 proposal/tasks/specs 的字段映射说明
 
@@ -238,6 +271,7 @@ node design/context-dev/tools/specflow/specflow.mjs templates
 - [ ] `specs/*/spec.md` 的 Scenario 至少覆盖 roadmap `acceptance_criteria` 的核心验收点
 - [ ] 若 roadmap 条目存在扩展字段（milestones/coverage_scope/gate_vs_non_gate/change_management/ops_support/kpi/risk_acceptance_policy），proposal/tasks 已体现或已说明暂不纳入原因
 - [ ] 已运行并通过：`node design/context-dev/tools/specflow/specflow.mjs validate <change-id> --strict`
+- [ ] 若提案涉及新错误场景：已在 `tools/errcodes/shared/*-error-codes.yaml` 定义错误码，`make errcode-gen` 通过，`spec.md` 错误 Scenario 引用了具体错误码（否则已注明“不涉及新错误码”）
 - [ ] 若 `Roadmap Entry Payload` 与 proposal/tasks/specs 任一项不一致，已获得用户明确确认；未确认则 ⛔ STOP
 
 > 若 `node design/context-dev/tools/specflow/specflow.mjs validate <change-id> --strict` 失败：先修复提案/格式/缺失项，再重新验证；在验证通过前不得宣称完成。

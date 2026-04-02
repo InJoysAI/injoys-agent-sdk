@@ -173,19 +173,24 @@ node design/context-dev/tools/specflow/specflow.mjs validate <change-id> --stric
 
 ## Phase 6: SSoT 先行任务检查
 
-读取 `.context/architecture/tech_stack.md` 判断项目 SSoT 类型：
+**动态读取**：从 `.context/criterion.md` Section 2（三维约束体系）获取已启用的 SSoT 层和工具，从 Section 7（SSoT 文件路径）获取各层的实际文件路径：
 
-| Tech Stack | `tasks.md` 必须包含 |
-|------------|------------------|
-| SQL/Relational DB（e.g. PostgreSQL） | 创建 Goose 迁移 `SSoT/schema/migrations/` 任务 |
-| REST API | 修改 `SSoT/api/main.tsp` 任务 |
-| 启用 Codegen | Codegen 执行任务 |
-| 无 REST API | 无 SSoT 约束 |
-| 所有项目 | 测试 + 归档任务（`node design/context-dev/tools/specflow/specflow.mjs validate <change-id> --strict` + `node design/context-dev/tools/specflow/specflow.mjs archive <change-id> --yes`） |
+1. 读取 `.context/criterion.md` Section 2 确定已启用的 SSoT 层（数据层/API 层/IPC 层/共享层）
+2. 读取 `.context/criterion.md` Section 7 获取各层的实际文件路径
+3. 验证任务顺序：SSoT 变更任务必须排在业务代码任务之前
+
+| criterion.md 中的 SSoT 层 | `tasks.md` 必须包含 |
+|---------------------------|-------------------|
+| 数据层（已配置路径） | 该路径下的迁移/Schema 变更任务 |
+| API 层（已配置路径） | 该路径下的契约修改 + Codegen 执行任务 |
+| IPC 层（已配置路径） | 该路径下的 IPC SSoT 修改 + Codegen 执行任务 |
+| 所有项目 | 测试 + 归档任务（`specflow validate --strict` + `specflow archive --yes`） |
+
+> ⚠️ 若 criterion.md 未配置任何 SSoT 层，则仅检查测试和归档任务。
 
 **检查方法**：
-1. 根据 Tech Stack 确定需要检查的 SSoT 任务
-2. 在 `tasks.md` 中搜索相关任务
+1. 根据 criterion.md 中实际配置的 SSoT 工具和路径确定需要检查的任务
+2. 在 `tasks.md` 中搜索相关任务（不硬编码工具名，从 criterion.md 读取）
 3. 验证任务顺序是否正确（SSoT 先行）
 
 ---

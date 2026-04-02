@@ -56,14 +56,20 @@ node design/context-dev/tools/specflow/specflow.mjs validate <提案ID> --strict
 
 ## Phase 3: 检查 SSoT 需求
 
-读取 `.context/architecture/tech_stack.md` 判断项目 SSoT 类型：
+**动态读取**：从 `.context/criterion.md` Section 2（三维约束体系）和 Section 7（SSoT 文件路径）获取已启用的 SSoT 层：
 
-例如：
-| Tech Stack | SSoT 需求 |
-|------------|----------|
-| SQL/Relational DB（e.g. PostgreSQL） | 需要 `SSoT/schema/migrations/` |
-| REST API | 需要 `SSoT/api/main.tsp` |
-| 无 REST API | 无 SSoT 约束 |
+1. 读取 `.context/criterion.md` Section 2 确定已启用的 SSoT 层
+2. 读取 Section 7 获取各层的实际文件路径
+3. 对每个已启用层，确认对应 SSoT 文件存在
+
+| criterion.md 中的 SSoT 层 | SSoT-first 执行顺序 |
+|---------------------------|-------------------|
+| 数据层（已配置路径） | 创建迁移/Schema 变更 |
+| 共享层（已配置路径） | 修改 `SSoT/shared/` 共享模型 |
+| API 层（已配置路径） | 修改 API 契约 → Codegen |
+| IPC 层（已配置路径） | 修改 IPC SSoT → Codegen |
+
+> ⚠️ 若 criterion.md 未配置任何 SSoT 层，则跳过 SSoT-first 步骤，直接进入业务代码。
 
 ---
 

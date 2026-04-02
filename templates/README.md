@@ -22,10 +22,10 @@ templates/
 │   └── AGENTS.md          # UI 总结生成（可选）
 ├── openspec/
 │   └── AGENTS.md          # OpenSpec 增强规范
-├── devenv/
-│   ├── AGENTS.md          # 环境检查入口
-│   ├── check-toolchain.sh # 工具链检查脚本
-│   ├── check-mcp.sh       # MCP 配置检查脚本
+├── devenv/                    # (reference implementation)
+│   ├── AGENTS.md          # 环境检查参考实现
+│   ├── check-toolchain.sh # 工具链检查脚本（示例）
+│   ├── check-mcp.sh       # MCP 配置检查脚本（示例）
 │   └── mcp-config.json    # MCP 配置模板 (tool-agnostic)
 ├── scripts/
 │   ├── context-gen.sh             # Hash/引导脚本
@@ -46,7 +46,7 @@ templates/
 
 | 命令 | 阶段 | 用途 |
 |------|------|------|
-| `/context-init` | 初始化 | 环境检查 + 创建目录 + 归档源文档 |
+| `/context-init` | 初始化 | 确认目标 + 可选环境检查 + 创建目录 + 归档源文档 |
 | `/context-openspec` | 集成 | 生成文档总结 + 填充 config.yaml + 生成路线图 |
 | `/context-openspec proposal <change-id> [roadmap-doc]` | 设计 | 基于路线图/大纲创建提案 → 生成 tasks.md |
 | `/context-interview` | 设计 | 深度访谈完善技术规格或用户指定文档 |
@@ -127,7 +127,7 @@ PRD：@docs/product-overview.md
 执行流程：
 1. `node design/context-dev/tools/specflow/specflow.mjs validate <提案ID> --strict`
 2. 展示任务列表，等待确认
-3. SSoT-first：创建 Goose 迁移 (`SSoT/schema/migrations/`) → 修改 `SSoT/api/main.tsp` → Codegen
+3. SSoT-first：按 `.context/criterion.md` 已启用层执行（数据层迁移 → 共享模型 → API 契约 → IPC 契约 → Codegen）
 4. 实现业务代码 + 测试
 5. `node design/context-dev/tools/specflow/specflow.mjs archive <提案ID> --yes`
 
@@ -150,12 +150,15 @@ PRD：@docs/product-overview.md
 
 | 层 | 文件路径 | 用途 |
 |----|---------|------|
-| 数据层 | `SSoT/schema/migrations/` | Goose SQL 迁移文件目录 |
-| API 层 | `SSoT/api/tspconfig.yaml` | TypeSpec 配置 |
-| API 层 | `SSoT/api/main.tsp` | API 契约入口 |
 | 需求层 | `openspec/config.yaml` | 项目信息 |
 | 需求层 | `openspec/proposal-roadmap.md` | 提案路线图 |
 | 需求层 | `openspec/changes/` | 变更提案目录 |
 | 需求层 | `openspec/specs/` | 当前规范 (真理源) |
+| 数据层 | `SSoT/schema/migrations/` | Goose SQL 迁移文件目录 |
+| 共享层（可选） | `SSoT/shared/models.tsp` | API + IPC 共用模型 |
+| API 层 | `SSoT/api/main.tsp` | API 契约入口 |
+| API 层 | `SSoT/api/tspconfig.yaml` | TypeSpec 配置（OpenAPI3 + JSON Schema） |
+| IPC 层（可选） | `SSoT/ipc/main.tsp` | IPC 契约入口 |
+| IPC 层（可选） | `SSoT/ipc/tspconfig.yaml` | TypeSpec 配置（JSON Schema + bundleId） |
 
 ---

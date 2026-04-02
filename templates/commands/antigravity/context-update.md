@@ -1,5 +1,5 @@
 ---
-description: Update Context assets (add/modify/delete/fix) and keep manifest in sync
+description: Update Context assets (sync/add/modify/delete/fix) and keep manifest in sync
 ---
 
 # Context Update
@@ -7,12 +7,15 @@ description: Update Context assets (add/modify/delete/fix) and keep manifest in 
 > ⚠️ 给 AI 的说明：本命令文档同时包含「已落地能力」与「规划中的接口草案」。
 >
 > - `archive <change-id>`：✅ 已落地（通过 `design/context-dev/tools/specflow/specflow.mjs`）
+> - `sync roadmap|proposal`：⚠️ 先按“工作流规范”执行；若仓库尚无独立脚本/AGENTS，可按本文档手工完成同步
 > - `add/modify/delete/fix`：⚠️ 目前仍处于初稿/接口设计阶段，可能未在此仓库中完整实现
 >
 > ⛔ 在执行任何会写入/删除文件的子命令前，必须先确认仓库中存在对应的可执行实现（AGENTS 或脚本）。
 > 若未找到实现：**STOP**，向用户说明“该子命令尚未落地”，并询问是否现在要你补齐实现或改为手工操作。
 
 Supported subcommands:
+- `sync roadmap [phase-or-file] [--mode review|apply]`: sync `proposal-roadmap*.md` into `.context/**`, related `source/` files, and manifest
+- `sync proposal <change-id> [--mode review|apply]`: sync `openspec/changes/<change-id>/` (or `openspec/changes/archive/YYYY-MM-DD-<change-id>/` if archived) into `.context/**`, related `source/` files, and manifest
 - `add <source>`: add a supplementary source doc into `.context/` (and update manifest)
 - `modify <scope>`: regenerate specific Context outputs after source changes
 - `delete <path>`: delete a Context file/dir (mark as deleted in manifest)
@@ -20,6 +23,20 @@ Supported subcommands:
 - `archive <change-id>`: archive a completed change and (optionally) sync specs (delta → main)
 
 If the target project still uses separate commands (`/context-add`, `/context-modify`, ...), this command describes the unified interface you should implement.
+
+## sync
+
+**Execute**: `@design/context-dev/update/sync/AGENTS.md`
+
+支持：
+- `sync roadmap [phase-or-file] [--mode review|apply]`
+- `sync proposal <change-id> [--mode review|apply]`
+
+> 该模块负责：
+> - 解析 authority / scope / mode
+> - 建立 source -> context 映射
+> - 分类差异（`missing` / `drift` / `reference` / `metadata` / `conflict`）
+> - 在 `apply` 模式下同步 `.context/**`、`source/` 与 `context-manifest.json`
 
 ## add
 > ⚠️ 若仓库未实现该子命令：STOP（不要“按文档想象实现”直接改文件）。

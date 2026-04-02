@@ -35,6 +35,8 @@
 |----------|--------|---------|
 | **数据层 (Goose SQL)** | SQL, Relational DB, PostgreSQL, 数据库, Schema, 表设计, 迁移, Goose, 数据模型 | 需要 → `SSoT/schema/migrations/` |
 | **API 层 (TypeSpec)** | REST API, TypeSpec, OpenAPI, 接口规范, tsp, API First | 需要 → `SSoT/api/` |
+| **IPC 层 (TypeSpec JSON Schema)** | Tauri, IPC, Electron, Desktop App, GUI, 桌面端, 浮窗 | 需要 → `SSoT/ipc/` |
+| **共享层 (TypeSpec)** | （当 API 层 + IPC 层同时存在时自动触发） | 需要 → `SSoT/shared/` |
 
 ### 0.3 遗留项目检测
 
@@ -62,8 +64,14 @@
 ✅ API 层 (TypeSpec)：需要初始化
    └── 检测到：REST API, TypeSpec
 
-⏩ 若两者都不需要：跳过 SSoT 初始化
-   └── 原因：架构文档未包含数据库或 API 规范
+✅ IPC 层 (TypeSpec JSON Schema)：需要初始化
+   └── 检测到：Tauri, IPC, 桌面端
+
+✅ 共享层 (TypeSpec)：需要初始化
+   └── 原因：API 层 + IPC 层同时存在
+
+⏩ 若都不需要：跳过 SSoT 初始化
+   └── 原因：架构文档未包含数据库、API 或 IPC 规范
 
 ⚠️ 棕地项目：是/否
 ```
@@ -121,6 +129,39 @@
 
 ---
 
+## Phase 3.5: IPC 层初始化 (TypeSpec JSON Schema)
+
+> ⚠️ **仅当检测到需要 IPC 层时执行**
+
+创建 `{目标项目}/SSoT/ipc/` 目录并生成：
+
+| 文件 | 模板 |
+|------|------|
+| `SSoT/ipc/tspconfig.yaml` | `@design/context-dev/tools/SSoT/ipc/tspconfig.yaml` |
+| `SSoT/ipc/main.tsp` | `@design/context-dev/tools/SSoT/ipc/main.tsp` |
+
+`main.tsp` 填充规则：
+- 从架构文档提取客户端本地 IPC 类型（Session、Config、UI 事件等）
+- import `../shared/models.tsp` 引用共享模型
+
+---
+
+## Phase 3.6: 共享层初始化 (TypeSpec)
+
+> ⚠️ **仅当 API 层 + IPC 层同时存在时执行**
+
+创建 `{目标项目}/SSoT/shared/` 目录并生成：
+
+| 文件 | 模板 |
+|------|------|
+| `SSoT/shared/models.tsp` | `@design/context-dev/tools/SSoT/shared/models.tsp` |
+
+`models.tsp` 填充规则：
+- 从架构文档提取 API 和 IPC 共用的模型（如状态枚举、共享 DTO）
+- API 层和 IPC 层通过 `import "../shared/models.tsp"` 引用
+
+---
+
 ## 📋 验证命令
 
 初始化完成后可执行：
@@ -129,8 +170,11 @@
 # 验证 Goose 迁移状态
 goose -dir SSoT/schema/migrations status
 
-# 编译 TypeSpec
+# 编译 TypeSpec (API 层)
 tsp compile SSoT/api/main.tsp
+
+# 编译 TypeSpec (IPC 层，若已初始化)
+tsp compile SSoT/ipc/main.tsp
 ```
 
 ---
@@ -141,12 +185,12 @@ tsp compile SSoT/api/main.tsp
 
 | 文件 | 更新内容 |
 |------|---------|
-| `.context/criterion.md` | Section 1 三维约束体系（标记已启用层）、Section 5 SSoT 文件路径（填入实际路径） |
-| `.context/AGENTS.md` | 目录结构添加 `schema/` 和 `api/` 引用 |
+| `.context/criterion.md` | Section 2 三维约束体系（标记已启用层 + 填入工具和路径）、Section 7 SSoT 文件路径（填入实际路径） |
+| `.context/AGENTS.md` | 目录结构添加 `SSoT/` 子目录引用（schema/ api/ ipc/ shared/） |
 
 **criterion.md 更新规则**：
-- Section 1: 将已初始化的层标记为 `✅ 已启用`
-- Section 5: 填入实际创建的 SSoT 文件路径
+- Section 2 三维约束体系：将已初始化的层（数据层/API 层/IPC 层/共享层）替换占位符为实际工具名和路径
+- Section 7 SSoT 文件路径：填入实际创建的 SSoT 文件路径（含 IPC/shared）
 
 ---
 
@@ -173,8 +217,15 @@ tsp compile SSoT/api/main.tsp
    ✅ SSoT/api/main.tsp
    ✅ SSoT/api/models/
 
+📱 IPC 层 (TypeSpec JSON Schema): [已初始化 / 跳过]
+   ✅ SSoT/ipc/tspconfig.yaml
+   ✅ SSoT/ipc/main.tsp
+
+🔗 共享层 (TypeSpec): [已初始化 / 跳过]
+   ✅ SSoT/shared/models.tsp
+
 📝 Context 文件更新:
-   🔁 .context/criterion.md (Section 1, 5 已更新)
+   🔁 .context/criterion.md (Section 2 SSoT 层已更新)
    🔁 .context/AGENTS.md (目录结构已更新)
 
 🔁 Manifest 已更新

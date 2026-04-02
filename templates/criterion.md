@@ -29,8 +29,10 @@
 | 维度 | 工具 | 约束规则 |
 |------|------|---------|
 | **需求层** | OpenSpec (`openspec/config.yaml`) | 功能变更必须先创建提案（`/context-openspec proposal <change-id> [roadmap-doc]`），评审通过后再开发 |
-| **数据层** | {{数据层真理源}} | {{数据层变更规则（如：通过 config 模块/通过 HCL/通过迁移脚本）}} |
-| **API 层** | {{API 契约/服务}} | API 变更必须先更新服务端接口（或契约），客户端仅调用 |
+| **数据层** | {{数据层工具，如 Goose/Alembic/Flyway}} | {{数据层变更规则；路径如 `SSoT/schema/migrations/`}} |
+| **API 层** | {{API 工具，如 TypeSpec/OpenAPI/Protobuf}} | {{API 变更规则；路径如 `SSoT/api/main.tsp`}} |
+| **IPC 层（可选）** | {{IPC 工具，如 JSON Schema/TypeSpec}} | {{IPC 变更规则；路径如 `SSoT/schema/ipc.schema.json` 或 `SSoT/ipc/main.tsp`}} |
+| **共享层（可选）** | {{共享模型工具，如 TypeSpec import}} | {{共享模型路径如 `SSoT/shared/`；被 API 层和 IPC 层引用}} |
 
 ---
 
@@ -201,13 +203,16 @@ MUST NOT:
 
 | 层 | 文件 | 用途 |
 |----|------|------|
-| 数据层 | `SSoT/schema/migrations/` | Goose SQL 迁移文件目录 |
-| API 层 | `SSoT/api/tspconfig.yaml` | TypeSpec 编译配置 |
-| API 层 | `SSoT/api/main.tsp` | API 契约入口 |
 | 需求层 | `openspec/config.yaml` | 项目信息 |
 | 需求层 | `openspec/proposal-roadmap.md` | 提案路线图 |
 | 需求层 | `openspec/specs/` | 当前规范（真理源） |
 | 需求层 | `openspec/changes/` | 变更提案目录 |
+| 数据层 | `SSoT/schema/migrations/` | {{数据层迁移工具}} SQL 迁移文件目录 |
+| 共享层（可选） | `SSoT/shared/models.tsp` | API + IPC 共用模型 |
+| API 层 | `SSoT/api/tspconfig.yaml` | TypeSpec 编译配置（OpenAPI3 + JSON Schema） |
+| API 层 | `SSoT/api/main.tsp` | API 契约入口 |
+| IPC 层（可选） | `SSoT/ipc/tspconfig.yaml` | TypeSpec 编译配置（JSON Schema + bundleId） |
+| IPC 层（可选） | `SSoT/ipc/main.tsp` | IPC 契约入口 |
 
 ---
 
