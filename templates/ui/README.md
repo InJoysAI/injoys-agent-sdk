@@ -9,7 +9,9 @@
 | 文件 | 用途 |
 |------|------|
 | `AGENTS.md` | `/context-openspec ui` 的执行规则与 Prompt |
-| `stitch_prompts.md` | 设计生成工具 Prompt（核心） |
+| `STITCH_GUIDE.md` | Stitch 2.0 使用指南（完整工作流程 + PTCF 速查 + FAQ） |
+| `stitch_design_system.md` | Stitch 2.0 DESIGN.md — AI 可读设计系统 SSoT（持久化） |
+| `stitch_prompts.md` | Stitch 2.0 Flow Prompts — PTCF 框架（按用户旅程分组） |
 | `design_system.md` | 设计系统（颜色/字体/间距/组件约束） |
 | `design_tokens.json` | Design Tokens（Global/Alias/Component） |
 | `layout_grid.md` | 栅格与响应式断点 |

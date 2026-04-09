@@ -1,0 +1,277 @@
+# {{Product Name}} — DESIGN.md (Stitch 2.0 Design System)
+
+> **Metadata**
+> - **Source**: `{{UI Spec Source Path}}`
+> - **Generated At**: `{{YYYY-MM-DD HH:mm}}`
+> - **Generator**: `{{Generator Name}}`
+> - **Stitch Version**: `2.0`
+
+> [!IMPORTANT]
+> **Stitch 2.0 DESIGN.md**
+>
+> This file is the **persistent, machine-readable design system SSoT** for Google Stitch 2.0.
+> Stitch automatically reads this file for every generation/edit/redesign operation — **no need to
+> inline tokens into individual prompts**.
+>
+> - Commit this file to Git for version control
+> - Update immediately when design decisions change
+> - Can be imported/exported across Stitch projects
+> - Coding agents (Claude Code, Copilot, etc.) can also consume this file for code-level consistency
+
+---
+
+## Brand Overview
+
+- **Brand Name:** {{Product Name}}
+- **Product:** {{Product Short Description}}
+- **Vibe:** {{Style Keywords — e.g., Minimalist, tech-forward, professional, playful}}
+- **Core Principles:** {{e.g., Mobile-first, accessibility, fluid spacing, data-dense-but-clean}}
+- **Target Users:** {{Primary user persona and context}}
+
+---
+
+## Color Palette (Tokens)
+
+> **Rule**: Use semantic token names. If exact hex values are not available from source docs,
+> use `TBD` and describe the intent qualitatively (e.g., "warm action blue").
+
+### Primary & Secondary
+
+| Token | Value | Usage |
+|-------|-------|-------|
+| `color-primary` | `{{#hex or TBD}}` | Main CTAs, active states, primary actions |
+| `color-primary-hover` | `{{#hex or TBD}}` | Primary color hover/pressed state |
+| `color-secondary` | `{{#hex or TBD}}` | Highlights, progress indicators, secondary actions |
+
+### Surfaces & Backgrounds
+
+| Token | Value | Usage |
+|-------|-------|-------|
+| `color-surface-bg` | `{{#hex or TBD}}` | Default page background |
+| `color-surface-card` | `{{#hex or TBD}}` | Card and panel backgrounds |
+| `color-surface-elevated` | `{{#hex or TBD}}` | Elevated surfaces (modals, popovers) |
+
+### Text
+
+| Token | Value | Usage |
+|-------|-------|-------|
+| `color-text-primary` | `{{#hex or TBD}}` | Primary content text |
+| `color-text-secondary` | `{{#hex or TBD}}` | Secondary/helper text, labels |
+| `color-text-disabled` | `{{#hex or TBD}}` | Disabled state text |
+| `color-text-inverse` | `{{#hex or TBD}}` | Text on dark/primary backgrounds |
+
+### Semantic / State Colors
+
+| Token | Value | Usage |
+|-------|-------|-------|
+| `color-error` | `{{#hex or TBD}}` | Destructive actions, error states |
+| `color-success` | `{{#hex or TBD}}` | Success states, positive indicators |
+| `color-warning` | `{{#hex or TBD}}` | Warning states, caution indicators |
+| `color-info` | `{{#hex or TBD}}` | Informational states, neutral alerts |
+
+### Borders & Dividers
+
+| Token | Value | Usage |
+|-------|-------|-------|
+| `color-border-default` | `{{#hex or TBD}}` | Default borders, dividers |
+| `color-border-focus` | `{{#hex or TBD}}` | Focus ring color |
+
+---
+
+## Typography
+
+- **Font Family:** `'{{Font Family}}', {{fallback stack}}`
+- **Monospace Font:** `'{{Mono Font Family}}', monospace`
+
+### Type Scale
+
+| Token | Size | Weight | Line-Height | Usage |
+|-------|------|--------|-------------|-------|
+| `text-display` | {{36px or TBD}} | Bold | 1.2 | Hero headlines, landing sections |
+| `text-h1` | {{32px or TBD}} | Bold | 1.2 | Page titles |
+| `text-h2` | {{24px or TBD}} | SemiBold | 1.3 | Section headers |
+| `text-h3` | {{20px or TBD}} | SemiBold | 1.3 | Sub-section headers |
+| `text-body` | {{16px or TBD}} | Regular | 1.5 | Primary body text |
+| `text-body-sm` | {{14px or TBD}} | Regular | 1.5 | Secondary body text, compact areas |
+| `text-label` | {{12px or TBD}} | Medium | 1.4 | Labels, captions, badges |
+| `text-caption` | {{11px or TBD}} | Regular | 1.4 | Timestamps, metadata |
+
+---
+
+## Spacing & Layout
+
+### Base Grid
+
+- **Base Unit:** {{8px or TBD}}
+
+### Spacing Tokens
+
+| Token | Value | Usage |
+|-------|-------|-------|
+| `space-xs` | {{4px or TBD}} | Tight inline spacing |
+| `space-sm` | {{8px or TBD}} | Component internal padding |
+| `space-md` | {{16px or TBD}} | Standard element spacing |
+| `space-lg` | {{24px or TBD}} | Section spacing |
+| `space-xl` | {{32px or TBD}} | Large section gaps |
+| `space-2xl` | {{48px or TBD}} | Page-level divisions |
+
+### Layout
+
+| Property | Value |
+|----------|-------|
+| Container Max-Width | {{1200px or TBD}} |
+| Sidebar Width (Desktop) | {{240px collapsed/60px or TBD}} |
+| Content Area | Fluid responsive |
+
+### Breakpoints
+
+| Name | Width | Layout Strategy |
+|------|-------|----------------|
+| Mobile | {{≤ 640px or TBD}} | {{Single column, bottom nav}} |
+| Tablet | {{641–1024px or TBD}} | {{Two column, collapsible sidebar}} |
+| Desktop | {{≥ 1025px or TBD}} | {{Full layout, sidebar + content}} |
+
+---
+
+## Border Radius
+
+| Token | Value | Usage |
+|-------|-------|-------|
+| `radius-sm` | {{4px or TBD}} | Inputs, small elements |
+| `radius-md` | {{8px or TBD}} | Buttons, badges |
+| `radius-lg` | {{12px or TBD}} | Cards, panels |
+| `radius-xl` | {{16px or TBD}} | Modals, large containers |
+| `radius-full` | `9999px` | Avatars, pills |
+
+---
+
+## Elevation / Shadows
+
+| Token | Value | Usage |
+|-------|-------|-------|
+| `shadow-sm` | `{{0px 1px 2px rgba(0,0,0,0.05) or TBD}}` | Subtle lift (cards at rest) |
+| `shadow-md` | `{{0px 2px 4px rgba(0,0,0,0.1) or TBD}}` | Active cards, dropdowns |
+| `shadow-lg` | `{{0px 4px 12px rgba(0,0,0,0.15) or TBD}}` | Modals, popovers |
+
+---
+
+## Component Guidelines
+
+> **Purpose**: Define concrete, measurable rules for common UI components.
+> Stitch 2.0 uses these to maintain cross-screen consistency.
+> Avoid vague adjectives; use specific values.
+
+### Buttons
+
+| Property | Value |
+|----------|-------|
+| Border Radius | `radius-md` ({{8px or TBD}}) |
+| Padding | {{8px 16px or TBD}} |
+| Font | `text-body-sm`, {{Medium weight}} |
+| Primary BG | `color-primary` |
+| Primary Text | `color-text-inverse` |
+| Secondary | Outlined, `color-primary` border |
+| Ghost | No border/bg, `color-primary` text |
+| Disabled | Opacity 0.5, no pointer-events |
+| Loading | Spinner replaces text, maintain width |
+
+### Cards
+
+| Property | Value |
+|----------|-------|
+| Border Radius | `radius-lg` ({{12px or TBD}}) |
+| Shadow | `shadow-sm` (elevated on hover → `shadow-md`) |
+| Padding | `space-md` ({{16px or TBD}}) |
+| Background | `color-surface-card` |
+| Border | {{1px solid color-border-default or none}} |
+
+### Inputs
+
+| Property | Value |
+|----------|-------|
+| Border Radius | `radius-sm` ({{4px or TBD}}) |
+| Border | {{1px solid color-border-default}} |
+| Height | {{40px or TBD}} |
+| Padding | {{8px 12px or TBD}} |
+| Focus | Border → `color-border-focus`, ring/glow |
+| Error | Border → `color-error`, helper text below |
+| Disabled | BG muted, text `color-text-disabled` |
+
+### Navigation
+
+| Property | Value |
+|----------|-------|
+| Desktop | {{Sidebar or Header}} — {{Width/Height}} |
+| Mobile | {{Bottom Nav or Drawer}} |
+| Active Item | {{color-primary background or left border indicator}} |
+| Collapse | {{Icon-only at 60px width or N/A}} |
+
+### Modals / Dialogs
+
+| Property | Value |
+|----------|-------|
+| Border Radius | `radius-xl` ({{16px or TBD}}) |
+| Shadow | `shadow-lg` |
+| Backdrop | {{rgba(0,0,0,0.4) or TBD}} |
+| Max Width | {{480px or TBD}} |
+| Padding | `space-lg` |
+
+### Tables
+
+| Property | Value |
+|----------|-------|
+| Header BG | {{color-surface-card or TBD}} |
+| Row Hover | {{color-surface-bg or TBD}} |
+| Border | {{1px bottom border, color-border-default}} |
+| Cell Padding | {{12px 16px or TBD}} |
+
+### Feedback
+
+| Type | Style |
+|------|-------|
+| Toast | {{Position}}, auto-dismiss {{5s}}, semantic color left border |
+| Inline Alert | Full-width banner with icon + dismiss |
+| Empty State | Centered illustration placeholder + CTA button |
+| Loading | Skeleton shimmer / spinner with `text-label` caption |
+
+---
+
+## Do's and Don'ts
+
+### ✅ Do
+
+- Use semantic token names (`color-primary`, not raw `#1A73E8`) in all components
+- Maintain high contrast for all text elements (WCAG AA minimum)
+- Use consistent border-radius within the same component family
+- Apply hover/focus states to all interactive elements
+- Test designs at all breakpoints before handoff
+
+### ❌ Don't
+
+- Use thin weight fonts (< 400) for UI labels or navigation items
+- Mix border-radius values within the same component variant
+- Hard-code colors — always reference tokens
+- Use placeholder text as real content in prototypes
+- {{Product-specific Don'ts from PRD / UI Spec}}
+
+---
+
+## Dark Mode (if applicable)
+
+> If the product supports dark mode, define the token overrides here.
+> Stitch will use these when generating dark-mode variants.
+
+| Light Token | Dark Override | Notes |
+|-------------|-------------|-------|
+| `color-surface-bg` | `{{#hex or TBD}}` | Dark page background |
+| `color-surface-card` | `{{#hex or TBD}}` | Dark card surface |
+| `color-text-primary` | `{{#hex or TBD}}` | Light text on dark |
+| `color-border-default` | `{{#hex or TBD}}` | Subtle borders on dark |
+
+---
+
+## Appendix: Token Summary
+
+> **Source**: `{{UI Spec Source Path}}` ({{PRD Version}})
+> **Total Token Categories**: Colors / Typography / Spacing / Radius / Elevation
+> **Coverage**: {{Full / Partial — list gaps as TODO}}

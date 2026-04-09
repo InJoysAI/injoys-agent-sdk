@@ -372,15 +372,156 @@ node design/context-dev/tools/specflow/specflow.mjs validate <change-id> --stric
 
 > ⛔ **必须解决所有验证错误后才能提交提案**
 
+**结果**：
+- ❌ 验证失败 → 根据常见错误提示修复，重新验证；修复前不得宣称完成
+- ✅ 验证通过 → 继续 Phase 5
+
 **常见错误**：
 - "Change must have at least one delta" → 检查 `specs/` 目录
 - "Requirement must have at least one scenario" → 使用 `#### Scenario:` 格式
 
 ---
 
+## Phase 5: 动态生成评审 Prompt
+
+> ⛔ **必须在 Phase 4 验证通过后执行**。
+> ⛔ **输出的 Prompt 必须完整填入实际的 change-id 和 Phase 编号，不得保留任何 `<...>` 占位符**。
+
+### 5.1 执行前数据汇总
+
+在生成 Prompt 前，AI 必须从前序步骤提取以下信息：
+
+| 步骤 | 读取来源 | 提取内容 | 用途 |
+|------|----------|----------|------|
+| ① | Phase 1.2.1 Roadmap 提案快照 | `change_id`、`phase`（如 Phase-0 / Phase-1） | 填入 Prompt 的提案 ID 与大纲所在 Phase |
+| ② | `openspec/changes/<change-id>/` 目录实际结构 | 存在的文件（proposal.md / tasks.md / specs/ / design.md） | 确保 Prompt 中提案路径表述准确 |
+| ③ | `openspec/changes/<change-id>/proposal.md` → `### 关联 Context 资产` | 关联资产列表 | 供评审者按需加载 |
+
+### 5.2 Prompt 输出格式
+
+完成数据汇总后，AI 输出以下**完全填充的 Prompt**（以 markdown 代码块包裹，便于用户复制至新对话运行）：
+
+~~~markdown
+```
+/context-check review 对 change-id 为 `<实际change-id>` 的提案进行三层联合评审，评审对象包括：
+- 大纲（Outline）：`openspec/proposal-roadmap-Phase-<N>.md` 中该提案的大纲条目
+- 提案内容（Proposal）：`openspec/changes/<实际change-id>/`（包含 proposal.md / tasks.md / specs/<实际capability>/spec.md，以及可能的 design.md）
+- 业务资产（Context）：`.context/` 目录下的权威文档
+
+---
+
+## 阶段一：大纲与资产一致性评审（Outline ↔ .context）
+
+验证大纲中描述的目标、范围、约束与验收口径是否与 `.context/` 权威资产对齐，识别大纲存在的遗漏、冲突或表述不准确之处。
+
+**权威对照源**：
+- `criterion.md`（工程约束 SSoT）
+- `domain/business_rules.md` + `domain/domain_model.md` + `domain/user_journeys.md`（业务规则、领域模型与用户旅程）
+- `domain/edge_cases.md`（边界场景，校验 In/Out 是否遗漏已知边缘情况）
+- `architecture/risks_and_debt.md` + `domain/risks_and_debt.md`（风险对照）
+- `architecture/security_policy.md`（安全约束）
+- `legacy/legacy_system_analysis.md`（遗留系统约束，Phase-0 提案必须参考）
+
+**评审项**：
+1. **业务目标对齐** — 大纲"业务目标"中的每条目标是否能在 `business_rules.md` 或 `user_journeys.md` 中找到对应的业务需求依据？是否有与 .context 冲突的目标？
+2. **关联资产覆盖度** — 大纲"关联 Context 资产"表格是否引用了该提案所涉及的全部 .context 文档？对照 `.context/` 实际目录，列出缺失引用和多余引用。
+3. **In/Out 边界与 .context 对齐** — 大纲的 In 范围是否与 .context 所定义的功能边界和业务规则一致？Out 范围是否遗漏了 `edge_cases.md` 中已知的需要明确排除的边缘场景？
+4. **验收标准与约束对齐** — 大纲的验收标准是否覆盖了 `criterion.md` 中相关的 MUST/MUST NOT 要求？是否有可操作的验证方式（日志/指标值/API 响应）？标注主观模糊或缺失量化指标的条目。
+5. **风险覆盖完整度** — 对照 `risks_and_debt.md` 中的 RISK-xxx 列表，大纲风险表是否覆盖了所有与该提案相关的风险？标注遗漏的 RISK-xxx 及其严重程度。
+
+**输出**：
+- 大纲与 .context 一致性评级（高 / 中 / 低）及核心发现
+- 业务目标对照表（| 大纲目标 | .context 依据 | 对齐状态 ✅/⚠️/❌ |）
+- 缺失 / 多余的资产引用列表
+- In/Out 边界问题清单（遗漏的边缘场景、与 .context 冲突的范围定义）
+- 验收标准问题列表（触发 MUST/MUST NOT 遗漏或缺失量化指标的条目）
+- 遗漏 RISK-xxx 列表（含风险等级）
+
+---
+
+## 阶段二：大纲与提案内容一致性校验（Outline ↔ Proposal）
+
+逐项核对提案内容是否忠实还原并完整展开了大纲的意图，识别边界漂移、缺口与偏差。
+
+**评审项**：
+1. **目标映射** — 大纲"业务目标"中的每条目标是否在 proposal.md 中均有对应说明？标注未覆盖项。
+2. **范围边界落地** — 大纲 In/Out 范围是否完整体现在 proposal.md 的范围章节中？是否有边界漂移（提案比大纲多做或少做了什么）？
+3. **关键任务还原** — 大纲"关键任务"列表是否在 tasks.md 中被拆解为可执行的原子任务？检查是否有大纲任务未在 tasks.md 出现。
+4. **验收标准传递** — 大纲的验收条目是否在 spec.md 或 tasks.md 的验收部分中被完整继承？是否有弱化或丢失。
+5. **依赖关系对齐** — 大纲声明的前置依赖和被依赖提案是否在 proposal.md 的依赖章节中完整体现？
+
+**输出**：
+- 一致性总评（完全一致 / 部分一致 / 不一致）
+- 目标覆盖对照表（| 大纲目标 | 提案对应章节 | 覆盖状态 |）
+- 边界漂移清单（多做/少做的具体内容）
+- 任务映射缺口列表
+- 依赖声明差异列表
+
+---
+
+## 阶段三：提案内容合规评审（Proposal → .context）
+
+判断提案内容是否满足 `.context/` 定义的系统业务要求与约束，并验证其在路线图中的定位合理性。
+
+**权威对照源**（按提案涉及模块选择性加载，全量列举以供对照）：
+| 评审维度 | 权威来源文件 |
+|---------|------------|
+| 业务规则 / 用户旅程 | `.context/domain/business_rules.md` + `.context/domain/user_journeys.md` + `.context/domain/domain_model.md` + `.context/domain/ubiquitous_language.md` |
+| 边界与边缘场景 | `.context/domain/edge_cases.md` |
+| 非功能要求（安全/合规/性能） | `.context/criterion.md` §3-§4 + `.context/architecture/security_policy.md` + `.context/db/security_hardening.md` |
+| 可观测性 / 运维 / 部署 | `.context/architecture/cross_cutting_concepts.md` + `.context/architecture/runtime_view.md` + `.context/architecture/deployment_view.md` |
+| 数据层（如涉及 DB 变更） | `.context/db/schema_design.md` + `.context/db/migrations_and_ssot.md` + `.context/db/performance_tuning.md` |
+| 遗留系统兼容 / 迁移路径 | `.context/legacy/legacy_system_analysis.md` + `.context/architecture/migration_architecture.md` |
+| 测试与验收 | `.context/domain/testing_strategy.md` + `.context/domain/data_strategy.md` |
+| UI / 交互（如涉及前端） | `.context/ui/design_system.md` + `.context/ui/interaction_states.md` + `.context/ui/stitch_prompts.md` |
+| API 契约 | `.context/architecture/api_strategy.md` |
+| 路线图定位与依赖 | `openspec/proposal-roadmap.md` + `openspec/proposal-roadmap-Phase-<N>.md` |
+
+**审查维度**：
+1. MUST/MUST NOT 合规矩阵（逐条扫描 criterion.md §3-§4，不可跳过）
+2. 业务规则核对（BR-xxx 逐条映射，标注满足/不满足/缺失证据）
+3. 路线图定位（依赖完整性、冲突点、重叠建设风险）
+4. 接口契约分析（上下游耦合、破坏性变更影响范围）
+5. 技术与交付风险（触发条件 + 影响 + 缓解 + 责任归属）
+6. 待澄清问题（P0 阻塞 / P1 重要 / P2 建议）
+7. 可执行修改建议（M-n 编号 + 修改位置 + 验收口径 + 监控指标）
+
+**输出报告**：
+1. **综合结论**（PASS / PASS (Conditional) / MODIFY / FAIL）及各阶段小结
+2. MUST/MUST NOT 合规矩阵（| 规则（criterion.md 位置）| 提案证据 | 状态 ✅/⚠️/❌ |）
+3. 业务契合度表（| BR-xxx | 满足/不满足/缺失 | 提案引用位置 |）
+4. 大纲↔提案一致性对照表（| 大纲章节 | 提案对应位置 | 一致性 | 差异说明 |）
+5. 路线图关联分析（依赖图核对、冲突点、整合建议）
+6. 风险清单（| 风险ID | 触发条件 | 影响 | 缓解方案 | 责任归属 |）
+7. 待澄清问题列表（按 P0/P1/P2 排序）
+8. 修改建议（M-n 编号 + 涉及层（大纲/提案/两者）+ 修改位置 + 具体内容 + 验收口径）
+
+**质量要求**：
+- 所有结论必须引用具体文件路径 + 章节/行号，禁止泛泛而谈
+- MUST/MUST NOT 必须逐条扫描，BR-xxx 必须逐条映射，不可合并或跳过
+- 修改建议须明确指出应改"大纲"还是"提案内容"或"两者均需同步"
+- 输出使用中文，文件引用使用相对路径（相对项目根目录）
+```
+~~~
+
+### 5.3 输出质量检查（生成后自检）
+
+AI 在输出 Prompt 前必须完成以下自检，确认**全部通过**再输出：
+
+- [ ] `change-id` 是实际值，非 `<CHANGE_ID>` 占位符（Prompt 中所有出现位置均已替换）
+- [ ] Phase 编号是实际值（如 `Phase-0`、`Phase-1`），非 `<N>` 占位符（Prompt 中所有出现位置均已替换）
+- [ ] 大纲路径引用了正确的 `openspec/proposal-roadmap-Phase-<N>.md` 文件（N 与快照一致）
+- [ ] `specs/<capability>/spec.md` 中的 `<capability>` 已替换为实际目录名
+- [ ] Prompt 全文无任何 `<...>` 占位符
+
+> ⏸️ **将上方 Prompt 复制至新对话运行评审**；建议在评审结论为 PASS 或 PASS (Conditional) 后，再继续实施（`/context-start <change-id>`）。
+
+---
+
 ## ✅ 完成后
 
 > ⛔ **只有 `node design/context-dev/tools/specflow/specflow.mjs validate <change-id> --strict` 通过后才能报告完成**
+> ⚠️ 下方模板中的 `<...>` 均为待填充字段，**输出时必须替换为实际值**。
 
 报告结果：
 
@@ -395,17 +536,19 @@ $ node design/context-dev/tools/specflow/specflow.mjs validate <change-id> --str
 ✅ All checks passed
 
 关联的 Context 资产:
-- .context/domain/business_rules.md
-- .context/architecture/security_policy.md
+- .context/domain/business_rules.md（必含）
+- <proposal.md 关联 Context 资产表中的其他文件>
 
 Roadmap 对齐:
 - source_primary: openspec/proposal-roadmap.md
-- source_supplement: <roadmap-doc or N/A>
-- phase: <phase>
-- matched change: <change-id>
+- source_supplement: <roadmap-doc 实际路径，或 N/A>
+- phase: <Phase-0 / Phase-1 / ...（实际值）>
+- matched change: <实际 change-id>
 - alignment: Why/What/Impact/tasks/specs 已逐项对齐（如有偏差已说明）
 
+✅ 评审 Prompt 已输出（见上方 Phase 5）
+
 下一步:
-- 开始实现: /context-start <change-id>
-- 或者 审阅提案: /context-check  proposal <change-id>
+- 复制 Phase 5 Prompt 至新对话运行三阶段评审
+- 评审通过后开始实施: /context-start <实际 change-id>
 ```

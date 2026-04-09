@@ -14,7 +14,8 @@
 ├── source/                    # 源文档目录（权威）
 │   └── *.md                   # 完整 UI 规范文档
 ├── design_system.md           # 必须生成
-├── stitch_prompts.md          # 必须生成
+├── stitch_design_system.md    # 必须生成 — Stitch 2.0 DESIGN.md（设计系统 SSoT）
+├── stitch_prompts.md          # 必须生成 — Stitch 2.0 Flow Prompts（PTCF 格式）
 ├── [atomic_components.md]     # 按需生成（Phase 0 检测）
 ├── [layout_grid.md]           # 按需生成（Phase 0 检测）
 ├── [design_tokens.json]       # 按需生成（Phase 0 检测）
@@ -94,7 +95,7 @@
 
 | 检查项 | 关键词 | 若存在则生成 | 优先级 |
 |--------|--------|-------------|--------|
-| Stitch | Stitch, AI 设计 | `stitch_prompts.md` | 重要 |
+| Stitch | Stitch, AI 设计 | `stitch_design_system.md` + `stitch_prompts.md` | 必须 |
 | 组件库 | 组件, Component, Atom, 原子化 | `atomic_components.md` | 推荐 |
 | 栅格系统 | Grid, 栅格, 断点, Breakpoint, 响应式 | `layout_grid.md` | 推荐 |
 | 设计 Token | Token, CSS 变量, --color, --spacing | `design_tokens.json` | 推荐 |
@@ -111,7 +112,9 @@
 ```
 === 生成计划 ===
 必须生成：
-- design_system.md（核心设计系统）
+- design_system.md（核心设计系统 — 内部引用）
+- stitch_design_system.md（Stitch 2.0 DESIGN.md — AI 可读设计系统 SSoT）
+- stitch_prompts.md（Stitch 2.0 Flow Prompts — PTCF 格式）
 
 推荐生成（关键词匹配）：
 - atomic_components.md（检测到：组件, Component）
@@ -130,18 +133,19 @@
 
 > 模板路径相对于 `design/context-dev/`
 
-| 输出文件 | 模板路径 |
-|----------|----------|
-| `design_system.md` | `templates/ui/design_system.md.template` |
-| `stitch_prompts.md` | `templates/ui/stitch_prompts.md.template` |
-| `atomic_components.md` | `templates/ui/atomic_components.md.template` |
-| `layout_grid.md` | `templates/ui/layout_grid.md.template` |
-| `design_tokens.json` | `templates/ui/design_tokens.json.template` |
-| `interaction_states.md` | `templates/ui/interaction_states.md.template` |
-| `motion_tokens.md` | `templates/ui/motion_tokens.md.template` |
-| `accessibility_checklist.md` | `templates/ui/accessibility_checklist.md.template` |
-| `handoff_checklist.md` | `templates/ui/handoff_checklist.md.template` |
-| `platform_guidelines.md` | `templates/ui/platform_guidelines.md.template` |
+| 输出文件 | 模板路径 | 备注 |
+|----------|----------|------|
+| `design_system.md` | `templates/ui/design_system.md.template` | 内部设计系统（CSS 变量 + 组件样式） |
+| `stitch_design_system.md` | `templates/ui/stitch_design_system.md.template` | **Stitch 2.0 DESIGN.md** — AI 可读设计系统 SSoT |
+| `stitch_prompts.md` | `templates/ui/stitch_prompts.md.template` | **Stitch 2.0 Flow Prompts** — PTCF 格式 |
+| `atomic_components.md` | `templates/ui/atomic_components.md.template` | |
+| `layout_grid.md` | `templates/ui/layout_grid.md.template` | |
+| `design_tokens.json` | `templates/ui/design_tokens.json.template` | |
+| `interaction_states.md` | `templates/ui/interaction_states.md.template` | |
+| `motion_tokens.md` | `templates/ui/motion_tokens.md.template` | |
+| `accessibility_checklist.md` | `templates/ui/accessibility_checklist.md.template` | |
+| `handoff_checklist.md` | `templates/ui/handoff_checklist.md.template` | |
+| `platform_guidelines.md` | `templates/ui/platform_guidelines.md.template` | |
 
 
 ---
@@ -168,7 +172,52 @@
 使用 `design_system.md` 模板格式输出。
 ```
 
-### 2. 填充 `atomic_components.md` (推荐)
+### 2. 填充 `stitch_design_system.md` (必须)
+
+**Prompt**:
+```markdown
+# Role
+你是一位 Stitch 2.0 Design System 专家。
+
+# Task
+基于 UI 设计规范（及 Step 1 已提取的 design_system.md），生成 Stitch 2.0 兼容的 DESIGN.md 文件。
+
+# Requirements
+- 遵循 Stitch 2.0 DESIGN.md 格式：Brand Overview → Color Palette → Typography → Spacing → Component Guidelines → Do's and Don'ts
+- 使用语义化 token 命名（`color-primary`、`space-md`），而非内部 CSS 变量
+- token 值必须来源于 UI 规范；未提供的用 `TBD` 占位并标注 intent
+- Component Guidelines 使用具体数值而非模糊形容词（如 "8px border-radius" 而非 "rounded"）
+- 若产品支持 Dark Mode，包含 Dark Mode override 表
+- **务必**添加 Metadata 区块到文件顶部
+
+# Output Format
+使用 `stitch_design_system.md` 模板格式输出。
+```
+
+### 3. 填充 `stitch_prompts.md` (必须)
+
+**Prompt**:
+```markdown
+# Role
+你是一位 Stitch 2.0 Prompt 工程师，擅长构建高效的 AI 设计 prompt。
+
+# Task
+基于 PRD 的用户旅程和页面清单，生成 Stitch 2.0 Flow-based Prompts。
+
+# Requirements
+- 每个 prompt 使用 PTCF 框架（Persona → Task → Context → Format）
+- 按用户旅程（Flow）分组，而非按单个屏幕
+- 每个 Flow prompt 指定: 屏幕列表、状态覆盖（default/loading/empty/error）、约束条件
+- **不要**在 prompt 中内联设计系统 token（Stitch 2.0 自动从 DESIGN.md 读取）
+- 包含 Edit (E.x) 和 Prototype (P.x) 类型的 prompt
+- 仅 PRD 提供的模块/页面清单信息 → 转换为 Flow prompt；不要臆造用户旅程
+- **务必**添加 Metadata 区块到文件顶部
+
+# Output Format
+使用 `stitch_prompts.md` 模板格式输出。
+```
+
+### 4. 填充 `atomic_components.md` (推荐)
 
 **Prompt**:
 ```markdown
@@ -185,7 +234,7 @@
 使用 `atomic_components.md` 模板格式输出。
 ```
 
-### 3. 填充 `layout_grid.md` (推荐)
+### 5. 填充 `layout_grid.md` (推荐)
 
 **Prompt**:
 ```markdown
@@ -202,7 +251,7 @@
 使用 `layout_grid.md` 模板格式输出。
 ```
 
-### 4. 填充 `design_tokens.json` (推荐)
+### 6. 填充 `design_tokens.json` (推荐)
 
 **Prompt**:
 ```markdown
@@ -220,7 +269,7 @@
 使用 `design_tokens.json` 模板格式输出。
 ```
 
-### 5. 填充 `interaction_states.md` (可选)
+### 7. 填充 `interaction_states.md` (可选)
 
 **Prompt**:
 ```markdown

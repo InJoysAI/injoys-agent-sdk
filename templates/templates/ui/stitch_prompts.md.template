@@ -1,287 +1,279 @@
-# {{Product Name}} — Stitch UI Design Prompts ({{Scope}} / {{Phase}})
+# {{Product Name}} — Stitch 2.0 Flow Prompts ({{Scope}} / {{Phase}})
 
 > **Metadata**
 > - **Source**: `{{UI Spec Source Path}}`
 > - **Generated At**: `{{YYYY-MM-DD HH:mm}}`
 > - **Generator**: `{{Generator Name}}`
+> - **Stitch Version**: `2.0`
 
 ---
 
 > **Reference PRD**: `{{PRD Path}}` ({{PRD Version}})
-> **Context**: These prompts are designed for **Google Stitch** to generate high-fidelity UI mockups for the {{Product Name}} {{Scope}}. Each prompt block represents **one screen/state**.
+> **Design System**: `{{DESIGN.md Path}}` — loaded automatically by Stitch 2.0
+> **Context**: These prompts are designed for **Google Stitch 2.0** to generate high-fidelity UI mockups
+> for the {{Product Name}} {{Scope}}. Each prompt block represents **one user flow** (multiple screens).
 
 > [!IMPORTANT]
-> **Design System Reference**
+> **Stitch 2.0 Workflow**
 >
-> In practice, Stitch may not reliably follow “memory-only” instructions like `Apply Prompt 0.1 tokens.`.
-> To maximize consistency, **inline the same token block** inside each prompt (Global Components + each screen/state prompt).
+> 1. **Load** `DESIGN.md` into Stitch project workspace (one-time setup per project)
+> 2. **Select** the Design System via the Design System Picker in Stitch UI
+> 3. **Generate** flows using the prompts below (each prompt → multi-screen flow)
+> 4. **Edit** individual screens/elements using conversational refinement
+> 5. **Prototype** — connect screens into interactive clickable flows
 >
-> All prompts from 0.2 onwards should include the following block when used in Stitch:
-> ```
-> **🎨 DESIGN SYSTEM TOKENS** (Apply strictly):
-> - Colors: {{Primary}} / {{Secondary}} / {{Surface}} / {{OnSurface}}
-> - Typography: {{Font Family}} (sizes per Prompt 0.1)
-> - Spacing: {{Spacing System}} (e.g. 8pt grid)
-> - Radius: {{Radius Tokens}}
-> - Shadows: {{Elevation Tokens}}
->
-> **🧩 COMPONENT STRATEGY** (Reuse Global Components):
-> - Use Prompt G.1 for Navigation
-> - Use Prompt G.2 for Buttons/Cards/Modals
-> - Use Prompt G.3 for Forms
-> - Use Prompt G.4 for Data Display
-> - Use Prompt G.5 for Feedback
-> ```
+> Design tokens are **NOT** inlined in each prompt — Stitch 2.0 reads them from `DESIGN.md` automatically.
 
-> **How to use these prompts in Google Stitch**
-> - Use **one prompt block per screen/state**.
-> - Start from **Prompt 0.1** (design system context), then generate **Global Components** before module screens.
-> - Reuse components across canvases: copy/paste existing components instead of redrawing; keep names consistent.
-> - After Stitch output, manually validate against `{{UI Guidelines Path}}` and implementation constraints.
-
-> **Prompt ID Convention**
-> - `0.1`: Design System Tokens (session memory / reference)
-> - `G.x`: Global Components (reusable component sheets)
-> - `0.x`: Optional public/unauthenticated module (e.g. landing, first-run)
-> - `1.x+`: Authenticated modules (module number aligns with prompt prefix)
+> **Prompt Conventions**
+> - Each prompt uses the **PTCF framework** (Persona → Task → Context → Format)
+> - `F.x`: User Flow prompts (multi-screen journeys)
+> - `E.x`: Edit/Refinement prompts (post-generation adjustments)
+> - `R.x`: Redesign prompts (style iteration on existing screens)
 
 ---
 
-## Global Style Foundation
+## Flow F.0: Ideation & Direction Setting
 
-### Prompt 0.1: Design System Context (Memory Instruction)
-
-> ⚠️ **Usage Note**: This is a read-only reference. You may paste it once per Stitch session to establish global context.
->
-> **Fallback (Derived from PRD)**:
-> - If you do **not** have a UI spec / design tokens, you may still create Prompt 0.1 from PRD + architecture.
-> - **Do not invent exact numeric tokens** (hex colors / px sizes) unless explicitly provided by source docs.
-> - Use `TBD` / `TODO` placeholders and describe *relative* guidance (e.g. “warm playful palette”, “large rounded corners”, “8pt spacing system”).
+> **Mode**: Ideate
+> **Purpose**: Establish design direction with the AI before generating screens.
+> This is a conversational step — no screens are generated yet.
 
 ```
-**CONTEXT INSTRUCTION — REFERENCE ONLY**
+**PERSONA**: You are a senior product designer specializing in {{Product Domain}} interfaces.
 
-Please remember the following design system tokens for {{Product Name}}. Apply these specifications to all subsequent UI generation prompts in this session.
+**TASK**: Let's establish the design direction for {{Product Name}}.
 
-**PRODUCT**: {{Product Short Description}}
+**CONTEXT**:
+- Product: {{Product Short Description}}
+- Target Users: {{Primary user persona — role, tech proficiency, usage frequency}}
+- Key Goals: {{Top 3 user goals from PRD}}
+- Platform: {{Web / Mobile / Desktop / Responsive}}
+- Competitive Reference: {{Competitor products or reference designs, if any}}
 
-**COLOR TOKENS**:
-- Primary: {{Primary Color Token or TBD}} (CTAs, active states)
-- Secondary: {{Secondary Color Token or TBD}} (highlights, progress)
-- Surface: {{Surface Tokens or TBD}} (backgrounds/cards)
-- On-Surface: {{On Surface Tokens or TBD}} (text)
-- States: Error {{Error or TBD}} | Success {{Success or TBD}} | Warning {{Warning or TBD}}
-
-**TYPOGRAPHY** ({{Font Family}}):
-- Display Large: {{TBD}}
-- Headline Medium: {{TBD}}
-- Title Medium: {{TBD}}
-- Body Large: {{TBD}}
-- Body Medium: {{TBD}}
-- Label Small: {{TBD}}
-
-**SPACING**: {{Spacing Tokens or “8pt grid (TBD exact values)”}}
-
-**BORDER RADIUS**: {{Radius Tokens or TBD}}
-
-**ELEVATION**: {{Elevation Tokens or TBD}}
-
-**LAYOUT**: {{Layout Grid / Breakpoints or TBD}}
-
-**VISUAL STYLE**: {{Style Keywords}}
-
----
-Acknowledge that you have stored these tokens. For subsequent prompts, I will also inline a “DESIGN SYSTEM TOKENS” block to ensure Stitch applies them.
+**FORMAT**:
+- Propose 2-3 visual direction options (mood, layout pattern, density level)
+- For each direction, describe: color temperature, layout density, interaction style
+- Recommend which direction best aligns with the product goals
+- We'll use the chosen direction alongside DESIGN.md for all subsequent flows
 ```
 
 ---
 
-## Global Components (Optional but recommended)
+## Flow F.1: {{Flow Name}} (e.g., Onboarding & Authentication)
 
-### Prompt G.1: Navigation (Header/Sidebar)
-
-```
-**🎨 DESIGN SYSTEM TOKENS** (Apply strictly):
-- Colors: {{Primary}} / {{Secondary}} / {{Surface}} / {{OnSurface}}
-- Typography: {{Font Family}} (Headlines {{24-36px}}, Body {{14-16px}})
-- Spacing: {{Spacing System}}
-- Radius: {{Radius Tokens}}
-- Shadows: {{Elevation Tokens}}
-
-**🧩 COMPONENT STRATEGY** (Reuse Global Components):
-- Use Prompt G.1 for Navigation
-
-Design global navigation components for {{Product Name}}:
-- Desktop: {{Sidebar or Header}} with primary nav items, active state, collapse behavior
-- Mobile: {{Drawer or Bottom Nav}} with safe-area padding
-- Include: user/avatar area (if applicable), app logo, primary actions, notifications (optional)
-```
-
-### Prompt G.2: Buttons / Cards / Modals
+> **Mode**: Generate
+> **Screens**: {{~N screens}}
+> **Priority**: {{P0/P1/P2}}
 
 ```
-**🎨 DESIGN SYSTEM TOKENS** (Apply strictly):
-- Colors: {{Primary}} / {{Secondary}} / {{Surface}} / {{OnSurface}}
-- Typography: {{Font Family}} (Headlines {{24-36px}}, Body {{14-16px}})
-- Spacing: {{Spacing System}}
-- Radius: {{Radius Tokens}}
-- Shadows: {{Elevation Tokens}}
+**PERSONA**: You are an expert product designer specializing in {{Product Domain}} interfaces,
+designing for {{Target User Description}}.
 
-**🧩 COMPONENT STRATEGY** (Reuse Global Components):
-- Use Prompt G.2 for Buttons/Cards/Modals
+**TASK**: Design a {{N}}-screen user flow for {{Flow Purpose / User Goal}}.
 
-Design a component sheet for Buttons, Cards, Modals:
-- Button variants: primary/secondary/ghost, sizes, disabled/loading
-- Card variants: default/selected/hovered
-- Modal patterns: confirm, form modal, destructive confirm
-```
+**CONTEXT**:
+- Product: {{Product Short Description}}
+- User Journey: {{Brief journey description — what triggers this flow, what's the expected outcome}}
+- Design System: Use the project's DESIGN.md (already loaded)
 
-### Prompt G.3: Forms (Inputs / Select / Toggles)
+**SCREENS** (generate in sequence):
+1. {{Screen 1 Name}}: {{Screen purpose, key components, primary action}}
+2. {{Screen 2 Name}}: {{Screen purpose, key components, primary action}}
+3. {{Screen 3 Name}}: {{Screen purpose, key components, primary action}}
+{{... add more screens as needed}}
 
-```
-**🎨 DESIGN SYSTEM TOKENS** (Apply strictly):
-- Colors: {{Primary}} / {{Secondary}} / {{Surface}} / {{OnSurface}}
-- Typography: {{Font Family}} (Headlines {{24-36px}}, Body {{14-16px}})
-- Spacing: {{Spacing System}}
-- Radius: {{Radius Tokens}}
-- Shadows: {{Elevation Tokens}}
+**STATES TO COVER** (for each screen):
+- Default state: {{Normal loaded state with real data}}
+- Loading state: {{Skeleton / spinner / progressive loading}}
+- Empty state: {{First-time or no-data view with guidance CTA}}
+- Error states: {{Validation errors, network errors, permission errors}}
 
-**🧩 COMPONENT STRATEGY** (Reuse Global Components):
-- Use Prompt G.3 for Forms
-
-Design a component sheet for Forms:
-- Inputs: default/focus/error/disabled
-- Textarea: character count + max-length helper
-- Select/Dropdown: search + empty option
-- Toggles/Checkbox/Radio: default/checked/disabled
-```
-
-### Prompt G.4: Data Display (Tables / Lists / Badges)
-
-```
-**🎨 DESIGN SYSTEM TOKENS** (Apply strictly):
-- Colors: {{Primary}} / {{Secondary}} / {{Surface}} / {{OnSurface}}
-- Typography: {{Font Family}} (Headlines {{24-36px}}, Body {{14-16px}})
-- Spacing: {{Spacing System}}
-- Radius: {{Radius Tokens}}
-- Shadows: {{Elevation Tokens}}
-
-**🧩 COMPONENT STRATEGY** (Reuse Global Components):
-- Use Prompt G.4 for Data Display
-
-Design a component sheet for Data Display:
-- Tables: header, row hover, sorting, pagination
-- Lists: dense/comfortable variants
-- Badges/Chips/Tags: semantic colors + sizes
-```
-
-### Prompt G.5: Feedback (Toasts / Alerts / Empty States)
-
-```
-**🎨 DESIGN SYSTEM TOKENS** (Apply strictly):
-- Colors: {{Primary}} / {{Secondary}} / {{Surface}} / {{OnSurface}}
-- Typography: {{Font Family}} (Headlines {{24-36px}}, Body {{14-16px}})
-- Spacing: {{Spacing System}}
-- Radius: {{Radius Tokens}}
-- Shadows: {{Elevation Tokens}}
-
-**🧩 COMPONENT STRATEGY** (Reuse Global Components):
-- Use Prompt G.5 for Feedback
-
-Design a component sheet for Feedback:
-- Toasts: success/error/warning/info
-- Alerts: inline banners + dismiss behavior
-- Empty states: illustration placeholder + CTA
-- Loading: skeletons + spinners
-```
-
----
-
-## Module 0 (Optional): {{Module Name}} ({{Auth State}})
-
-### Prompt 0.2: {{Screen Name}} ({{State Name}})
-
-```
-**🎨 DESIGN SYSTEM TOKENS** (Apply strictly):
-- Colors: {{Primary}} / {{Secondary}} / {{Surface}} / {{OnSurface}}
-- Typography: {{Font Family}} (Headlines {{24-36px}}, Body {{14-16px}})
-- Spacing: {{Spacing System}}
-- Radius: {{Radius Tokens}}
-- Shadows: {{Elevation Tokens}}
-
-**🧩 COMPONENT STRATEGY** (Reuse Global Components):
-- Use Prompt G.1 for Navigation
-- Use Prompt G.2 for Buttons/Cards/Modals
-
-**Interface Purpose**: {{What is this screen for? What is the primary user goal?}}
-
-**Core Components**:
-1. {{Component 1}}
-2. {{Component 2}}
-3. {{Component 3}}
-
-**Layout & Structure**:
-- {{Information hierarchy}}
-- {{Desktop vs mobile layout}}
-
-**Data & States**:
-- Default state: {{...}}
-- Loading state: {{...}}
-- Empty state: {{...}}
-- Error states: {{...}}
-
-**Constraints**:
+**CONSTRAINTS**:
 - {{Copywriting rules / forbidden terms}}
-- {{Privacy/security constraints}}
+- {{Privacy/security constraints — e.g., PII masking}}
+- {{Layout constraints — e.g., sidebar must remain visible}}
+- {{Accessibility requirements — e.g., WCAG AA contrast}}
+
+**FORMAT**:
+- Responsive: Show both {{desktop and mobile}} layouts
+- Generate real-looking placeholder content (not "Lorem ipsum")
+- Ensure all interactive elements have clear affordance (hover/focus states)
 ```
 
 ---
 
-## Module 1: {{Module Name}}
+## Flow F.2: {{Flow Name}} (e.g., Dashboard & Monitoring)
 
-### Prompt 1.1: {{Screen Name}} ({{State Name}})
+> **Mode**: Generate
+> **Screens**: {{~N screens}}
+> **Priority**: {{P0/P1/P2}}
 
 ```
-**🎨 DESIGN SYSTEM TOKENS** (Apply strictly):
-- Colors: {{Primary}} / {{Secondary}} / {{Surface}} / {{OnSurface}}
-- Typography: {{Font Family}} (Headlines {{24-36px}}, Body {{14-16px}})
-- Spacing: {{Spacing System}}
-- Radius: {{Radius Tokens}}
-- Shadows: {{Elevation Tokens}}
+**PERSONA**: You are an expert product designer specializing in {{data-rich / operational / consumer}}
+interface patterns.
 
-**🧩 COMPONENT STRATEGY** (Reuse Global Components):
-- Use Prompt G.1 for Navigation
-- Use Prompt G.2 for Buttons/Cards/Modals
-- Use Prompt G.3 for Forms
-- Use Prompt G.4 for Data Display
-- Use Prompt G.5 for Feedback
+**TASK**: Design a {{N}}-screen user flow for {{Flow Purpose / User Goal}}.
 
-{{Repeat the same prompt block structure as Prompt 0.2.}}
+**CONTEXT**:
+- Product: {{Product Short Description}}
+- User Journey: {{Journey description}}
+- Design System: Use the project's DESIGN.md (already loaded)
+
+**SCREENS** (generate in sequence):
+1. {{Screen 1 Name}}: {{Screen purpose, key components, primary action}}
+2. {{Screen 2 Name}}: {{Screen purpose, key components, primary action}}
+{{... add more screens as needed}}
+
+**STATES TO COVER** (for each screen):
+- Default state: {{Normal view with populated data}}
+- Loading state: {{Skeleton shimmer for data-heavy areas}}
+- Empty state: {{Onboarding guidance or first-run setup}}
+- Error states: {{Data fetch failure, partial load, stale data indicator}}
+
+**CONSTRAINTS**:
+- {{Data density requirements — tables, charts, KPIs}}
+- {{Real-time update indicators, if applicable}}
+- {{Responsive behavior for data tables on mobile}}
+
+**FORMAT**:
+- Responsive: Show both {{desktop and mobile}} layouts
+- Use realistic sample data that conveys the information hierarchy
+```
+
+---
+
+## {{Add more Flow F.x blocks as needed, following the same PTCF structure}}
+
+---
+
+## Edit Prompts (Post-Generation Refinement)
+
+> **Mode**: Edit
+> **Purpose**: Refine specific elements or apply cross-screen changes after initial generation.
+
+### Prompt E.1: Cross-Screen Consistency Check
+
+```
+**TASK**: Review all generated screens and ensure:
+1. Navigation component is identical across all screens (same items, same active states)
+2. Typography hierarchy is consistent (same heading sizes for same-level content)
+3. Color usage follows DESIGN.md tokens strictly
+4. Spacing between sections is uniform
+5. Button styles and sizes are consistent for same-level actions
+
+Fix any inconsistencies found.
+```
+
+### Prompt E.2: {{Specific Edit Description}}
+
+```
+**TASK**: On {{Screen/Flow Name}}:
+- {{Change 1: e.g., "Replace the card layout with a data table for the store list"}}
+- {{Change 2: e.g., "Add a search/filter bar above the table"}}
+- {{Change 3: e.g., "Change the status indicators from text to colored badges"}}
+
+Maintain consistency with all other screens in the project.
+```
+
+### Prompt E.3: State Variations
+
+```
+**TASK**: For {{Screen Name}}, generate the following additional state variants:
+1. **Loading state**: Skeleton placeholders for all dynamic content areas
+2. **Empty state**: Illustrated empty state with onboarding CTA
+3. **Error state**: Error banner with retry action
+4. **Partial state**: {{e.g., "Some stores connected, some pending"}}
+
+Each variant should be a separate frame on the canvas.
+```
+
+---
+
+## Redesign Prompts (Style Iteration)
+
+> **Mode**: Redesign
+> **Purpose**: Explore alternative visual directions for existing screens.
+
+### Prompt R.1: {{Redesign Description}}
+
+```
+**TASK**: Take the {{Flow/Screen Name}} and redesign it with:
+- {{Style change: e.g., "Dark mode variant"}}
+- {{Layout change: e.g., "Card-based layout instead of table"}}
+- {{Density change: e.g., "More compact/information-dense"}}
+
+Keep all functional elements and content intact. Only change the visual treatment.
+Use DESIGN.md dark mode tokens (if applicable).
+```
+
+---
+
+## Prototype Instructions
+
+> **Mode**: Prototype
+> **Purpose**: After generating all flows, connect screens into interactive prototypes.
+
+### Prototype P.1: {{Flow Name}} Interactive Flow
+
+```
+**TASK**: Connect the following screens into an interactive prototype:
+
+**Flow sequence**:
+{{Screen A}} → ({{trigger: e.g., "Login button click"}}) → {{Screen B}}
+{{Screen B}} → ({{trigger: e.g., "Store card click"}}) → {{Screen C}}
+{{Screen C}} → ({{trigger: e.g., "Back button"}}) → {{Screen B}}
+{{...}}
+
+**Transitions**: Use {{fade / slide-left / none}} between screens.
+**Missing screens**: If the flow requires screens not yet generated, suggest what's needed.
 ```
 
 ---
 
 ## Quality Checklist
 
-- [ ] One prompt block per screen/state (no mixed screens)
-- [ ] All UI states covered (loading/empty/error/disabled)
-- [ ] Tokens-driven styles (colors/typography/spacing/radius)
-- [ ] No leakage of internal technical terms in user-facing copy (if PRD requires)
-- [ ] Components reusable and named consistently
+### Design System Compliance
+- [ ] `DESIGN.md` is loaded in Stitch project workspace
+- [ ] Design System Picker is set to the correct system
+- [ ] All screens use token-driven styles (no hard-coded values)
+- [ ] Colors match semantic roles defined in DESIGN.md
+
+### Flow Coverage
+- [ ] All user journeys from PRD are covered (cross-reference with PRD)
+- [ ] Each flow covers: default / loading / empty / error states
+- [ ] Navigation is consistent across all flows
+- [ ] Responsive layouts verified (desktop + mobile at minimum)
+
+### Component Consistency
+- [ ] Buttons: same sizes and styles for same-level actions across flows
+- [ ] Typography: consistent heading hierarchy
+- [ ] Cards/Tables: uniform padding, radius, shadow
+- [ ] Feedback: consistent toast/alert/empty-state patterns
+
+### Prototype & Handoff
+- [ ] Key flows connected as interactive prototypes
+- [ ] Transitions are smooth and logical
+- [ ] No dead-end screens (all have navigation back)
+- [ ] Code export validated (if applicable)
+
+### Content Quality
+- [ ] No leaked internal technical terms in user-facing copy
+- [ ] Real-looking (not Lorem ipsum) placeholder content
+- [ ] All labels and CTAs are actionable and clear
 
 ---
 
-## Appendix: Prompt Template Summary
+## Appendix: Flow Summary
 
-> **PRD Reference**: `{{PRD Path}}` ({{PRD Version}}) | **Total Prompts**: {{~N}}
+> **PRD Reference**: `{{PRD Path}}` ({{PRD Version}}) | **Total Flows**: {{~N}}
 
-| Module | Prompt ID | Screen Name | Priority |
-|--------|-----------|-------------|----------|
-| Global | 0.1 | Design System Tokens (Memory) | P0 |
-| Global Comps | G.1 | Navigation | P0 |
-| Global Comps | G.2 | Buttons / Cards / Modals | P0 |
-| Global Comps | G.3 | Forms | P0 |
-| Global Comps | G.4 | Data Display | {{P0/P1}} |
-| Global Comps | G.5 | Feedback | P0 |
-| Module 0 (Optional) | 0.2 | {{Screen Name}} | {{P0/P1/P2}} |
-| Module 1 | 1.1 | {{Screen Name}} | {{P0/P1/P2}} |
+| Flow ID | Flow Name | Screens | Priority | Mode |
+|---------|-----------|---------|----------|------|
+| F.0 | Ideation & Direction Setting | — | P0 | Ideate |
+| F.1 | {{Flow Name}} | {{~N}} | {{P0/P1/P2}} | Generate |
+| F.2 | {{Flow Name}} | {{~N}} | {{P0/P1/P2}} | Generate |
+| E.1 | Cross-Screen Consistency | — | P0 | Edit |
+| E.2 | {{Edit Description}} | — | {{P0/P1}} | Edit |
+| E.3 | State Variations | — | P0 | Edit |
+| R.1 | {{Redesign Description}} | — | {{P1/P2}} | Redesign |
+| P.1 | {{Flow Name}} Interactive | — | P0 | Prototype |

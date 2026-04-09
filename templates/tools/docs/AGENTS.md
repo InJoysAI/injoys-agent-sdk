@@ -110,32 +110,7 @@
 
 ---
 
-### Phase 4: 生成派生文件（可选）
-
-**当用户未提供某类源文件，但 PRD/架构/其他文档中包含相关内容时**：
-
-| 缺失的源文件 | 可从 | 生成为 | manifest 记录 |
-|-------------|------|--------|---------------|
-| UI 规范 | PRD | `.context/ui/design_spec.md` | `source_ref: "PRD"`, `status: "generated"` |
-| 安全策略 | 架构文档 | `.context/architecture/security_policy.md` | `source_ref: "TDS"`, `status: "generated"` |
-
-**⚠️ 必须执行**: 向用户确认：
-
-> "未提供 UI 规范源文件，但 PRD 中包含 UI 设计内容。
-> 是否从 PRD 生成 `.context/ui/design_spec.md`？(y/n)"
-
-**等待用户回复后再继续。**
-
-生成时在 Manifest 的 `sources` 节点记录**原始来源**：
-```json
-"UI_SPEC_DERIVED": {
-  "path": ".context/ui/design_spec.md",
-  "derived_from": "PRD",
-  "type": "ui_design"
-}
-```
-
-### Phase 5: 生成根目录文件
+### Phase 4: 生成根目录文件
 
 | 文件 | 操作 |
 |------|------|
@@ -165,7 +140,7 @@
 
 ---
 
-### Phase 6: 更新 Manifest
+### Phase 5: 更新 Manifest
 
 **执行**: `@design/context-dev/tools/manifest/AGENTS.md` (mode: update)
 
