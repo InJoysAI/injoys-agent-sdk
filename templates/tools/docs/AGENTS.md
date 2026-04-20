@@ -104,7 +104,7 @@
 
 3. **执行分析** — 执行 `@design/context-dev/legacy/AGENTS.md` 直接读取原始路径生成 `legacy_system_analysis.md`
 
-> ⚠️ **源文档只读**: `source/` 目录中的文件为权威来源，不得修改。
+> ⚠️ **源文档只读**: `source/` 目录中的文件为权威来源，谨慎修改。
 
 每个子目录生成 `README.md` 说明（作为快速索引）。
 

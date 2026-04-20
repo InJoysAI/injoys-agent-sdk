@@ -43,7 +43,7 @@
 > 1. 所有生成的文件都必须在顶部包含 Metadata 区块（Source, Generated At, Generator）。
 > 2. 生成结果必须登记到目标项目 `.context/context-manifest.json` 的 `generated_files`（路径相对于 `.context/` 根目录）。
 > 3. **输出边界**: 本命令只能写入 `.context/architecture/**`（不含 `source/`），不可直接写入其他目录。
-> 4. **源文档只读**: 不得修改 `source/` 目录中的文件。
+> 4. **源文档只读**: 谨慎修改 `source/` 目录中的文件。
 
 ---
 

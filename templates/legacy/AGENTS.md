@@ -30,7 +30,7 @@
 > **⚠️ 全局规则**:  
 > 1. 所有生成的文件都必须在顶部包含 Metadata 区块（Source, Generated At, Generator）。
 > 2. **输出边界**: 本命令只能写入 `.context/legacy/**`（不含 `source/`）。
-> 3. **源文档只读**: 不得修改 `source/` 目录中的文件。
+> 3. **源文档只读**: 谨慎修改 `source/` 目录中的文件。
 
 ---
 
