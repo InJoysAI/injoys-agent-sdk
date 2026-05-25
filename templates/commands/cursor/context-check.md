@@ -75,7 +75,7 @@ Supported subcommands:
 
 **详细步骤**见 `project/AGENTS.md`，包括：
 1. 文件存在性校验（`config.yaml`）
-2. 格式正确性校验（9 个必需章节）
+2. 格式正确性校验（参考模板）
 3. Context 内容一致性校验
 4. 完整性校验（无残留占位符）
 5. 生成检查报告

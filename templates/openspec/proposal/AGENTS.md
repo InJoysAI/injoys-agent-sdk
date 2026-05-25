@@ -441,7 +441,7 @@ node design/context-dev/tools/specflow/specflow.mjs validate <change-id> --stric
 
 ## 阶段二：大纲与提案内容一致性校验（Outline ↔ Proposal）
 
-逐项核对提案内容是否忠实还原并完整展开了大纲的意图，识别边界漂移、缺口与偏差。
+逐项核对提案内容是否忠实还原并完整展开覆盖了大纲的意图，识别边界漂移、缺口与偏差。
 
 **评审项**：
 1. **目标映射** — 大纲"业务目标"中的每条目标是否在 proposal.md 中均有对应说明？标注未覆盖项。
