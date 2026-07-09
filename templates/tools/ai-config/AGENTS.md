@@ -20,7 +20,7 @@
 > 1. Antigravity
 > 2. Cursor
 > 3. Claude
-> 4. Windsurf
+> 4. Devin
 > 5. Codex
 > 6. Qoder
 > 7. 全部"
@@ -52,7 +52,7 @@ bash design/context-dev/scripts/install-ai-commands.sh --tools antigravity,curso
 | Antigravity | `.agent/workflows/` |
 | Claude | `.claude/commands/` |
 | Cursor | `.cursor/commands/` |
-| Windsurf | `.windsurf/workflows/` |
+| Devin | `.devin/workflows/` |
 | Codex | `~/.codex/prompts/` |
 | Qoder | `.qoder/commands/` |
 

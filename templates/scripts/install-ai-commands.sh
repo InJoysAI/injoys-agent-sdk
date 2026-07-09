@@ -7,7 +7,7 @@ set -euo pipefail
 #   design/context-dev/commands/<tool>/*.md
 #
 # Usage:
-#   bash design/context-dev/scripts/install-ai-commands.sh --tools antigravity,cursor,claude,windsurf,qoder
+#   bash design/context-dev/scripts/install-ai-commands.sh --tools antigravity,cursor,claude,devin,qoder
 #
 # Notes:
 # - Codex prompts are global (~/.codex/prompts). Use install-codex-prompts.sh.
@@ -25,12 +25,12 @@ while [[ $# -gt 0 ]]; do
       shift 2
       ;;
     -h|--help)
-      echo "Usage: $0 --tools antigravity,claude,cursor,windsurf,qoder"
+      echo "Usage: $0 --tools antigravity,claude,cursor,devin,qoder"
       exit 0
       ;;
     *)
       echo "Unknown arg: $1"
-      echo "Usage: $0 --tools antigravity,claude,cursor,windsurf,qoder"
+      echo "Usage: $0 --tools antigravity,claude,cursor,devin,qoder"
       exit 1
       ;;
   esac
@@ -43,7 +43,7 @@ fi
 
 # Expand "all" to full list
 if [[ "$TOOLS" == "all" ]]; then
-  TOOLS="antigravity,claude,cursor,windsurf,qoder"
+  TOOLS="antigravity,claude,cursor,devin,qoder"
 fi
 
 IFS=',' read -r -a tool_list <<< "$TOOLS"
@@ -76,8 +76,8 @@ for tool in "${tool_list[@]}"; do
     cursor)
       copy_dir "$SRC_BASE/cursor" "$ROOT_DIR/.cursor/commands"
       ;;
-    windsurf)
-      copy_dir "$SRC_BASE/windsurf" "$ROOT_DIR/.windsurf/workflows"
+    devin)
+      copy_dir "$SRC_BASE/devin" "$ROOT_DIR/.devin/workflows"
       ;;
     qoder)
       copy_dir "$SRC_BASE/qoder" "$ROOT_DIR/.qoder/commands"

@@ -2,7 +2,7 @@
 # MCP 配置检查脚本
 # 用法: 
 #   ./check-mcp.sh                    # 检查所有 AI 工具（默认）
-#   ./check-mcp.sh --tool windsurf    # 仅检查 Windsurf MCP 配置
+#   ./check-mcp.sh --tool devin    # 仅检查 Devin MCP 配置
 #   ./check-mcp.sh --tool cursor      # 仅检查 Cursor MCP 配置
 #   ./check-mcp.sh --tool claude      # 仅检查 Claude Desktop MCP 配置
 #   ./check-mcp.sh --tool antigravity # 仅检查 Antigravity 工作流配置
@@ -29,12 +29,12 @@ while [[ $# -gt 0 ]]; do
       echo ""
       echo "选项:"
       echo "  --tool, -t <name>  指定要检查的 AI 工具"
-      echo "                     可选值: all, windsurf, cursor, claude, antigravity"
+      echo "                     可选值: all, devin, cursor, claude, antigravity"
       echo "  --help, -h         显示帮助信息"
       echo ""
       echo "示例:"
       echo "  $0                      # 检查所有"
-      echo "  $0 --tool windsurf      # 仅检查 Windsurf"
+      echo "  $0 --tool devin      # 仅检查 Devin"
       echo "  $0 -t antigravity       # 仅检查 Antigravity"
       exit 0
       ;;
@@ -162,7 +162,7 @@ case "$TARGET_TOOL" in
   "all")
     check_mcp_config "Claude Desktop" "$HOME/.config/claude/claude_desktop_config.json" "mcpServers"
     check_mcp_config "Cursor" "$HOME/.cursor/mcp.json" "mcpServers"
-    check_mcp_config "Windsurf" "$HOME/.codeium/windsurf/mcp_config.json" "mcpServers"
+    check_mcp_config "Devin" "$HOME/.codeium/devin/mcp_config.json" "mcpServers"
     check_antigravity
     ;;
   "claude")
@@ -171,15 +171,15 @@ case "$TARGET_TOOL" in
   "cursor")
     check_mcp_config "Cursor" "$HOME/.cursor/mcp.json" "mcpServers"
     ;;
-  "windsurf")
-    check_mcp_config "Windsurf" "$HOME/.codeium/windsurf/mcp_config.json" "mcpServers"
+  "devin")
+    check_mcp_config "Devin" "$HOME/.codeium/devin/mcp_config.json" "mcpServers"
     ;;
   "antigravity")
     check_antigravity
     ;;
   *)
     echo -e "${RED}❌${NC} 未知工具: $TARGET_TOOL"
-    echo "可选值: all, windsurf, cursor, claude, antigravity"
+    echo "可选值: all, devin, cursor, claude, antigravity"
     exit 1
     ;;
 esac

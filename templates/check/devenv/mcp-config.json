@@ -80,6 +80,6 @@
     "_config_paths": {
         "claude_desktop": "~/.config/claude/claude_desktop_config.json",
         "cursor": "~/.cursor/mcp.json",
-        "windsurf": "~/.codeium/windsurf/mcp_config.json"
+        "devin": "~/.codeium/devin/mcp_config.json"
     }
 }

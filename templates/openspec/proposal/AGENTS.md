@@ -501,6 +501,7 @@ node design/context-dev/tools/specflow/specflow.mjs validate <change-id> --stric
 - MUST/MUST NOT 必须逐条扫描，BR-xxx 必须逐条映射，不可合并或跳过
 - 修改建议须明确指出应改"大纲"还是"提案内容"或"两者均需同步"
 - 输出使用中文，文件引用使用相对路径（相对项目根目录）
+- 检查报告输出到当前提案内容目录下，文件名为 `check-report.md`
 ```
 ~~~
 

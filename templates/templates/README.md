@@ -10,7 +10,7 @@
 | `AGENTS.md.template` | `AGENTS.md` | Antigravity |
 | `CLAUDE.md.template` | `CLAUDE.md` | Claude Code |
 | `cursorrules.template` | `.cursorrules` | Cursor |
-| `windsurfrules.template` | `.windsurfrules` | Windsurf |
+| `windsurfrules.template` | `.windsurfrules` | Devin |
 
 ## 占位符说明
 

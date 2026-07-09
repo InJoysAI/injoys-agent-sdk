@@ -56,7 +56,7 @@
 
 # Input
 用户指定的 AI 工具（可选）：
-- `--tool windsurf` → Windsurf
+- `--tool devin` → Devin
 - `--tool cursor` → Cursor
 - `--tool claude` → Claude Desktop
 - `--tool antigravity` → Antigravity
@@ -67,7 +67,7 @@
 |------|---------|
 | Claude Desktop | `~/.config/claude/claude_desktop_config.json` |
 | Cursor | `~/.cursor/mcp.json` |
-| Windsurf | `~/.codeium/windsurf/mcp_config.json` |
+| Devin | `~/.codeium/devin/mcp_config.json` |
 | Antigravity | `.agent/workflows/` 目录 |
 
 # Command
@@ -126,7 +126,7 @@
 |------|----------------------|
 | **Claude Desktop** | `~/.config/claude/claude_desktop_config.json` |
 | **Cursor** | `~/.cursor/mcp.json` |
-| **Windsurf** | `~/.codeium/windsurf/mcp_config.json` |
+| **Devin** | `~/.codeium/devin/mcp_config.json` |
 
 > **模板文件**: `design/context-dev/check/devenv/mcp-config.json`  
 
@@ -158,7 +158,7 @@
 ✅ datamodel-codegen: 0.26.x
 
 === MCP 配置文件 ===
-✅ Windsurf: 已存在
+✅ Devin: 已存在
    ✓ MCP 服务器已配置
 
 📋 MCP 配置模板: design/context-dev/check/devenv/mcp-config.json
