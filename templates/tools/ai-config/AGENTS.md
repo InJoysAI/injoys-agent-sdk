@@ -23,7 +23,8 @@
 > 4. Devin
 > 5. Codex
 > 6. Qoder
-> 7. 全部"
+> 7. Grok
+> 8. 全部"
 
 **❌ 禁止**: 未经用户确认直接执行 Phase 2
 
@@ -36,11 +37,11 @@
 根据用户选择，执行安装脚本：
 
 ```bash
-# 如果用户选择 "全部" 或 "7"
+# 如果用户选择 "全部" 或 "8"
 bash design/context-dev/scripts/install-ai-commands.sh --tools all
 
 # 如果用户选择特定工具，用逗号分隔
-bash design/context-dev/scripts/install-ai-commands.sh --tools antigravity,cursor
+bash design/context-dev/scripts/install-ai-commands.sh --tools antigravity,cursor,grok
 ```
 
 ---
@@ -55,6 +56,9 @@ bash design/context-dev/scripts/install-ai-commands.sh --tools antigravity,curso
 | Devin | `.devin/workflows/` |
 | Codex | `~/.codex/prompts/` |
 | Qoder | `.qoder/commands/` |
+| Grok | `.grok/commands/` + `.claude/commands/`（兼容发现） |
+
+> **Grok 说明**：Grok 斜杠命令从 `.grok/commands/*.md` 与 `.claude/commands/*.md` 加载，**不会**读取 `.agent/workflows/`。与 Antigravity 同步时需同时安装 `grok`（或从 `.agent/workflows` 复制到上述目录）。
 
 ---
 

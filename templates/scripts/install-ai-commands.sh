@@ -7,10 +7,12 @@ set -euo pipefail
 #   design/context-dev/commands/*.md
 #
 # Usage:
-#   bash design/context-dev/scripts/install-ai-commands.sh --tools antigravity,cursor,claude,devin,qoder
+#   bash design/context-dev/scripts/install-ai-commands.sh --tools antigravity,cursor,claude,devin,qoder,grok
 #
 # Notes:
 # - Codex prompts are global (~/.codex/prompts). Use install-codex-prompts.sh.
+# - Grok loads flat *.md from .grok/commands/ and .claude/commands/ (compat).
+#   It does NOT read .agent/workflows/ — use --tools grok (or claude) for slash commands.
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/../../.." && pwd)"
@@ -25,12 +27,12 @@ while [[ $# -gt 0 ]]; do
       shift 2
       ;;
     -h|--help)
-      echo "Usage: $0 --tools antigravity,claude,cursor,devin,qoder"
+      echo "Usage: $0 --tools antigravity,claude,cursor,devin,qoder,grok"
       exit 0
       ;;
     *)
       echo "Unknown arg: $1"
-      echo "Usage: $0 --tools antigravity,claude,cursor,devin,qoder"
+      echo "Usage: $0 --tools antigravity,claude,cursor,devin,qoder,grok"
       exit 1
       ;;
   esac
@@ -43,7 +45,7 @@ fi
 
 # Expand "all" to full list
 if [[ "$TOOLS" == "all" ]]; then
-  TOOLS="antigravity,claude,cursor,devin,qoder"
+  TOOLS="antigravity,claude,cursor,devin,qoder,grok"
 fi
 
 IFS=',' read -r -a tool_list <<< "$TOOLS"
@@ -81,6 +83,12 @@ for tool in "${tool_list[@]}"; do
       ;;
     qoder)
       copy_dir "$COMMANDS_DIR" "$ROOT_DIR/.qoder/commands"
+      ;;
+    grok)
+      # Native Grok project commands (slash autocomplete)
+      copy_dir "$COMMANDS_DIR" "$ROOT_DIR/.grok/commands"
+      # Claude-compat path (also discovered by Grok)
+      copy_dir "$COMMANDS_DIR" "$ROOT_DIR/.claude/commands"
       ;;
     codex)
       echo "ℹ️  Codex uses ~/.codex/prompts; run: bash design/context-dev/scripts/install-codex-prompts.sh"

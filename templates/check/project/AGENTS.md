@@ -53,9 +53,13 @@
 ### 2.2 派生快照元数据
 
 - 顶部包含生成来源、`Context-SHA256` 和禁止手工编辑声明
-- 对实际来源文件重新计算组合指纹；不一致标记 `[STALE] P1`
+- 对实际来源文件按 **`design/context-dev/openspec/project/AGENTS.md` →「Context-SHA256 算法」** 重算组合指纹：
+  - `file_digest = hex(sha256(utf8(path) || 0x0A || file_bytes))`
+  - 按路径排序后 `Context-SHA256 = hex(sha256(join_hex_with_newline))`（末条无尾随 `\n`）
+  - 与 YAML 头部 `Context-SHA256`（及 Manifest `last_openspec_project.context_sha256` 若存在）比对
+  - **不一致** → 标记 `[STALE] P1`（来源已变或快照过期；要求 `/context-openspec project` 重生成）
+  - **无法解析算法文档** → 标记 `[AMBIGUOUS] P2`（流程缺陷，非内容错误）
 - `schema: spec-driven` 和 `context` / `rules` 结构可被 YAML 解析器读取
-
 ---
 
 ## Phase 3: Context 内容一致性校验

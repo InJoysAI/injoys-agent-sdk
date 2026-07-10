@@ -198,6 +198,8 @@ node design/context-dev/tools/specflow/specflow.mjs validate <change-id> --stric
 
 ## Phase 7: 生成检查报告
 
+> 检查报告输出到当前提案内容目录下，文件名为 `check-report.md`
+
 输出检查报告（✅/⚠️/❌），并给出最小修复建议：
 
 ```

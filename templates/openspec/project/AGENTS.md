@@ -29,13 +29,43 @@
 
 生成/更新 `openspec/config.yaml`，用于 OPSX 注入规划上下文。该文件是 `.context/` 权威资产的**只读派生快照**，不得引入来源资产中不存在的新约束，也不得手工维护。
 
-生成前，对本次实际读取的 `.context` 文件按路径排序并计算组合 SHA-256；将来源和指纹写入 YAML 顶部注释。来源内容或指纹未变化时，不重写文件。
+生成前，对本次实际读取的 `.context` 文件计算 **Context-SHA256** 组合指纹；将来源列表与指纹写入 YAML 顶部注释。来源内容或指纹未变化时，不重写文件。
+
+#### Context-SHA256 算法（规范性 · 生成与 `/context-check project` 必须一致）
+
+输入集合 = Phase 1 实际读取的资产路径（已跳过 `README.md` / `openspec/` / `source/`；**包含** `.context/criterion.md`）。
+
+1. 路径规范：仓库相对路径、POSIX 正斜杠 `/`（例如 `.context/criterion.md`）。
+2. 对每个文件计算单文件摘要（UTF-8 路径字节 + 单字节 `0x0A` + **磁盘原始文件字节**，不做换行归一化）：
+   ```text
+   file_digest = hex(sha256( utf8(relative_path) || 0x0A || file_bytes ))
+   ```
+3. 按 `relative_path` 字典序升序排序上述 `file_digest`（排序键为路径，不是 digest）。
+4. 将排序后的 hex 串以换行符 `\n` 拼接；**末条之后不加**尾随换行：
+   ```text
+   joined = file_digest_1 || 0x0A || file_digest_2 || ... || file_digest_n
+   Context-SHA256 = hex(sha256(utf8(joined)))
+   ```
+5. 写入 `openspec/config.yaml` 顶部 `# Context-SHA256: <64-hex>`，并建议同步写入 Manifest `last_openspec_project.context_sha256`。
+
+> 参考实现（Python 3）：
+> ```python
+> import hashlib
+> from pathlib import Path
+> paths = sorted(relative_paths)  # e.g. [".context/criterion.md", ...]
+> digests = []
+> for p in paths:
+>     b = p.replace("\\", "/").encode("utf-8") + b"\n" + Path(p).read_bytes()
+>     digests.append(hashlib.sha256(b).hexdigest())
+> context_sha256 = hashlib.sha256("\n".join(digests).encode("utf-8")).hexdigest()
+> ```
 
 **格式要求（必须遵循）**：
 
 ```yaml
 # Generated from: .context/context-manifest.json + listed Context assets
 # Context-SHA256: <sha256>
+# Context-SHA256-Algo: path-nl-content-then-join-hex  # optional marker; algorithm defined in design/context-dev/openspec/project/AGENTS.md
 # DO NOT EDIT: regenerate with /context-openspec project
 schema: spec-driven
 
