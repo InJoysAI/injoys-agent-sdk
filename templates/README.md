@@ -47,7 +47,7 @@ templates/
 | `/context-openspec proposal <change-id> [roadmap-doc]` | 设计 | 基于路线图/大纲创建提案 → 生成 tasks.md |
 | `/context-interview` | 设计 | 深度访谈完善技术规格或用户指定文档 |
 | `/context-start` | 实施 | validate → SSoT-first → codegen → code → archive |
-| `/context-check` | 检查 | 子命令: `env` / `tasks` / `proposal` |
+| `/context-check` | 检查 | 子命令: `env` / `tasks` / `proposal` / `plan` / `project` / `review` |
 | `/context-update` | 维护 | 子命令: `add` / `modify` / `delete` / `fix` |
 
 ---
@@ -138,6 +138,15 @@ PRD：@docs/product-overview.md
 
 # 检查环境
 /context-check env
+
+# PRD 与架构双向追溯（路径可由 Manifest 自动解析）
+/context-check review prd-tad
+
+# 全量生成资产、Manifest、README、Integration Index 四方同步
+/context-check review assets
+
+# 单模块生成资产与源文档核对
+/context-check review scope domain
 ```
 
 ---

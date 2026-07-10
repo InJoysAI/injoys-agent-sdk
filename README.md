@@ -64,7 +64,7 @@ cd injoys-agent-sdk
     Execute tasks following SSoT-first workflow.
 
 5.  **Check Status** (`/context-check`):
-    Check environment (`env`), tasks (`tasks`), or proposal (`proposal`).
+    Check environment and OpenSpec status, or run reusable document reviews such as `review prd-tad`, `review assets`, and `review scope domain`.
 
 6.  **Update Context** (`/context-update`) *(planned)*:
     Add, modify, delete, or fix context assets.

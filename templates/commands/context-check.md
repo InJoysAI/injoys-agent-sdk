@@ -10,7 +10,11 @@ Supported subcommands:
 - `proposal <change-id>`: proposal quality + Context consistency checks
 - `plan`: roadmap quality + Context consistency checks
 - `project`: config.yaml quality + Context consistency checks
-- `review [<scope>]`: Context 生成结果质量校验（domain/architecture/db/ui/legacy）
+- `review prd-tad [prd-path] [tad-path]`: PRD ↔ TAD 双向追溯
+- `review assets`: 全量生成资产四方同步与跨模块一致性
+- `review core`: README / AGENTS / criterion / Manifest 核对
+- `review scope <domain|architecture|db|ui|legacy>`: 单模块生成资产 ↔ 源文档核对
+- `review "<description>"`: 自由文本专项核对
 
 ---
 
@@ -85,23 +89,24 @@ Supported subcommands:
 
 **Execute**: `@design/context-dev/check/review/AGENTS.md`
 
-> 传递 `$ARGUMENTS`：`"<核对事项描述>"`
+> 传递 `$ARGUMENTS`：`<profile> [arguments]` 或 `"<核对事项描述>"`
 
-**开放式核对命令** — 用户描述核对需求，AI 主动读取相关资产并与用户交互确认。
+**画像化核对命令** — 常见深度审查无需重复粘贴长 Prompt；仍支持自由文本专项检查。
 
 **示例**:
 ```
+/context-check review prd-tad
+/context-check review assets
+/context-check review core
+/context-check review scope db
 /context-check review "检查 api_strategy.md 的错误响应格式"
-/context-check review "核对 tech_stack.md 中的版本约束是否最新"
-/context-check review "确认 business_rules.md 覆盖了所有 PRD 业务规则"
-/context-check review "验证 .context 资产与 openspec/config.yaml 的一致性"
 ```
 
 **执行流程**：
-1. 解析核对意图（范围、标准、深度）
-2. 读取相关 `.context/**` 资产
-3. 执行核对（结构/内容/一致性/规范）
-4. 展示发现并请求用户确认
-5. 根据反馈行动（修复/澄清/深入）
+1. 解析画像、范围、权威来源和排除项
+2. 按需读取证据，避免无关资产全量加载
+3. 执行双向追溯、同步或专项核对
+4. 按统一标签和 P0/P1/P2 输出证据化报告
+5. 默认只读；仅在用户明确要求后修复并更新 Manifest
 
 $ARGUMENTS

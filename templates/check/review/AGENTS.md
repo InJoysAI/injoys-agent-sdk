@@ -1,150 +1,97 @@
 # Context Review 核对指令
 
-> 当 `/context-check review "<核对事项>"` 被调用时执行此文件。
+> 当 `/context-check review <profile> [arguments]` 被调用时执行。遵循 `@design/context-dev/check/AGENTS.md` 通用审查协议。
 
----
+## 输入
 
-## 🎯 执行指令
+支持以下预置画像，也兼容自由文本：
 
-> ⛔ **必须依次执行所有步骤**，不得跳过或中断。
+| Profile | 用途 | 默认范围 |
+|---------|------|----------|
+| `prd-tad [prd-path] [tad-path]` | PRD 与技术架构双向一致性 | 指定路径；未指定时从 Manifest 的 PRD/ARCHITECTURE source 解析 |
+| `assets` | 全量生成资产一致性 | `.context/**`，排除 `source/`、系统文件和临时文件 |
+| `core` | 初始化核心文档检查 | `.context/README.md`、`AGENTS.md`、`criterion.md`、Manifest、实际文件系统 |
+| `scope <domain|architecture|db|ui|legacy>` | 单模块生成资产与源文档对照 | 对应 scope、`source/`、关联 SSoT 和必要的跨模块资产 |
+| `"<自由描述>"` | 临时专项检查 | 从描述解析范围与参照物 |
 
-**输入**: `$ARGUMENTS` = 用户描述的核对事项（自由文本）
+`project`、`plan`、`proposal` 已有专用子命令，不通过自由文本重复实现。
 
----
+## Phase 1: 解析范围
 
-## Phase 1: 解析核对意图
+1. 识别 profile、显式路径和排除项。
+2. 检查路径是否存在；显式路径缺失则停止并报告。
+3. 未提供可从 Manifest 唯一确定的路径时直接使用；存在多个权威候选且无法判定时才询问用户。
+4. 输出实际审查范围，禁止把示例文件名、项目名、字段名或数值当作当前项目事实。
 
-从用户描述中识别：
+## Phase 2: 加载证据
 
-| 识别项 | 说明 | 示例 |
-|--------|------|------|
-| **范围** | 涉及哪些 `.context/**` 文件 | "api_strategy.md" → `.context/architecture/api_strategy.md` |
-| **参照物** | 核对的标准来源 | "与代码一致" → 需要读取代码文件 |
-| **深度** | 结构/内容/一致性 | "格式" → 结构校验；"内容" → 内容校验 |
+### prd-tad
 
-> 若核对事项涉及 OpenSpec（如 `openspec/config.yaml`、`openspec/proposal-roadmap*.md`、`openspec/changes/<change-id>/*`），也应纳入“范围”。
+只读取 PRD、TAD 及其 Metadata。分别提取：业务流程、实体、状态、接口诉求、NFR、技术组件、数据流、安全和运维约束。
 
-**若描述模糊**：
-- 主动列出可能的检查项
-- 询问用户想重点关注哪些方面
+### assets
 
----
+建立以下四方清单：
 
-## Phase 2: 读取 Context 资产
+1. `.context/context-manifest.json.generated_files`
+2. 根 README 和各模块 README 索引
+3. `.context/openspec/integration.md` 的 `CONTEXT_ASSET_INDEX`
+4. 实际文件系统
 
-**执行**: `@design/context-dev/tools/asset-reader/AGENTS.md`
+排除 `*/source/*`、`.DS_Store`、临时文件。内容审查按 Manifest 中实际存在的 scope 动态执行，不假定固定文件清单。
 
-> 该模块会：
-> - 从 `context-manifest.json` 的 `generated_files` 节点获取文件列表
-> - 按 scope 遍历：architecture, domain, db, ui, legacy
-> - 跳过 README.md、openspec/、source/
+### core
 
-根据 Phase 1 识别的范围，额外读取：
-- 对应的 AGENTS.md 规范（`design/context-dev/<scope>/AGENTS.md`）
-- 用户提及的参照物（源文档、代码文件等）
+读取三份核心文档、Manifest 和实际目录树，核对职责边界：README 是人类索引，AGENTS 是 AI 入口，criterion 是工程约束 SSoT。
 
-若核对事项涉及 OpenSpec 路线图/提案大纲：
-- `openspec/proposal-roadmap.md`（索引/总览）
-- `openspec/proposal-roadmap-Phase*.md` / `openspec/proposal-roadmap-Phase-*.md`（分 Phase 大纲，若存在）
+### scope
 
----
+读取对应生成资产和 `source/` 权威材料；DB 额外读取迁移 SSoT，UI 额外读取产品旅程与安全约束，architecture/domain 互相读取必要的术语和接口引用。仅在用户提供代码路径时检查实现。
 
-## Phase 3: 执行核对
+### 自由文本
 
-根据用户意图执行对应类型的校验：
+按描述加载最小必要资产。涉及 OpenSpec 时可读取根目录 `openspec/*`，但必须区分它与 `.context/openspec/integration.md`。
 
-### 3.1 结构校验
+## Phase 3: 执行画像检查
 
-检查文件/章节是否存在：
+### 3.1 prd-tad 双向追溯
 
-| 检查项 | 规则来源 |
-|--------|----------|
-| 必需文件存在 | `<scope>/AGENTS.md` 的"动态生成条件"表 |
-| 必需章节存在 | `<scope>/AGENTS.md` 的"Phase 1: 填充模板" |
-| Metadata 区块 | 全局规则：Source, Generated At, Generator |
+- PRD → TAD：业务链路、异常边界、实体/状态、接口诉求、NFR 是否有技术落点。
+- TAD → PRD：每个关键组件、数据存储、接口和强约束是否能追溯到业务价值或明确架构决策。
+- 生成业务流覆盖矩阵、实体/接口映射、术语差异和 NFR 落地表。
 
-### 3.2 内容校验
+### 3.2 assets 全量一致性
 
-检查内容是否准确、完整：
+- Manifest / README / Integration Index / 文件系统四方同步。
+- Metadata 来源、生成批次和待生成状态是否自洽。
+- 领域术语、状态枚举、数据模型、API、错误语义、安全和 SSoT 路径跨模块是否一致。
+- criterion 的每条相关 MUST/MUST NOT 是否被引用资产覆盖且无冲突。
+- 风险、测试策略和边缘场景是否形成可验证闭环。
 
-| 检查项 | 方法 |
-|--------|------|
-| 小节非空 | 不得为空或仅占位符 |
-| 无残留占位符 | 不得包含 `{{...}}` |
-| 格式正确 | 表格、代码块、Mermaid 语法正确 |
+### 3.3 core 职责与结构
 
-### 3.3 一致性校验
+- 目录树无幽灵引用和遗漏引用。
+- 三份核心文档对目录、更新规则和 SSoT 路径的描述一致。
+- 不在 README/AGENTS 重复维护 criterion 的详细规则。
+- 外部路径标明已存在、待生成或可选，不把待生成资产误报为缺失。
 
-检查与参照物是否一致：
+### 3.4 scope 源资产对照
 
-| 参照物类型 | 校验方法 |
-|------------|----------|
-| 源文档 | 内容是否覆盖源文档关键信息 |
-| 代码文件 | 描述是否与代码实现一致 |
-| 其他 Context 资产 | 交叉引用是否正确 |
+- 建立生成文件与源材料的配对表。
+- 双向识别遗漏、冲突、过时、无依据新增和孤立文件。
+- DB：执行源文档 ↔ DB 摘要 ↔ migrations 三角验证。
+- UI：执行 UI 源规范 ↔ UI 资产 ↔ PRD 旅程/架构安全约束三角验证。
+- Domain：检查实体、规则、旅程、术语、边界和测试覆盖。
+- Architecture：检查组件、接口、运行时、部署、安全、数据和风险的一致性。
 
----
+## Phase 4: 输出报告
 
-## Phase 4: 展示发现并请求确认
+严格使用通用协议的标签、严重度和标准输出。额外要求：
 
-输出核对结果，格式如下：
-
-```
-🔍 核对结果
-
-**核对事项**: <用户描述>
-**涉及文件**: 
-- <file1>
-- <file2>
-
-## 发现的问题
-
-1. ⚠️ [问题描述]
-   - 当前内容: `...`
-   - 期望内容: `...`
-   - 建议修复: ...
-
-2. ❓ [需要确认的项]
-   - 问题: ...
-   - 请确认: 是否需要修复？
-
-## ✅ 已通过的检查
-
-- [检查项 1] ✓
-- [检查项 2] ✓
-
----
-
-请确认以上发现，或提供更多信息。
-```
-
----
-
-## Phase 5: 根据用户反馈行动
-
-| 用户回复 | 执行动作 |
-|----------|----------|
-| 确认问题 | 执行修复，更新文件 |
-| 否认问题 | 请求用户说明原因，更新理解 |
-| 补充信息 | 根据新信息重新核对 |
-| 请求修复 | 直接执行修复并更新 Manifest |
-
-修复完成后：
-- **执行**: `@design/context-dev/tools/manifest/AGENTS.md` (mode: update)
-
----
-
-## 📚 规范文件索引
-
-执行核对时，根据涉及的 scope 读取对应 AGENTS.md：
-
-| Scope | 规范文件 |
-|-------|----------|
-| domain | `design/context-dev/domain/AGENTS.md` |
-| architecture | `design/context-dev/architecture/AGENTS.md` |
-| db | `design/context-dev/db/AGENTS.md` |
-| ui | `design/context-dev/ui/AGENTS.md` |
-| legacy | `design/context-dev/legacy/AGENTS.md` |
-| openspec | `design/context-dev/openspec/AGENTS.md`（以及按需读取 `design/context-dev/openspec/proposal/AGENTS.md` / `design/context-dev/openspec/plan/AGENTS.md`） |
+- 引用具体文件路径及章节、字段或行号。
+- 区分“权威源缺失”和“生成资产遗漏”。
+- `assets` 必须单独说明 `generated_files.openspec` 与 `.context/openspec/integration.md` 是否同步。
+- 只报告有证据的问题；通过项可以矩阵汇总，不展开重复叙述。
+- 默认不请求用户逐项确认，也不自动修复。用户明确要求修复后，修改对应资产并更新 Manifest。
 
 $ARGUMENTS

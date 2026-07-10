@@ -67,6 +67,22 @@
 
 ---
 
+### Phase 3: 登记集成资产
+
+执行 `@design/context-dev/tools/manifest/AGENTS.md`（mode: update），确保：
+
+```json
+"generated_files": {
+  "openspec": [
+    ".context/openspec/integration.md"
+  ]
+}
+```
+
+该路径表示 `.context/` 内的集成说明，不得与项目根目录的 `openspec/config.yaml`、`openspec/specs/` 或 `openspec/changes/` 混淆。重复执行不得产生重复项。
+
+---
+
 ## ✅ 完成后
 
 报告结果：
@@ -75,4 +91,5 @@
 === Integration 幂等增强 ===
 ✅ .context/openspec/integration.md (存在/已复制)
 ✅ CONTEXT_ASSET_INDEX 区块已刷新
+✅ generated_files.openspec 已登记且无重复项
 ```

@@ -1,6 +1,7 @@
 # Project Check 指令
 
 > 当 `/context-check project` 被调用时执行此文件。
+> 遵循 `@design/context-dev/check/AGENTS.md` 通用审查协议。
 
 ---
 
@@ -49,6 +50,12 @@
 - ❌ 缺失必需章节 → 警告
 - ✅ 格式正确 → 继续
 
+### 2.2 派生快照元数据
+
+- 顶部包含生成来源、`Context-SHA256` 和禁止手工编辑声明
+- 对实际来源文件重新计算组合指纹；不一致标记 `[STALE] P1`
+- `schema: spec-driven` 和 `context` / `rules` 结构可被 YAML 解析器读取
+
 ---
 
 ## Phase 3: Context 内容一致性校验
@@ -72,6 +79,7 @@
 | Tech Stack 完整性 | `tech_stack.md` | 必须覆盖所有 MUST 级别的技术 |
 | 约束一致性 | `criterion.md` | context 必须反映 MUST/MUST NOT 规则 |
 | Domain 覆盖 | `business_rules.md` | 必须涵盖核心业务规则 |
+| 反向可追溯 | 全部实际来源 | config 中的具体技术、数值、路径和强约束必须能追溯到来源；否则标记 `[UNJUSTIFIED]` |
 
 **示例**：
 - ❌ `tech_stack.md` 要求 Rust stable，但 `config.yaml` 中未体现
@@ -87,6 +95,8 @@
 | 章节存在 | 所有必需章节都存在 |
 | 章节非空 | 所有章节都有实质内容（非占位符） |
 | 无残留占位符 | 不得残留 `{{...}}` 占位符 |
+| 数值与枚举精度 | 动态提取 config 中的数值、状态、错误码和路径，逐项与来源核对 |
+| 条件章节 | DB/UI 等模块不存在时允许缺席，不使用固定项目清单误报 |
 
 ---
 
