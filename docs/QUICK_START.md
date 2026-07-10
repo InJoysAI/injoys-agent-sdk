@@ -147,7 +147,12 @@ Topic: business rules for user authentication
 └─────────────────────────────┘
              ↓
 ┌─────────────────────────────┐
-│ Phase 7: Archive            │
+│ Phase 7: Generate dynamic   │
+│ review prompt automatically │
+└─────────────────────────────┘
+             ↓
+┌─────────────────────────────┐
+│ Phase 8: Archive            │
 │  specflow archive           │
 │  --yes --no-validate        │
 └─────────────────────────────┘
@@ -197,7 +202,7 @@ If execution is interrupted, re-run `/context-start feat-user-login`. AI will co
 
 ### Reusable Document Reviews
 
-These reviews are optional, read-only diagnostics. Run them when the corresponding document boundary changes; they are not repeated automatically during proposal implementation.
+These document reviews are optional, read-only diagnostics for Context assets. They are separate from the implementation-specific dynamic review prompt that `/context-start` always generates in Phase 7.
 
 ```bash
 # PRD ↔ architecture bidirectional traceability
