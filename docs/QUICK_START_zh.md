@@ -8,7 +8,7 @@
 
 - Node.js 18+
 - Git
-- AI 编程工具（Antigravity / Claude Code / Cursor / Windsurf / Codex / Qoder）
+- AI 编程工具（Antigravity / Claude Code / Cursor / Devin / Codex / Qoder）
 
 ---
 

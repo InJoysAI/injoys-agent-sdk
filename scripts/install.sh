@@ -87,8 +87,8 @@ copy_workflows "$SCRIPT_DIR/templates/commands/claude" "$TARGET_DIR/.claude/comm
 # Cursor
 copy_workflows "$SCRIPT_DIR/templates/commands/cursor" "$TARGET_DIR/.cursor/commands"
 
-# Windsurf
-copy_workflows "$SCRIPT_DIR/templates/commands/windsurf" "$TARGET_DIR/.windsurf/workflows"
+# Devin
+copy_workflows "$SCRIPT_DIR/templates/commands/devin" "$TARGET_DIR/.devin/workflows"
 
 # Qoder
 copy_workflows "$SCRIPT_DIR/templates/commands/qoder" "$TARGET_DIR/.qoder/commands"
@@ -120,7 +120,7 @@ copy_codex_bootstrap "$SCRIPT_DIR/templates/commands/codex"
 # Agent-specific config files (.cursorrules, .windsurfrules, CLAUDE.md) are 
 # NOT installed by default. Users should copy them manually if needed:
 #   - Cursor:     design/context-dev/templates/cursorrules.template -> .cursorrules
-#   - Windsurf:   design/context-dev/templates/windsurfrules.template -> .windsurfrules
+#   - Devin:   design/context-dev/templates/windsurfrules.template -> .windsurfrules
 #   - Claude:     design/context-dev/templates/CLAUDE.md.template -> CLAUDE.md
 
 # -----------------------------------------------------------------------------
@@ -139,5 +139,5 @@ echo "  3. (Codex) Restart Codex to load prompts from ~/.codex/prompts/"
 echo ""
 echo "Optional: Install agent-specific config files:"
 echo "  - Cursor:   cp design/context-dev/templates/cursorrules.template .cursorrules"
-echo "  - Windsurf: cp design/context-dev/templates/windsurfrules.template .windsurfrules"
+echo "  - Devin: cp design/context-dev/templates/windsurfrules.template .windsurfrules"
 echo "  - Claude:   cp design/context-dev/templates/CLAUDE.md.template CLAUDE.md"

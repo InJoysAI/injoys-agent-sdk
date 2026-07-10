@@ -23,11 +23,11 @@ const log = {
   step: (msg) => console.log(`${colors.cyan}→${colors.reset} ${msg}`)
 };
 
- function getCommandName() {
-   const binPath = process.argv[1] || '';
-   const binName = path.basename(binPath);
-   return binName || 'injoys';
- }
+function getCommandName() {
+  const binPath = process.argv[1] || '';
+  const binName = path.basename(binPath);
+  return binName || 'injoys';
+}
 
 // Help message
 function showHelp() {
@@ -78,20 +78,20 @@ function copyDir(src, dest, excludes = []) {
 // Init command
 function initCommand(targetPath) {
   const target = path.resolve(targetPath || '.');
-  
+
   log.info(`Initializing InJoys Agent SDK in: ${target}`);
   console.log('');
 
   // Copy templates
   const templatesDir = path.join(PACKAGE_ROOT, 'templates');
   const contextDir = path.join(target, '.context');
-  
+
   log.step('Creating .context/ directory...');
   copyDir(templatesDir, contextDir, ['README.md', 'devenv', 'scripts', 'templates']);
 
   // Copy rules
   const rulesDir = path.join(PACKAGE_ROOT, 'rules');
-  
+
   log.step('Copying rule templates...');
   if (fs.existsSync(rulesDir)) {
     const rules = fs.readdirSync(rulesDir);
@@ -99,7 +99,7 @@ function initCommand(targetPath) {
       const src = path.join(rulesDir, rule);
       const destName = rule.replace('.template', '');
       const dest = path.join(target, destName);
-      
+
       if (!fs.existsSync(dest)) {
         fs.copyFileSync(src, dest);
         log.info(`Created: ${destName}`);
@@ -111,21 +111,21 @@ function initCommand(targetPath) {
 
   // Copy commands based on detected AI tool
   const commandsDir = path.join(PACKAGE_ROOT, 'commands');
-  
+
   log.step('Copying command templates...');
-  
+
   // Detect AI tool and copy appropriate commands
   const aiToolDirs = {
     '.agent/workflows': 'antigravity',
-    '.claude/commands': 'claude', 
+    '.claude/commands': 'claude',
     '.cursor/commands': 'cursor',
-    '.windsurf/workflows': 'windsurf'
+    '.devin/workflows': 'devin'
   };
 
   for (const [destDir, srcDir] of Object.entries(aiToolDirs)) {
     const srcPath = path.join(commandsDir, srcDir);
     const destPath = path.join(target, destDir);
-    
+
     if (fs.existsSync(srcPath)) {
       copyDir(srcPath, destPath);
       log.info(`Copied commands to: ${destDir}`);
@@ -144,7 +144,7 @@ function initCommand(targetPath) {
 // Check env command
 function checkEnvCommand() {
   const scriptPath = path.join(PACKAGE_ROOT, 'scripts', 'check-toolchain.sh');
-  
+
   if (fs.existsSync(scriptPath)) {
     log.info('Running environment check...');
     console.log('');

@@ -8,7 +8,7 @@
 
 - Node.js 18+
 - Git
-- AI coding tool (Antigravity / Claude Code / Cursor / Windsurf / Codex / Qoder)
+- AI coding tool (Antigravity / Claude Code / Cursor / Devin / Codex / Qoder)
 
 ---
 

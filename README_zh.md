@@ -15,7 +15,7 @@
 ## 功能特性
 
 -   **7 个核心命令**：`/context-init`、`/context-openspec`、`/context-openspec proposal <change-id> [roadmap-doc]`、`/context-interview`、`/context-start`、`/context-check`、`/context-update`
--   **多 Agent 支持**：开箱即用的命令，支持 **Antigravity**、**Claude Code**、**Cursor**、**Windsurf**、**Codex** 和 **Qoder**。
+-   **多 Agent 支持**：开箱即用的命令，支持 **Antigravity**、**Claude Code**、**Cursor**、**Devin**、**Codex** 和 **Qoder**。
 -   **SSoT 集成**：提供 Schema (Atlas) 和 API (TypeSpec) 的单一数据源（SSoT）集成模板。
 
 ## 安装指南
