@@ -39,7 +39,7 @@ After installation, you'll see:
 
 Prepare your source documents:
 - PRD (Product Requirements Document)
-- Architecture design document (optional but recommended)
+- Architecture design document (required; it is the authoritative input for technical constraints)
 
 Execute in your AI tool:
 
@@ -54,6 +54,8 @@ Architecture: @docs/system-architecture.md
 - ✅ Creates `.context/` directory
 - ✅ Archives source documents
 - ✅ Generates `context-manifest.json`
+- ✅ Generates `.context/criterion.md` as the engineering-constraint source of truth
+- ✅ Installs the full shared `/context-*` command set for the selected AI tools
 
 ---
 
@@ -67,14 +69,16 @@ Architecture: @docs/system-architecture.md
 1. Read PRD → Generate `.context/domain/` summaries
 2. Read architecture doc → Generate `.context/architecture/` summaries
 3. Fill `.context/criterion.md` (Project Criterion)
-4. Initialize OpenSpec → `openspec init`
-5. Generate `openspec/project.md` and `openspec/proposal-roadmap.md`
+4. Ensure `.context/openspec/integration.md` and the Context asset index are synchronized
+5. Generate the derived `openspec/config.yaml` snapshot and `openspec/proposal-roadmap.md`
+
+`openspec/config.yaml` is generated from authoritative `.context/` assets. Do not maintain it manually; regenerate it with `/context-openspec project` when its source fingerprint changes.
 
 **Step-by-step execution (recommended)**:
 ```bash
 /context-openspec domain        # Process PRD first
 /context-openspec architecture  # Then architecture
-/context-openspec project       # Generate project.md
+/context-openspec project       # Generate the derived config.yaml snapshot
 /context-openspec plan          # Generate proposal-roadmap.md
 ```
 
@@ -144,7 +148,8 @@ Topic: business rules for user authentication
              ↓
 ┌─────────────────────────────┐
 │ Phase 7: Archive            │
-│  openspec archive --yes     │
+│  specflow archive           │
+│  --yes --no-validate        │
 └─────────────────────────────┘
 ```
 
@@ -154,8 +159,8 @@ If tasks involve database or API changes:
 
 | SSoT Type | Modify First | Then Execute |
 |-----------|--------------|--------------|
-| PostgreSQL | `schema/postgres.hcl` | `atlas schema apply` |
-| REST API | `api/main.tsp` | `tsp compile` → `oapi-codegen` |
+| PostgreSQL | `SSoT/schema/migrations/` | Apply the project Goose migration workflow |
+| REST API | `SSoT/api/main.tsp` | `tsp compile` → project code generation |
 
 ### Task Status Markers
 
@@ -182,6 +187,33 @@ If execution is interrupted, re-run `/context-start feat-user-login`. AI will co
 
 # Check proposal completeness
 /context-check proposal feat-user-login
+
+# Check the generated OpenSpec project snapshot
+/context-check project
+
+# Check roadmap coverage, sequencing, and dependencies
+/context-check plan
+```
+
+### Reusable Document Reviews
+
+These reviews are optional, read-only diagnostics. Run them when the corresponding document boundary changes; they are not repeated automatically during proposal implementation.
+
+```bash
+# PRD ↔ architecture bidirectional traceability
+/context-check review prd-tad
+
+# Manifest / README / Integration Index / filesystem synchronization
+/context-check review assets
+
+# Core document ownership and directory references
+/context-check review core
+
+# Generated assets ↔ source documents for one scope
+/context-check review scope domain
+/context-check review scope architecture
+/context-check review scope db
+/context-check review scope ui
 ```
 
 ---
@@ -210,8 +242,8 @@ curl -fsSL https://raw.githubusercontent.com/injoysai/injoys-agent-sdk/main/scri
 /context-start feat-user-login
   → Confirm task list (y)
   → AI auto-executes:
-     [x] Create user table (schema/postgres.hcl → atlas)
-     [x] Implement login API (api/main.tsp → oapi-codegen)
+     [x] Create user table (SSoT/schema/migrations/ → Goose)
+     [x] Implement login API (SSoT/api/main.tsp → codegen)
      [x] Add tests
   → Verification passed
   → Auto-archived
@@ -223,10 +255,11 @@ curl -fsSL https://raw.githubusercontent.com/injoysai/injoys-agent-sdk/main/scri
 
 ## FAQ
 
-### Q: OpenSpec not installed?
+### Q: Is a global OpenSpec CLI required?
 ```bash
-npm install -g @fission-ai/openspec@latest
+node design/context-dev/tools/specflow/specflow.mjs --help
 ```
+No. The workflow uses the bundled Specflow tool. Node.js 18+ is required.
 
 ### Q: `.context/` doesn't exist?
 Run `/context-init` first.

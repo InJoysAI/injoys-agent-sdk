@@ -39,7 +39,7 @@ curl -fsSL https://raw.githubusercontent.com/injoysai/injoys-agent-sdk/main/scri
 
 准备你的源文档：
 - PRD（产品需求文档）
-- 架构设计文档（可选但推荐）
+- 架构设计文档（必需，作为技术约束的权威输入）
 
 在 AI 工具中执行：
 
@@ -54,6 +54,8 @@ PRD：@docs/product-overview.md
 - ✅ 创建 `.context/` 目录
 - ✅ 归档源文档
 - ✅ 生成 `context-manifest.json`
+- ✅ 生成工程约束权威来源 `.context/criterion.md`
+- ✅ 为所选 AI 工具安装共享的完整 `/context-*` 命令集
 
 ---
 
@@ -67,14 +69,16 @@ PRD：@docs/product-overview.md
 1. 读取 PRD → 生成 `.context/domain/` 总结
 2. 读取架构文档 → 生成 `.context/architecture/` 总结
 3. 填充 `.context/criterion.md`（项目准则）
-4. 初始化 OpenSpec → `openspec init`
-5. 生成 `openspec/project.md` 和 `openspec/proposal-roadmap.md`
+4. 同步 `.context/openspec/integration.md` 和 Context 资产索引
+5. 生成派生快照 `openspec/config.yaml` 和 `openspec/proposal-roadmap.md`
+
+`openspec/config.yaml` 从 `.context/` 权威资产派生，不应手工维护；来源指纹变化后使用 `/context-openspec project` 重新生成。
 
 **分步执行（推荐）**：
 ```bash
 /context-openspec domain        # 先处理 PRD
 /context-openspec architecture  # 再处理架构
-/context-openspec project       # 生成 project.md
+/context-openspec project       # 生成派生的 config.yaml 快照
 /context-openspec plan          # 生成 proposal-roadmap.md
 ```
 
@@ -144,7 +148,8 @@ PRD：@docs/product-overview.md
              ↓
 ┌─────────────────────────────┐
 │ Phase 7: 归档               │
-│  openspec archive --yes     │
+│  specflow archive           │
+│  --yes --no-validate        │
 └─────────────────────────────┘
 ```
 
@@ -154,8 +159,8 @@ PRD：@docs/product-overview.md
 
 | SSoT 类型 | 先修改 | 再执行 |
 |-----------|--------|--------|
-| PostgreSQL | `schema/postgres.hcl` | `atlas schema apply` |
-| REST API | `api/main.tsp` | `tsp compile` → `oapi-codegen` |
+| PostgreSQL | `SSoT/schema/migrations/` | 执行项目的 Goose 迁移流程 |
+| REST API | `SSoT/api/main.tsp` | `tsp compile` → 项目代码生成 |
 
 ### 任务状态标记
 
@@ -182,6 +187,33 @@ PRD：@docs/product-overview.md
 
 # 检查提案完整性
 /context-check proposal feat-user-login
+
+# 检查 OpenSpec 项目上下文快照
+/context-check project
+
+# 检查路线图覆盖、排序和依赖
+/context-check plan
+```
+
+### 可复用文档审查
+
+以下审查是可选、只读的诊断工具。在对应文档边界发生变化时主动执行，不会在提案实施过程中被自动重复调用。
+
+```bash
+# PRD ↔ 架构文档双向追溯
+/context-check review prd-tad
+
+# Manifest / README / Integration Index / 文件系统四方同步
+/context-check review assets
+
+# 核心文档职责和目录引用
+/context-check review core
+
+# 单模块生成资产 ↔ 源文档
+/context-check review scope domain
+/context-check review scope architecture
+/context-check review scope db
+/context-check review scope ui
 ```
 
 ---
@@ -210,8 +242,8 @@ curl -fsSL https://raw.githubusercontent.com/injoysai/injoys-agent-sdk/main/scri
 /context-start feat-user-login
   → 确认任务列表 (y)
   → AI 自动执行：
-     [x] 创建用户表 (schema/postgres.hcl → atlas)
-     [x] 实现登录 API (api/main.tsp → oapi-codegen)
+     [x] 创建用户表 (SSoT/schema/migrations/ → Goose)
+     [x] 实现登录 API (SSoT/api/main.tsp → codegen)
      [x] 添加测试
   → 验证通过
   → 自动归档
@@ -223,10 +255,11 @@ curl -fsSL https://raw.githubusercontent.com/injoysai/injoys-agent-sdk/main/scri
 
 ## 常见问题
 
-### Q: OpenSpec 未安装？
+### Q: 是否需要全局安装 OpenSpec CLI？
 ```bash
-npm install -g @fission-ai/openspec@latest
+node design/context-dev/tools/specflow/specflow.mjs --help
 ```
+不需要。当前工作流使用仓库内置 Specflow，只要求 Node.js 18+。
 
 ### Q: `.context/` 不存在？
 先运行 `/context-init`。
@@ -241,4 +274,3 @@ npm install -g @fission-ai/openspec@latest
 ```
 
 ---
-
