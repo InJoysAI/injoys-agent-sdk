@@ -4,18 +4,18 @@ set -euo pipefail
 # Install Codex CLI prompt files to the user's home directory.
 #
 # Codex CLI loads prompts from: ~/.codex/prompts/
-# This installer copies the repository's `commands/codex/*.md` files into that directory.
+# This installer copies the repository's shared `commands/*.md` files into that directory.
 #
 # Usage (run from your project root where `design/context-dev/` exists):
 #   bash design/context-dev/scripts/install-codex-prompts.sh
 #   # or with a custom source dir:
-#   CODEX_PROMPTS_SRC=design/context-dev/commands/codex bash design/context-dev/scripts/install-codex-prompts.sh
+#   CODEX_PROMPTS_SRC=design/context-dev/commands bash design/context-dev/scripts/install-codex-prompts.sh
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Default source: the installed injoys-agent-sdk repo layout under design/context-dev is:
-# design/context-dev/commands/codex/*.md
-DEFAULT_SRC="$SCRIPT_DIR/../commands/codex"
+# design/context-dev/commands/*.md
+DEFAULT_SRC="$SCRIPT_DIR/../commands"
 SRC_DIR="${CODEX_PROMPTS_SRC:-$DEFAULT_SRC}"
 
 DEST_DIR="$HOME/.codex/prompts"
@@ -43,4 +43,3 @@ done
 
 echo "✅ Installed ${#files[@]} Codex prompt files to: $DEST_DIR"
 echo "   Restart Codex if prompts are not visible."
-

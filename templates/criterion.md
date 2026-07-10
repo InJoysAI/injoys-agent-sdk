@@ -28,7 +28,7 @@
 
 | 维度 | 工具 | 约束规则 |
 |------|------|---------|
-| **需求层** | OpenSpec (`openspec/config.yaml`) | 功能变更必须先创建提案（`/context-openspec proposal <change-id> [roadmap-doc]`），评审通过后再开发 |
+| **需求层** | OpenSpec | 功能变更必须先创建并评审提案；具体命令和文件格式由 OpenSpec 工作流定义 |
 | **数据层** | {{数据层工具，如 Goose/Alembic/Flyway}} | {{数据层变更规则；路径如 `SSoT/schema/migrations/`}} |
 | **API 层** | {{API 工具，如 TypeSpec/OpenAPI/Protobuf}} | {{API 变更规则；路径如 `SSoT/api/main.tsp`}} |
 | **IPC 层（可选）** | {{IPC 工具，如 JSON Schema/TypeSpec}} | {{IPC 变更规则；路径如 `SSoT/schema/ipc.schema.json` 或 `SSoT/ipc/main.tsp`}} |
@@ -179,23 +179,21 @@ MUST NOT:
 
 ---
 
-## 6. 变更工作流（SSoT-first）
+## 6. SSoT-first 执行顺序
 
 ```
-需求变更
+Schema/迁移（如有）
     ↓
-创建提案：/context-openspec proposal <change-id> [roadmap-doc]
+共享模型（如有）
     ↓
-验证提案：node design/context-dev/tools/specflow/specflow.mjs validate <提案ID> --strict
+API/IPC 契约（如有）
     ↓
-更新服务端/契约（如有）
+Codegen
     ↓
-实现业务逻辑（客户端/服务端）
-    ↓
-运行测试
-    ↓
-归档：node design/context-dev/tools/specflow/specflow.mjs archive <提案ID> --yes
+业务实现与测试
 ```
+
+> OpenSpec 的提案、验证和归档命令由 `/context-*` 工作流维护，不在项目准则中重复定义。
 
 ---
 
@@ -203,10 +201,6 @@ MUST NOT:
 
 | 层 | 文件 | 用途 |
 |----|------|------|
-| 需求层 | `openspec/config.yaml` | 项目信息 |
-| 需求层 | `openspec/proposal-roadmap.md` | 提案路线图 |
-| 需求层 | `openspec/specs/` | 当前规范（真理源） |
-| 需求层 | `openspec/changes/` | 变更提案目录 |
 | 数据层 | `SSoT/schema/migrations/` | {{数据层迁移工具}} SQL 迁移文件目录 |
 | 共享层（可选） | `SSoT/shared/models.tsp` | API + IPC 共用模型 |
 | API 层 | `SSoT/api/tspconfig.yaml` | TypeSpec 编译配置（OpenAPI3 + JSON Schema） |
@@ -219,6 +213,8 @@ MUST NOT:
 ## 8. 统一入口
 
 本文件（`.context/criterion.md`）是项目约束的**权威来源**。
+
+`openspec/config.yaml` 是供 OpenSpec 注入上下文的派生快照，不是独立权威来源，也不应手工维护。
 
 > 💡 仅当源文档（PRD/架构等）变化时才需更新 `.context/`；业务代码变更不触发重生成。
 

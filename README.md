@@ -16,6 +16,7 @@ It unifies two core capabilities:
 
 - **7 Core Commands**: `/context-init`, `/context-openspec`, `/context-openspec proposal <change-id> [roadmap-doc]`, `/context-interview`, `/context-start`, `/context-check`, `/context-update`
 - **Multi-Agent Support**: Ready-to-use commands for **Antigravity**, **Claude Code**, **Cursor**, **Devin**, **Codex**, and **Qoder**.
+- **Single Command Source**: All supported AI tools install from one shared command set to prevent drift.
 - **SSoT Integration**: Templates for integrating Single Source of Truth (SSoT) definitions for Schema (Atlas) and API (TypeSpec).
 
 ## Installation

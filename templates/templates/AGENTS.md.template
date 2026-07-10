@@ -35,4 +35,4 @@
 
 - `.context/criterion.md` — 完整项目准则
 - `.context/architecture/tech_stack.md` — 技术栈详情
-- `openspec/config.yaml` — 项目信息
+- `openspec/config.yaml` — 从 `.context/` 生成的 OpenSpec 上下文快照

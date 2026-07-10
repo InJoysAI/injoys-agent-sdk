@@ -87,7 +87,7 @@ function initCommand(targetPath) {
   const contextDir = path.join(target, '.context');
 
   log.step('Creating .context/ directory...');
-  copyDir(templatesDir, contextDir, ['README.md', 'devenv', 'scripts', 'templates']);
+  copyDir(templatesDir, contextDir, ['README.md', 'commands', 'scripts', 'templates']);
 
   // Copy rules
   const rulesDir = path.join(PACKAGE_ROOT, 'rules');
@@ -110,24 +110,23 @@ function initCommand(targetPath) {
   }
 
   // Copy commands based on detected AI tool
-  const commandsDir = path.join(PACKAGE_ROOT, 'commands');
+  const commandsDir = path.join(PACKAGE_ROOT, 'templates', 'commands');
 
   log.step('Copying command templates...');
 
   // Detect AI tool and copy appropriate commands
-  const aiToolDirs = {
-    '.agent/workflows': 'antigravity',
-    '.claude/commands': 'claude',
-    '.cursor/commands': 'cursor',
-    '.devin/workflows': 'devin'
-  };
+  const aiToolDirs = [
+    '.agent/workflows',
+    '.claude/commands',
+    '.cursor/commands',
+    '.devin/workflows'
+  ];
 
-  for (const [destDir, srcDir] of Object.entries(aiToolDirs)) {
-    const srcPath = path.join(commandsDir, srcDir);
+  for (const destDir of aiToolDirs) {
     const destPath = path.join(target, destDir);
 
-    if (fs.existsSync(srcPath)) {
-      copyDir(srcPath, destPath);
+    if (fs.existsSync(commandsDir)) {
+      copyDir(commandsDir, destPath);
       log.info(`Copied commands to: ${destDir}`);
     }
   }

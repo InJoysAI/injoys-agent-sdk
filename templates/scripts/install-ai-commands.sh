@@ -3,8 +3,8 @@ set -euo pipefail
 
 # Install the full `/context-*` command set to selected AI tool directories.
 #
-# This script expects the command sources to exist under:
-#   design/context-dev/commands/<tool>/*.md
+# This script uses the tool-agnostic command sources under:
+#   design/context-dev/commands/*.md
 #
 # Usage:
 #   bash design/context-dev/scripts/install-ai-commands.sh --tools antigravity,cursor,claude,devin,qoder
@@ -14,7 +14,7 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/../../.." && pwd)"
-SRC_BASE="$SCRIPT_DIR/../commands"
+COMMANDS_DIR="$SCRIPT_DIR/../commands"
 
 TOOLS=""
 
@@ -68,19 +68,19 @@ copy_dir() {
 for tool in "${tool_list[@]}"; do
   case "$tool" in
     antigravity)
-      copy_dir "$SRC_BASE/antigravity" "$ROOT_DIR/.agent/workflows"
+      copy_dir "$COMMANDS_DIR" "$ROOT_DIR/.agent/workflows"
       ;;
     claude)
-      copy_dir "$SRC_BASE/claude" "$ROOT_DIR/.claude/commands"
+      copy_dir "$COMMANDS_DIR" "$ROOT_DIR/.claude/commands"
       ;;
     cursor)
-      copy_dir "$SRC_BASE/cursor" "$ROOT_DIR/.cursor/commands"
+      copy_dir "$COMMANDS_DIR" "$ROOT_DIR/.cursor/commands"
       ;;
     devin)
-      copy_dir "$SRC_BASE/devin" "$ROOT_DIR/.devin/workflows"
+      copy_dir "$COMMANDS_DIR" "$ROOT_DIR/.devin/workflows"
       ;;
     qoder)
-      copy_dir "$SRC_BASE/qoder" "$ROOT_DIR/.qoder/commands"
+      copy_dir "$COMMANDS_DIR" "$ROOT_DIR/.qoder/commands"
       ;;
     codex)
       echo "ℹ️  Codex uses ~/.codex/prompts; run: bash design/context-dev/scripts/install-codex-prompts.sh"

@@ -110,7 +110,7 @@ node design/context-dev/tools/specflow/specflow.mjs validate <change-id> --stric
 **必读文件**（`proposal.md` 必须引用）：
 - `.context/criterion.md` — 项目约束
 - `.context/architecture/tech_stack.md` — 技术约束
-- `openspec/config.yaml` — 项目概况
+- `openspec/config.yaml` — 从 Context 生成的项目概况快照
 
 **检查方法**：
 1. 读取 `proposal.md`

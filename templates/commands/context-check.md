@@ -22,7 +22,6 @@ Supported subcommands:
 2. `scripts/check-env.sh` 存在 → 执行 `bash scripts/check-env.sh`
 3. 均不存在 → 跳过，输出提示
 
-> 💡 参考实现：`design/context-dev/check/devenv/`（含工具链和 MCP 检查脚本）
 ---
 
 ## tasks

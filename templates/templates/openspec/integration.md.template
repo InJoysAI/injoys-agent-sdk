@@ -105,7 +105,7 @@ Read the following files for specification validation (if present per `CONTEXT_A
 4. After review approval, create Goose migration in `SSoT/schema/migrations/` and modify `SSoT/api/main.tsp`
 5. Run codegen commands to generate code
 6. Implement business logic
-7. Archive the change: node design/context-dev/tools/specflow/specflow.mjs archive feat-update-nickname --yes
+7. Validate once, then archive without re-validating: node design/context-dev/tools/specflow/specflow.mjs validate feat-update-nickname --strict && node design/context-dev/tools/specflow/specflow.mjs archive feat-update-nickname --yes --no-validate
 ```
 
 <!-- CONTEXT_OPENSPEC_INTEGRATION:END -->

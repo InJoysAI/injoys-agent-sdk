@@ -37,6 +37,6 @@ description: Implement an OpenSpec change (validate → SSoT → code → test �
 4. 展示任务列表并确认
 5. 按顺序执行任务（SSoT 先行）
 6. 验证（测试 + `node design/context-dev/tools/specflow/specflow.mjs validate <提案ID> --strict`）
-7. 归档（`node design/context-dev/tools/specflow/specflow.mjs archive <提案ID> --yes`）
+7. 归档（最终校验已通过后执行 `node design/context-dev/tools/specflow/specflow.mjs archive <提案ID> --yes --no-validate`）
 
 $ARGUMENTS

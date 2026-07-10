@@ -40,7 +40,7 @@
 
 **额外读取**（proposal 专用）：
 - `.context/openspec/integration.md` — Context 读取规范
-- `openspec/config.yaml` — 项目整体情况（OPSX 注入上下文）
+- `openspec/config.yaml` — 从 Context 生成的项目上下文快照（OPSX 注入上下文）
 - `openspec/proposal-roadmap.md` — 规划文档（索引/总览，且必须提取 `<change-id>` 对应条目正文）
 - `openspec/proposal-roadmap-Phase*.md` / `openspec/proposal-roadmap-Phase-*.md` — 分 Phase 规划（若存在，视为更细粒度计划）
 
@@ -203,7 +203,7 @@ node design/context-dev/tools/specflow/specflow.mjs templates
 3. 编写 `openspec/changes/<change-id>/proposal.md`、`openspec/changes/<change-id>/tasks.md`
 4. 创建 `openspec/changes/<change-id>/specs/<capability>/spec.md` delta 文件
 5. 若需要技术设计/架构决策，创建 `openspec/changes/<change-id>/design.md`（以 `node design/context-dev/tools/specflow/specflow.mjs instructions design --change <change-id>` 的要求为准）
-6. 增加以 SSoT 为首的步骤：验证是否需要更改 schema/API 合约；如果不需要，则添加明确的“SSoT 未更改”检查，以及 `node design/context-dev/tools/specflow/specflow.mjs validate <change-id> --strict` + `node design/context-dev/tools/specflow/specflow.mjs archive <change-id> --yes` 的任务；如果需要，则包括创建 Goose 迁移 (`SSoT/schema/migrations/`) 和 `SSoT/api/main.tsp` 的更新以及相应的代码生成（codegen）。
+6. 增加以 SSoT 为首的步骤：验证是否需要更改 schema/API 合约；如果不需要，则添加明确的“SSoT 未更改”检查，以及 `node design/context-dev/tools/specflow/specflow.mjs validate <change-id> --strict` + `node design/context-dev/tools/specflow/specflow.mjs archive <change-id> --yes --no-validate` 的任务；如果需要，则包括创建 Goose 迁移 (`SSoT/schema/migrations/`) 和 `SSoT/api/main.tsp` 的更新以及相应的代码生成（codegen）。
 7. 如果涉及接口方面的设计，需要同步更新`.context/architecture/api_strategy.md`,添加对应的请求响应示例
 8. 如果涉及自定义错误码，必须遵循本项目的错误码 SSoT 流程（详见下方 §2.1.1）
 
@@ -258,7 +258,7 @@ return Err(AppError::new(codes::SessionNotFound, get_error_message(codes::Sessio
 - [ ] `change-id` 唯一且 verb-led（必要时用 `ls openspec/changes/` 检查；冲突则换名）
 - [ ] 目录结构完整：`openspec/changes/<change-id>/` + `specs/<capability>/`
 - [ ] `proposal.md` 至少包含：`## Why`、`## What Changes`、`## Impact`（且 Impact 里包含 “关联 Context 资产” 表）
-- [ ] `tasks.md` 包含：SSoT 检查/变更（或“SSoT 未更改”）、`node design/context-dev/tools/specflow/specflow.mjs validate <change-id> --strict`、以及 `node design/context-dev/tools/specflow/specflow.mjs archive <change-id> --yes`（作为后续任务）
+- [ ] `tasks.md` 包含：SSoT 检查/变更（或“SSoT 未更改”）、`node design/context-dev/tools/specflow/specflow.mjs validate <change-id> --strict`、以及 `node design/context-dev/tools/specflow/specflow.mjs archive <change-id> --yes --no-validate`（作为紧随最终校验的后续任务）
 - [ ] 每个 delta spec 文件至少包含 1 个 operation header（`## ADDED|MODIFIED|REMOVED|RENAMED Requirements`）
 - [ ] 每条 `### Requirement:` 至少 1 个 `#### Scenario:`（严格 4 个 `#`；否则将导致解析失败）
 - [ ] 已输出 `Roadmap 提案快照`（来源文件、phase、目标、范围、依赖、验收、关键任务、风险、关联资产）
@@ -270,7 +270,6 @@ return Err(AppError::new(codes::SessionNotFound, get_error_message(codes::Sessio
 - [ ] `tasks.md` 至少覆盖 roadmap 的全部 `key_tasks`（可细化拆分，不得缺失）
 - [ ] `specs/*/spec.md` 的 Scenario 至少覆盖 roadmap `acceptance_criteria` 的核心验收点
 - [ ] 若 roadmap 条目存在扩展字段（milestones/coverage_scope/gate_vs_non_gate/change_management/ops_support/kpi/risk_acceptance_policy），proposal/tasks 已体现或已说明暂不纳入原因
-- [ ] 已运行并通过：`node design/context-dev/tools/specflow/specflow.mjs validate <change-id> --strict`
 - [ ] 若提案涉及新错误场景：已在 `tools/errcodes/shared/*-error-codes.yaml` 定义错误码，`make errcode-gen` 通过，`spec.md` 错误 Scenario 引用了具体错误码（否则已注明“不涉及新错误码”）
 - [ ] 若 `Roadmap Entry Payload` 与 proposal/tasks/specs 任一项不一致，已获得用户明确确认；未确认则 ⛔ STOP
 
@@ -303,7 +302,7 @@ return Err(AppError::new(codes::SessionNotFound, get_error_message(codes::Sessio
 **硬约束**：
 - 必须是可执行的 Markdown checkbox 列表（`- [ ] ...`）
 - 必须包含验证步骤：`- [ ] 运行 node design/context-dev/tools/specflow/specflow.mjs validate <change-id> --strict`（普通 checkbox 文本行，不可仅放在代码块）
-- 必须包含归档步骤：`- [ ] 运行 node design/context-dev/tools/specflow/specflow.mjs archive <change-id> --yes`（普通 checkbox 文本行，不可仅放在代码块）
+- 必须包含归档步骤：`- [ ] 运行 node design/context-dev/tools/specflow/specflow.mjs archive <change-id> --yes --no-validate`（紧随最终校验；普通 checkbox 文本行，不可仅放在代码块）
 - 必须包含 `Roadmap 对齐任务`（对应 roadmap 的 `key_tasks`；可以拆分为更细粒度子任务）
 - 禁止残留任何 `{{...}}` 占位符（写入文件前必须全部替换为实际内容）
 
@@ -382,140 +381,16 @@ node design/context-dev/tools/specflow/specflow.mjs validate <change-id> --stric
 
 ---
 
-## Phase 5: 动态生成评审 Prompt
+## Phase 5: 可选深度评审
 
-> ⛔ **必须在 Phase 4 验证通过后执行**。
-> ⛔ **输出的 Prompt 必须完整填入实际的 change-id 和 Phase 编号，不得保留任何 `<...>` 占位符**。
+Phase 4 的结构校验通过后，提案生成流程即可完成。仅当用户明确要求深度内容审查时，调用：
 
-### 5.1 执行前数据汇总
-
-在生成 Prompt 前，AI 必须从前序步骤提取以下信息：
-
-| 步骤 | 读取来源 | 提取内容 | 用途 |
-|------|----------|----------|------|
-| ① | Phase 1.2.1 Roadmap 提案快照 | `change_id`、`phase`（如 Phase-0 / Phase-1） | 填入 Prompt 的提案 ID 与大纲所在 Phase |
-| ② | `openspec/changes/<change-id>/` 目录实际结构 | 存在的文件（proposal.md / tasks.md / specs/ / design.md） | 确保 Prompt 中提案路径表述准确 |
-| ③ | `openspec/changes/<change-id>/proposal.md` → `### 关联 Context 资产` | 关联资产列表 | 供评审者按需加载 |
-
-### 5.2 Prompt 输出格式
-
-完成数据汇总后，AI 输出以下**完全填充的 Prompt**（以 markdown 代码块包裹，便于用户复制至新对话运行）：
-
-~~~markdown
 ```
-/context-check review 对 change-id 为 `<实际change-id>` 的提案进行三层联合评审，评审对象包括：
-- 大纲（Outline）：`openspec/proposal-roadmap-Phase-<N>.md` 中该提案的大纲条目
-- 提案内容（Proposal）：`openspec/changes/<实际change-id>/`（包含 proposal.md / tasks.md / specs/<实际capability>/spec.md，以及可能的 design.md）
-- 业务资产（Context）：`.context/` 目录下的权威文档
-
----
-
-## 阶段一：大纲与资产一致性评审（Outline ↔ .context）
-
-验证大纲中描述的目标、范围、约束与验收口径是否与 `.context/` 权威资产对齐，识别大纲存在的遗漏、冲突或表述不准确之处。
-
-**权威对照源**：
-- `criterion.md`（工程约束 SSoT）
-- `domain/business_rules.md` + `domain/domain_model.md` + `domain/user_journeys.md`（业务规则、领域模型与用户旅程）
-- `domain/edge_cases.md`（边界场景，校验 In/Out 是否遗漏已知边缘情况）
-- `architecture/risks_and_debt.md` + `domain/risks_and_debt.md`（风险对照）
-- `architecture/security_policy.md`（安全约束）
-- `legacy/legacy_system_analysis.md`（遗留系统约束，Phase-0 提案必须参考）
-
-**评审项**：
-1. **业务目标对齐** — 大纲"业务目标"中的每条目标是否能在 `business_rules.md` 或 `user_journeys.md` 中找到对应的业务需求依据？是否有与 .context 冲突的目标？
-2. **关联资产覆盖度** — 大纲"关联 Context 资产"表格是否引用了该提案所涉及的全部 .context 文档？对照 `.context/` 实际目录，列出缺失引用和多余引用。
-3. **In/Out 边界与 .context 对齐** — 大纲的 In 范围是否与 .context 所定义的功能边界和业务规则一致？Out 范围是否遗漏了 `edge_cases.md` 中已知的需要明确排除的边缘场景？
-4. **验收标准与约束对齐** — 大纲的验收标准是否覆盖了 `criterion.md` 中相关的 MUST/MUST NOT 要求？是否有可操作的验证方式（日志/指标值/API 响应）？标注主观模糊或缺失量化指标的条目。
-5. **风险覆盖完整度** — 对照 `risks_and_debt.md` 中的 RISK-xxx 列表，大纲风险表是否覆盖了所有与该提案相关的风险？标注遗漏的 RISK-xxx 及其严重程度。
-
-**输出**：
-- 大纲与 .context 一致性评级（高 / 中 / 低）及核心发现
-- 业务目标对照表（| 大纲目标 | .context 依据 | 对齐状态 ✅/⚠️/❌ |）
-- 缺失 / 多余的资产引用列表
-- In/Out 边界问题清单（遗漏的边缘场景、与 .context 冲突的范围定义）
-- 验收标准问题列表（触发 MUST/MUST NOT 遗漏或缺失量化指标的条目）
-- 遗漏 RISK-xxx 列表（含风险等级）
-
----
-
-## 阶段二：大纲与提案内容一致性校验（Outline ↔ Proposal）
-
-逐项核对提案内容是否忠实还原并完整展开覆盖了大纲的意图，识别边界漂移、缺口与偏差。
-
-**评审项**：
-1. **目标映射** — 大纲"业务目标"中的每条目标是否在 proposal.md 中均有对应说明？标注未覆盖项。
-2. **范围边界落地** — 大纲 In/Out 范围是否完整体现在 proposal.md 的范围章节中？是否有边界漂移（提案比大纲多做或少做了什么）？
-3. **关键任务还原** — 大纲"关键任务"列表是否在 tasks.md 中被拆解为可执行的原子任务？检查是否有大纲任务未在 tasks.md 出现。
-4. **验收标准传递** — 大纲的验收条目是否在 spec.md 或 tasks.md 的验收部分中被完整继承？是否有弱化或丢失。
-5. **依赖关系对齐** — 大纲声明的前置依赖和被依赖提案是否在 proposal.md 的依赖章节中完整体现？
-
-**输出**：
-- 一致性总评（完全一致 / 部分一致 / 不一致）
-- 目标覆盖对照表（| 大纲目标 | 提案对应章节 | 覆盖状态 |）
-- 边界漂移清单（多做/少做的具体内容）
-- 任务映射缺口列表
-- 依赖声明差异列表
-
----
-
-## 阶段三：提案内容合规评审（Proposal → .context）
-
-判断提案内容是否满足 `.context/` 定义的系统业务要求与约束，并验证其在路线图中的定位合理性。
-
-**权威对照源**（按提案涉及模块选择性加载，全量列举以供对照）：
-| 评审维度 | 权威来源文件 |
-|---------|------------|
-| 业务规则 / 用户旅程 | `.context/domain/business_rules.md` + `.context/domain/user_journeys.md` + `.context/domain/domain_model.md` + `.context/domain/ubiquitous_language.md` |
-| 边界与边缘场景 | `.context/domain/edge_cases.md` |
-| 非功能要求（安全/合规/性能） | `.context/criterion.md` §3-§4 + `.context/architecture/security_policy.md` + `.context/db/security_hardening.md` |
-| 可观测性 / 运维 / 部署 | `.context/architecture/cross_cutting_concepts.md` + `.context/architecture/runtime_view.md` + `.context/architecture/deployment_view.md` |
-| 数据层（如涉及 DB 变更） | `.context/db/schema_design.md` + `.context/db/migrations_and_ssot.md` + `.context/db/performance_tuning.md` |
-| 遗留系统兼容 / 迁移路径 | `.context/legacy/legacy_system_analysis.md` + `.context/architecture/migration_architecture.md` |
-| 测试与验收 | `.context/domain/testing_strategy.md` + `.context/domain/data_strategy.md` |
-| UI / 交互（如涉及前端） | `.context/ui/design_system.md` + `.context/ui/interaction_states.md` + `.context/ui/stitch_prompts.md` |
-| API 契约 | `.context/architecture/api_strategy.md` |
-| 路线图定位与依赖 | `openspec/proposal-roadmap.md` + `openspec/proposal-roadmap-Phase-<N>.md` |
-
-**审查维度**：
-1. MUST/MUST NOT 合规矩阵（逐条扫描 criterion.md §3-§4，不可跳过）
-2. 业务规则核对（BR-xxx 逐条映射，标注满足/不满足/缺失证据）
-3. 路线图定位（依赖完整性、冲突点、重叠建设风险）
-4. 接口契约分析（上下游耦合、破坏性变更影响范围）
-5. 技术与交付风险（触发条件 + 影响 + 缓解 + 责任归属）
-6. 待澄清问题（P0 阻塞 / P1 重要 / P2 建议）
-7. 可执行修改建议（M-n 编号 + 修改位置 + 验收口径 + 监控指标）
-
-**输出报告**：
-1. **综合结论**（PASS / PASS (Conditional) / MODIFY / FAIL）及各阶段小结
-2. MUST/MUST NOT 合规矩阵（| 规则（criterion.md 位置）| 提案证据 | 状态 ✅/⚠️/❌ |）
-3. 业务契合度表（| BR-xxx | 满足/不满足/缺失 | 提案引用位置 |）
-4. 大纲↔提案一致性对照表（| 大纲章节 | 提案对应位置 | 一致性 | 差异说明 |）
-5. 路线图关联分析（依赖图核对、冲突点、整合建议）
-6. 风险清单（| 风险ID | 触发条件 | 影响 | 缓解方案 | 责任归属 |）
-7. 待澄清问题列表（按 P0/P1/P2 排序）
-8. 修改建议（M-n 编号 + 涉及层（大纲/提案/两者）+ 修改位置 + 具体内容 + 验收口径）
-
-**质量要求**：
-- 所有结论必须引用具体文件路径 + 章节/行号，禁止泛泛而谈
-- MUST/MUST NOT 必须逐条扫描，BR-xxx 必须逐条映射，不可合并或跳过
-- 修改建议须明确指出应改"大纲"还是"提案内容"或"两者均需同步"
-- 输出使用中文，文件引用使用相对路径（相对项目根目录）
-- 检查报告输出到当前提案内容目录下，文件名为 `check-report.md`
+/context-check proposal <change-id>
+/context-check review "核对提案 <change-id> 与 roadmap、.context 资产的一致性"
 ```
-~~~
 
-### 5.3 输出质量检查（生成后自检）
-
-AI 在输出 Prompt 前必须完成以下自检，确认**全部通过**再输出：
-
-- [ ] `change-id` 是实际值，非 `<CHANGE_ID>` 占位符（Prompt 中所有出现位置均已替换）
-- [ ] Phase 编号是实际值（如 `Phase-0`、`Phase-1`），非 `<N>` 占位符（Prompt 中所有出现位置均已替换）
-- [ ] 大纲路径引用了正确的 `openspec/proposal-roadmap-Phase-<N>.md` 文件（N 与快照一致）
-- [ ] `specs/<capability>/spec.md` 中的 `<capability>` 已替换为实际目录名
-- [ ] Prompt 全文无任何 `<...>` 占位符
-
-> ⏸️ **将上方 Prompt 复制至新对话运行评审**；建议在评审结论为 PASS 或 PASS (Conditional) 后，再继续实施（`/context-start <change-id>`）。
+深度评审是独立诊断流程，不作为提案生成或开始实施的强制前置步骤。
 
 ---
 

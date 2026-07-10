@@ -11,7 +11,7 @@
 templates/
 ├── README.md              # 本文件
 ├── AGENTS.md              # Context 生成器入口
-├── criterion.md        # 项目准则模板
+├── criterion.md           # 项目准则模板（工程约束 SSoT）
 ├── architecture/
 │   └── AGENTS.md          # 架构总结生成（MVP）
 ├── domain/
@@ -22,11 +22,7 @@ templates/
 │   └── AGENTS.md          # UI 总结生成（可选）
 ├── openspec/
 │   └── AGENTS.md          # OpenSpec 增强规范
-├── devenv/                    # (reference implementation)
-│   ├── AGENTS.md          # 环境检查参考实现
-│   ├── check-toolchain.sh # 工具链检查脚本（示例）
-│   ├── check-mcp.sh       # MCP 配置检查脚本（示例）
-│   └── mcp-config.json    # MCP 配置模板 (tool-agnostic)
+├── commands/               # 工具无关的唯一 /context-* 命令源
 ├── scripts/
 │   ├── context-gen.sh             # Hash/引导脚本
 │   ├── install-ai-commands.sh     # 安装完整 /context-* 命令集
@@ -129,7 +125,7 @@ PRD：@docs/product-overview.md
 2. 展示任务列表，等待确认
 3. SSoT-first：按 `.context/criterion.md` 已启用层执行（数据层迁移 → 共享模型 → API 契约 → IPC 契约 → Codegen）
 4. 实现业务代码 + 测试
-5. `node design/context-dev/tools/specflow/specflow.mjs archive <提案ID> --yes`
+5. `node design/context-dev/tools/specflow/specflow.mjs archive <提案ID> --yes --no-validate`
 
 ### 6. 检查状态
 
@@ -150,7 +146,7 @@ PRD：@docs/product-overview.md
 
 | 层 | 文件路径 | 用途 |
 |----|---------|------|
-| 需求层 | `openspec/config.yaml` | 项目信息 |
+| 需求层 | `openspec/config.yaml` | 从 `.context/` 生成的 OpenSpec 上下文快照（禁止手工维护） |
 | 需求层 | `openspec/proposal-roadmap.md` | 提案路线图 |
 | 需求层 | `openspec/changes/` | 变更提案目录 |
 | 需求层 | `openspec/specs/` | 当前规范 (真理源) |

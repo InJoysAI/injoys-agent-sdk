@@ -13,7 +13,7 @@ TARGET_DIR="${1:-.}"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." 2>/dev/null && pwd)" || SCRIPT_DIR=""
 
 # Check if we're running from a local clone or via curl
-if [ -d "$SCRIPT_DIR/templates" ] && [ -d "$SCRIPT_DIR/standards" ]; then
+if [ -d "$SCRIPT_DIR/templates" ] && [ -f "$SCRIPT_DIR/scripts/install.sh" ]; then
     INSTALL_MODE="local"
     echo "📦 Installing InJoys Agent SDK (local mode) to: $TARGET_DIR"
 else
@@ -75,23 +75,22 @@ copy_workflows() {
   # The full command set is generated/installed after `/context-init`.
   cp "$tool_dir/context-init.md" "$target_dir/" 2>/dev/null || true
   cp "$tool_dir/context-check.md" "$target_dir/" 2>/dev/null || true
-  cp "$tool_dir/context-interview.md" "$target_dir/" 2>/dev/null || true
 }
 
 # Antigravity
-copy_workflows "$SCRIPT_DIR/templates/commands/antigravity" "$TARGET_DIR/.agent/workflows"
+copy_workflows "$SCRIPT_DIR/templates/commands" "$TARGET_DIR/.agent/workflows"
 
 # Claude Code
-copy_workflows "$SCRIPT_DIR/templates/commands/claude" "$TARGET_DIR/.claude/commands"
+copy_workflows "$SCRIPT_DIR/templates/commands" "$TARGET_DIR/.claude/commands"
 
 # Cursor
-copy_workflows "$SCRIPT_DIR/templates/commands/cursor" "$TARGET_DIR/.cursor/commands"
+copy_workflows "$SCRIPT_DIR/templates/commands" "$TARGET_DIR/.cursor/commands"
 
 # Devin
-copy_workflows "$SCRIPT_DIR/templates/commands/devin" "$TARGET_DIR/.devin/workflows"
+copy_workflows "$SCRIPT_DIR/templates/commands" "$TARGET_DIR/.devin/workflows"
 
 # Qoder
-copy_workflows "$SCRIPT_DIR/templates/commands/qoder" "$TARGET_DIR/.qoder/commands"
+copy_workflows "$SCRIPT_DIR/templates/commands" "$TARGET_DIR/.qoder/commands"
 
 # Codex (global prompts directory)
 copy_codex_bootstrap() {
@@ -112,7 +111,7 @@ copy_codex_bootstrap() {
   fi
 }
 
-copy_codex_bootstrap "$SCRIPT_DIR/templates/commands/codex"
+copy_codex_bootstrap "$SCRIPT_DIR/templates/commands"
 
 # -----------------------------------------------------------------------------
 # 4. Agent Configuration Templates (NOT installed by default)

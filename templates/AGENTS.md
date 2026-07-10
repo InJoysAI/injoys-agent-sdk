@@ -43,8 +43,6 @@
    可创建 Makefile check-env 或 scripts/check-env.sh 配置项目环境检查。
 ```
 
-> 💡 **参考实现**: 如需环境检查示例，参见 `design/context-dev/check/devenv/`（含工具链和 MCP 检查脚本）。
-
 **⚠️ Step 2 完成后必须继续 Step 3**
 
 ---
@@ -129,7 +127,6 @@
 | 模块 | 路径 | 用途 |
 |------|------|------|
 | 环境检查 (Provider) | 项目自定义 `Makefile check-env` 或 `scripts/check-env.sh` | 项目级环境检查（可选） |
-| 环境检查 (参考实现) | `@design/context-dev/check/devenv/` | 工具链 + MCP 检查示例 |
 | 文档收集与生成 | `@design/context-dev/tools/docs/AGENTS.md` | 收集源文件并生成 .context/ |
 | Manifest | `@design/context-dev/tools/manifest/AGENTS.md` | 记录文件变化 |
 | AI 配置 | `@design/context-dev/tools/ai-config/AGENTS.md` | 配置 AI 工具 |
