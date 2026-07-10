@@ -97,8 +97,10 @@ Architecture: @docs/system-architecture.md
    - `proposal.md` — Scope, boundaries, acceptance criteria
    - `tasks.md` — Task checklist
    - `design.md` — Technical design (if needed)
+4. Run strict Specflow validation
+5. Automatically generate a fully populated three-layer review prompt covering Outline ↔ Context, Outline ↔ Proposal, and Proposal ↔ Context
 
-**Review the proposal**:
+Run the generated prompt in a separate review conversation. For a shorter structural check, you can also run:
 ```
 /context-check proposal feat-user-login
 ```
@@ -241,7 +243,8 @@ curl -fsSL https://raw.githubusercontent.com/injoysai/injoys-agent-sdk/main/scri
 /context-openspec proposal feat-user-login [roadmap-doc]
 
 # 5. Review (human confirms proposal.md)
-# ...
+# Run the automatically generated Phase 5 review prompt
+# Continue after PASS or PASS (Conditional)
 
 # 6. Implement
 /context-start feat-user-login

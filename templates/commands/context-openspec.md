@@ -51,4 +51,6 @@ mkdir -p openspec/changes openspec/specs openspec/changes/archive
 
 > 传递 `$ARGUMENTS`：无参数 = 一键模式；有参数 = 子命令模式
 
+当执行 `proposal <change-id> [roadmap-doc]` 时，提案通过严格校验后必须自动输出完全填充的三层动态评审 Prompt（Outline ↔ Context、Outline ↔ Proposal、Proposal ↔ Context），无需用户额外请求。
+
 $ARGUMENTS

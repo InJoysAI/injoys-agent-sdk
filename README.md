@@ -58,7 +58,7 @@ cd injoys-agent-sdk
     Generate structured summaries from docs and integrate with OpenSpec.
 
 3.  **Create Proposal** (`/context-openspec proposal <change-id> [roadmap-doc]`):
-    Create a change proposal based on the matching roadmap item, with an optional supplemental roadmap or outline document.
+    Create and validate a change proposal from the matching roadmap item, then automatically generate a proposal-specific three-layer review prompt.
 
 4.  **Implement Changes** (`/context-start <proposalId>`):
     Execute tasks following SSoT-first workflow.

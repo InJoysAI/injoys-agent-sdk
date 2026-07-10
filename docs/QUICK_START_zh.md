@@ -97,8 +97,10 @@ PRD：@docs/product-overview.md
    - `proposal.md` — 范围、边界、验收标准
    - `tasks.md` — 任务清单
    - `design.md` — 技术设计（如需）
+4. 执行严格 Specflow 校验
+5. 自动生成完全填充的三层评审 Prompt：大纲 ↔ Context、大纲 ↔ 提案、提案 ↔ Context
 
-**审查提案**：
+将自动生成的 Prompt 放到独立评审对话中执行。如只需较轻量的结构检查，也可以运行：
 ```
 /context-check proposal feat-user-login
 ```
@@ -241,7 +243,8 @@ curl -fsSL https://raw.githubusercontent.com/injoysai/injoys-agent-sdk/main/scri
 /context-openspec proposal feat-user-login [roadmap-doc]
 
 # 5. 审查（人工确认 proposal.md）
-# ...
+# 执行 Phase 5 自动生成的评审 Prompt
+# 结论为 PASS 或 PASS (Conditional) 后继续
 
 # 6. 实施
 /context-start feat-user-login
