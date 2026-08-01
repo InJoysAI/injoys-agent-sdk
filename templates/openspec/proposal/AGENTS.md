@@ -406,7 +406,7 @@ node design/context-dev/tools/specflow/specflow.mjs validate <change-id> --stric
 
 ~~~markdown
 ```
-/context-check review 对 change-id 为 `<实际change-id>` 的提案进行三层联合评审，评审对象包括：
+/context-check review proposal `<实际change-id>` 提案进行三层联合评审，评审对象包括：
 - 大纲（Outline）：`<本次实际匹配的 roadmap 文件>` 中该提案的条目（补充来源：`<实际补充文件或无>`）
 - 提案内容（Proposal）：`openspec/changes/<实际change-id>/`（包含 proposal.md / tasks.md / specs/<实际capability>/spec.md，以及可能的 design.md）
 - 业务资产（Context）：`.context/` 目录下的权威文档

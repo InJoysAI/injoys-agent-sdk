@@ -14,6 +14,7 @@ Supported subcommands:
 - `review assets`: 全量生成资产四方同步与跨模块一致性
 - `review core`: README / AGENTS / criterion / Manifest 核对
 - `review scope <domain|architecture|db|ui|legacy>`: 单模块生成资产 ↔ 源文档核对
+- `review proposal <change-id>`: 提案大纲 ↔ Proposal ↔ Context 三层联合评审，并写入提案目录
 - `review "<description>"`: 自由文本专项核对
 
 ---
@@ -93,12 +94,29 @@ Supported subcommands:
 
 **画像化核对命令** — 常见深度审查无需重复粘贴长 Prompt；仍支持自由文本专项检查。
 
+### `review proposal <change-id>` 强制执行契约
+
+> ⛔ 本节直接适用于顶层命令。即使当前 AI 工具不会自动展开上面的 `@.../AGENTS.md` 引用，也必须执行本节；不得把它当作普通自由文本 review。
+
+收到 `review proposal <change-id>` 后必须在同一次执行中完成：
+
+1. 读取 `design/context-dev/check/AGENTS.md` 和 `design/context-dev/check/review/AGENTS.md`，使用其中 `proposal` 画像。
+2. 定位 Roadmap 中该 Change ID 的大纲，只读取该条目及其明确指向的 Phase 补充条目。
+3. 读取 `openspec/changes/<change-id>/` 的 proposal、tasks、design、specs，以及 Manifest 登记且与提案相关的 Context 资产；禁止改为全量 `.context` 摘要。
+4. 完成 Outline ↔ Context、Outline ↔ Proposal、Proposal → Context 三层评审。
+5. 将完整报告写入 `openspec/changes/<change-id>/check-report.md`。
+6. 重新读取报告，确认非空且包含：综合结论、MUST/MUST NOT 矩阵、BR-xxx 表、大纲↔提案表、路线图分析、风险、P0/P1/P2、M-n 修改建议。
+7. 最终回复只能汇报报告路径、综合结论和 P0/P1/P2 数量。
+
+> ⛔ 在 `check-report.md` 写入并复核成功前，禁止输出 Context recap、禁止询问“下一步做什么”、禁止宣称评审完成。
+
 **示例**:
 ```
 /context-check review prd-tad
 /context-check review assets
 /context-check review core
 /context-check review scope db
+/context-check review proposal feat-example
 /context-check review "检查 api_strategy.md 的错误响应格式"
 ```
 
@@ -106,7 +124,7 @@ Supported subcommands:
 1. 解析画像、范围、权威来源和排除项
 2. 按需读取证据，避免无关资产全量加载
 3. 执行双向追溯、同步或专项核对
-4. 按统一标签和 P0/P1/P2 输出证据化报告
+4. 按统一标签和 P0/P1/P2 输出证据化报告；`proposal` 画像必须写入提案目录
 5. 默认只读；仅在用户明确要求后修复并更新 Manifest
 
 $ARGUMENTS

@@ -44,7 +44,7 @@ templates/
 |------|------|------|
 | `/context-init` | 初始化 | 确认目标 + 可选环境检查 + 创建目录 + 归档源文档 |
 | `/context-openspec` | 集成 | 生成文档总结 + 填充 config.yaml + 生成路线图 |
-| `/context-openspec proposal <change-id> [roadmap-doc]` | 设计 | 基于路线图创建并校验提案，自动生成三层动态评审 Prompt |
+| `/context-openspec proposal <change-id> [roadmap-doc]` | 设计 | 基于路线图创建并校验提案，动态生成三层评审 Prompt |
 | `/context-interview` | 设计 | 深度访谈完善技术规格或用户指定文档 |
 | `/context-start` | 实施 | validate → SSoT-first → codegen → code → archive |
 | `/context-check` | 检查 | 子命令: `env` / `tasks` / `proposal` / `plan` / `project` / `review` |
@@ -107,7 +107,7 @@ PRD：@docs/product-overview.md
 
 - 读取 `openspec/proposal-roadmap.md` 定位条目
 - 创建 `openspec/changes/<提案ID>/`（proposal.md, design.md, tasks.md）
-- 严格校验通过后自动输出完全填充的三层评审 Prompt，无需额外请求
+- 严格校验通过后根据实际 Roadmap、提案工件和 Context 资产动态生成三层评审 Prompt，并由专用画像生成、复核 `check-report.md`
 
 也可以显式指定“提案大纲文档”（例如某个 Phase 文件）：
 

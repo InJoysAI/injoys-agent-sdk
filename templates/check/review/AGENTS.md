@@ -12,9 +12,10 @@
 | `assets` | 全量生成资产一致性 | `.context/**`，排除 `source/`、系统文件和临时文件 |
 | `core` | 初始化核心文档检查 | `.context/README.md`、`AGENTS.md`、`criterion.md`、Manifest、实际文件系统 |
 | `scope <domain|architecture|db|ui|legacy>` | 单模块生成资产与源文档对照 | 对应 scope、`source/`、关联 SSoT 和必要的跨模块资产 |
+| `proposal <change-id>` | 提案三层联合评审 | Roadmap 大纲 ↔ Proposal 工件 ↔ Manifest 登记且实际存在的 Context 资产 |
 | `"<自由描述>"` | 临时专项检查 | 从描述解析范围与参照物 |
 
-`project`、`plan`、`proposal` 已有专用子命令，不通过自由文本重复实现。
+`project`、`plan` 和基础 `proposal` 质量检查已有专用子命令；`review proposal` 专门执行更严格的三层联合评审，不得退化为自由文本检查。
 
 ## Phase 1: 解析范围
 
@@ -22,6 +23,7 @@
 2. 检查路径是否存在；显式路径缺失则停止并报告。
 3. 未提供可从 Manifest 唯一确定的路径时直接使用；存在多个权威候选且无法判定时才询问用户。
 4. 输出实际审查范围，禁止把示例文件名、项目名、字段名或数值当作当前项目事实。
+5. `proposal` 必须提供且只能解析出一个 `<change-id>`；目录或 Roadmap 条目不存在时停止并报告，不得改为全量资产综述。
 
 ## Phase 2: 加载证据
 
@@ -47,6 +49,16 @@
 ### scope
 
 读取对应生成资产和 `source/` 权威材料；DB 额外读取迁移 SSoT，UI 额外读取产品旅程与安全约束，architecture/domain 互相读取必要的术语和接口引用。仅在用户提供代码路径时检查实现。
+
+### proposal
+
+按以下顺序建立有限证据集，禁止遍历或总结整个 `.context/`：
+
+1. 从 `openspec/proposal-roadmap.md` 按 `Change ID: <change-id>` 定位主条目；若条目指向 Phase 文件，只补充读取该提案对应条目。
+2. 读取 `openspec/changes/<change-id>/` 中实际存在的 `proposal.md`、`tasks.md`、`design.md` 和 `specs/*/spec.md`。
+3. 读取 `.context/context-manifest.json`、`.context/criterion.md` 和 `.context/openspec/integration.md`。
+4. 从提案的 Context 引用、Roadmap 关联资产及 Manifest 交集确定其余必读资产。只读取 Manifest 登记、实际存在且与提案相关的文件。
+5. `source/` 默认不读取；只有生成资产证据冲突或明确要求追溯源文档时才读取对应来源。
 
 ### 自由文本
 
@@ -84,6 +96,27 @@
 - Domain：检查实体、规则、旅程、术语、边界和测试覆盖。
 - Architecture：检查组件、接口、运行时、部署、安全、数据和风险的一致性。
 
+### 3.5 proposal 三层联合评审
+
+必须完整执行三层检查，不得只输出 Context 摘要：
+
+1. **Outline ↔ Context**：逐项核对业务目标、关联资产、In/Out、验收标准、MUST/MUST NOT 和相关风险。
+2. **Outline ↔ Proposal**：逐项映射目标、范围、关键任务、验收标准和依赖；标出多做、少做、弱化及遗漏。
+3. **Proposal → Context**：逐条扫描与提案相关的 criterion MUST/MUST NOT 和 BR-xxx，核对架构、接口、数据、安全、运行时、风险及路线图定位。
+
+报告必须至少包含：
+
+1. 综合结论：`PASS` / `PASS (Conditional)` / `MODIFY` / `FAIL`，以及三个阶段的小结。
+2. MUST/MUST NOT 合规矩阵。
+3. BR-xxx 业务契合度表。
+4. 大纲 ↔ 提案一致性对照表。
+5. 路线图关联与依赖分析。
+6. 风险清单。
+7. 按 P0/P1/P2 排序的待澄清问题。
+8. `M-n` 修改建议，包含涉及层、位置、内容和验收口径。
+
+每个结论必须引用相对项目根目录的文件路径及章节、字段或行号。没有证据时标记 `[AMBIGUOUS]`，不得补写推测性结论。
+
 ## Phase 4: 输出报告
 
 严格使用通用协议的标签、严重度和标准输出。额外要求：
@@ -93,5 +126,16 @@
 - `assets` 必须单独说明 `generated_files.openspec` 与 `.context/openspec/integration.md` 是否同步。
 - 只报告有证据的问题；通过项可以矩阵汇总，不展开重复叙述。
 - 默认不请求用户逐项确认，也不自动修复。用户明确要求修复后，修改对应资产并更新 Manifest。
+
+### proposal 报告落盘与完成门禁
+
+`proposal` 画像必须执行以下步骤：
+
+1. 将完整报告写入 `openspec/changes/<change-id>/check-report.md`，不得只在对话中输出报告。
+2. 写入后重新读取该文件，确认文件非空，并逐项确认上述八个必需章节均存在。
+3. 检查报告中不存在模板占位符、被截断的反引号引用或未闭合的 Markdown 表格行。
+4. 向用户回复报告路径、综合结论和 P0/P1/P2 数量；对话回复不能替代文件。
+
+> ⛔ `check-report.md` 不存在、为空或缺少任一必需章节时，不得宣称评审完成。
 
 $ARGUMENTS
