@@ -47,7 +47,7 @@ templates/
 | `/context-openspec proposal <change-id> [roadmap-doc]` | 设计 | 基于路线图创建并校验提案，动态生成三层评审 Prompt |
 | `/context-interview` | 设计 | 深度访谈完善技术规格或用户指定文档 |
 | `/context-start` | 实施 | validate → SSoT-first → codegen → code → archive |
-| `/context-check` | 检查 | 子命令: `env` / `tasks` / `proposal` / `plan` / `project` / `review` |
+| `/context-check` | 检查 | 子命令: `env` / `manifest` / `tasks` / `proposal` / `plan` / `project` / `review` |
 | `/context-update` | 维护 | 子命令: `add` / `modify` / `delete` / `fix` |
 
 ---
@@ -148,7 +148,12 @@ PRD：@docs/product-overview.md
 
 # 单模块生成资产与源文档核对
 /context-check review scope domain
+
+# Manifest 当前状态与扁平审计历史校验
+/context-check manifest
 ```
+
+`context-manifest.json` 只保存当前源文件、生成资产和最近同步状态。完整同步/决策历史使用 `.context/history/context-sync.jsonl`，禁止通过 `previous_sync` 递归嵌套进 Manifest。
 
 ---
 

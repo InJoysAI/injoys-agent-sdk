@@ -429,6 +429,18 @@ function applyDeltaToMain({ capability, deltaText }) {
   const rebuilt = `${before.trimEnd()}\n\n## Requirements\n${rebuiltReq}`;
   fs.writeFileSync(mainPath, rebuilt, "utf8");
 
+  // Retire an empty capability only when the merged main spec has no
+  // requirements and the directory contains no other artifacts. This keeps
+  // partially removed capabilities (with any remaining requirement) intact.
+  if (existingByTitle.size === 0) {
+    const capabilityDir = path.dirname(mainPath);
+    const entries = fs.readdirSync(capabilityDir);
+    if (entries.length === 1 && entries[0] === "spec.md") {
+      fs.rmSync(capabilityDir, { recursive: true, force: true });
+      summary.push(`Retired empty capability directory: ${path.relative(REPO_ROOT, capabilityDir)}`);
+    }
+  }
+
   return summary;
 }
 

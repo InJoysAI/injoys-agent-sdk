@@ -27,24 +27,11 @@
 
 ## 目录结构
 
+```text
+{{context_directory_tree}}
 ```
-.context/
-├── README.md              # 目录说明
-├── AGENTS.md              # 本文件
-├── criterion.md        # 项目准则
-├── context-manifest.json  # 元数据清单
-├── architecture/          # 架构约束
-│   ├── system_design.md
-│   ├── tech_stack.md
-│   └── security_policy.md
-├── domain/                # 业务领域
-│   ├── business_rules.md
-│   └── user_journeys.md
-├── db/ (可选)             # 数据库设计
-├── ui/ (可选)             # UI 规范
-├── openspec/              # OpenSpec 集成目录
-└── legacy/ (可选)         # 遗留分析
-```
+
+本目录树按 `context-manifest.json#generated_files`、实际 `source/` 文件及 `context_sync_history.path` 生成；审计日志不属于生成资产，精确机器清单仍以 Manifest 为准。
 
 ## 核心文件
 
@@ -52,6 +39,7 @@
 |------|------|
 | `criterion.md` | 项目准则 — AI 必须遵守的工程约束 |
 | `context-manifest.json` | 元数据清单 — 追踪源文件 hash 和生成时间 |
+| `history/context-sync.jsonl` | 扁平同步/决策审计日志；默认不作为生成资产加载 |
 | `architecture/tech_stack.md` | 技术栈约束 (MUST/SHOULD) |
 | `domain/business_rules.md` | 业务逻辑规则 |
 
@@ -60,6 +48,7 @@
 - **增量更新**: 使用 `/context-update` 重生成变更文件
 - **新增源文档**: 使用 `/context-update` 添加新源文件
 - **全量重生成**: 删除 `context-manifest.json` 后重新运行 `/context-init`
+- **历史边界**: Manifest 只保留最近同步状态；完整历史追加到 `history/context-sync.jsonl`，禁止 `previous_sync` 递归链
 
 ## 与 OpenSpec 集成
 

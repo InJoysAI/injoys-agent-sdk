@@ -40,7 +40,7 @@
 3. `.context/openspec/integration.md` 的 `CONTEXT_ASSET_INDEX`
 4. 实际文件系统
 
-排除 `*/source/*`、`.DS_Store`、临时文件。内容审查按 Manifest 中实际存在的 scope 动态执行，不假定固定文件清单。
+排除 `*/source/*`、`.DS_Store`、临时文件和 `context_sync_history.path` 指向的审计日志。审计日志单独执行 Manifest 校验，不得因其未登记到 `generated_files` 而报告孤立资产。内容审查按 Manifest 中实际存在的 scope 动态执行，不假定固定文件清单。
 
 ### core
 
@@ -75,6 +75,7 @@
 ### 3.2 assets 全量一致性
 
 - Manifest / README / Integration Index / 文件系统四方同步。
+- `context_sync_history.path` 可解析、日志保持扁平，且未混入 `generated_files`。
 - Metadata 来源、生成批次和待生成状态是否自洽。
 - 领域术语、状态枚举、数据模型、API、错误语义、安全和 SSoT 路径跨模块是否一致。
 - criterion 的每条相关 MUST/MUST NOT 是否被引用资产覆盖且无冲突。

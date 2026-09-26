@@ -64,6 +64,7 @@ cat .context/context-manifest.json
 | 文件名是 `README.md` | ❌ 跳过（目录说明文件） |
 | 路径包含 `openspec/` | ❌ 跳过（避免循环引用） |
 | 路径包含 `source/` | ❌ 默认跳过（除非需要回溯验证） |
+| 等于 `context_sync_history.path` | ❌ 跳过（审计日志不属于生成资产上下文） |
 
 **筛选示例**：
 
@@ -170,6 +171,7 @@ for scope in ["architecture", "domain", "db", "ui", "legacy"]:
 - .context/*/README.md (目录说明)
 - .context/*/source/* (按需回溯)
 - .context/openspec/* (避免循环引用)
+- .context/history/context-sync.jsonl (审计日志，不注入项目上下文)
 
 回溯读取（若有）:
 - .context/architecture/source/InJoysAI-*.md

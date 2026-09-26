@@ -123,6 +123,11 @@
 - **保留模板结构**，不删除任何 Section
 - 顶部添加 Metadata
 
+**AGENTS.md 填充规则**：
+- 将 `{{context_directory_tree}}` 替换为生成当时实际存在及本次计划生成的 `.context/` 目录树
+- 目录树必须包含根资产、已存在的分域资产、OpenSpec Context 资产及实际 `source/` 文件
+- 后续 Manifest 的 `generated_files` 发生变化时，由 Manifest 更新流程同步刷新目录树
+
 > 💡 criterion.md 是唯一需要解析源文档的文件，用于提取技术约束。
 
 ---

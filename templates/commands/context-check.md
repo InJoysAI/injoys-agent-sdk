@@ -16,6 +16,7 @@ Supported subcommands:
 - `review scope <domain|architecture|db|ui|legacy>`: 单模块生成资产 ↔ 源文档核对
 - `review proposal <change-id>`: 提案大纲 ↔ Proposal ↔ Context 三层联合评审，并写入提案目录
 - `review "<description>"`: 自由文本专项核对
+- `manifest`: 校验 Manifest/同步历史的格式、职责边界与体积上限
 
 ---
 
@@ -26,6 +27,18 @@ Supported subcommands:
 1. `Makefile` 中存在 `check-env` target → 执行 `make check-env`
 2. `scripts/check-env.sh` 存在 → 执行 `bash scripts/check-env.sh`
 3. 均不存在 → 跳过，输出提示
+
+---
+
+## manifest
+
+执行：
+
+```bash
+bash design/context-dev/scripts/check-context-manifest.sh
+```
+
+检查 JSON/JSONL 可解析、Manifest 不含 `previous_sync`、历史为扁平事件、最新 `context_sync` 事件与 `last_context_sync` 对齐，并限制 Manifest 不超过 32 KiB。
 
 ---
 

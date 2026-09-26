@@ -166,11 +166,20 @@ Mode: review
 1. 仅做**最小且可审计**的修改
 2. 先更新目标 `.context/**`
 3. 再更新相关 `source/**`
-4. 最后更新 `context-manifest.json`
-5. 输出变更摘要：
+4. 将本次审计事件作为单行 JSON 追加到 `.context/history/context-sync.jsonl`
+5. 最后更新 `context-manifest.json`，让 `last_context_sync` 只保存最新同步状态
+6. 执行 `bash design/context-dev/scripts/check-context-manifest.sh`
+7. 输出变更摘要：
    - 修改了哪些文件
    - 每个文件修改原因
    - 依据来自哪个 roadmap/proposal 条目
+
+Manifest/历史写入规则：
+
+- 禁止创建或保留 `previous_sync` 字段；历史必须是扁平 JSONL，不得递归嵌套。
+- `last_context_sync` 不写长篇 `notes`；完整差异摘要写入当次 JSONL 事件。
+- JSONL 事件至少包含 `event_type: "context_sync"`、`source`、`synced_at`，并按实际情况填写 `workflow`、`change_id`、`authority`、`mode`、`updated_context_files`、`notes`。
+- 先安全写入历史事件，再以最新状态替换 `last_context_sync`；任何校验失败都不得报告同步完成。
 
 ---
 
