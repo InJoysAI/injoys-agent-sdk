@@ -1,12 +1,27 @@
 /**
  * injoys-agent-sdk Core Module
- * 
+ *
  * Exports utilities for programmatic use of injoys-agent-sdk.
  */
 
 const path = require('path');
 const fs = require('fs');
 const crypto = require('crypto');
+
+/** Where templates are installed inside a target project (shared with scripts/install.sh). */
+const INSTALL_DIR = path.join('design', 'context-dev');
+
+/** Command directories of the supported AI tools (relative to the project root). */
+const AI_TOOL_DIRS = {
+    antigravity: path.join('.agent', 'workflows'),
+    claude: path.join('.claude', 'commands'),
+    cursor: path.join('.cursor', 'commands'),
+    devin: path.join('.devin', 'workflows'),
+    qoder: path.join('.qoder', 'commands')
+};
+
+/** Commands bootstrapped on install; the rest are installed after /context-init. */
+const BOOTSTRAP_COMMANDS = ['context-init.md', 'context-check.md'];
 
 /**
  * Calculate SHA256 hash of a file
@@ -23,26 +38,66 @@ function calculateHash(filePath) {
  * @param {string} src - Source directory
  * @param {string} dest - Destination directory
  * @param {string[]} excludes - Files/dirs to exclude
+ * @param {object} [options]
+ * @param {boolean} [options.overwrite=true] - Overwrite files that already exist
+ * @param {boolean} [options.dryRun=false] - Report what would happen without writing
+ * @returns {{copied: string[], skipped: string[]}} Destination paths copied / skipped
  */
-function copyDir(src, dest, excludes = []) {
-    if (!fs.existsSync(dest)) {
+function copyDir(src, dest, excludes = [], options = {}) {
+    const { overwrite = true, dryRun = false } = options;
+    const result = { copied: [], skipped: [] };
+
+    if (!dryRun) {
         fs.mkdirSync(dest, { recursive: true });
     }
 
-    const entries = fs.readdirSync(src, { withFileTypes: true });
-
-    for (const entry of entries) {
+    for (const entry of fs.readdirSync(src, { withFileTypes: true })) {
         if (excludes.includes(entry.name)) continue;
 
         const srcPath = path.join(src, entry.name);
         const destPath = path.join(dest, entry.name);
 
         if (entry.isDirectory()) {
-            copyDir(srcPath, destPath, excludes);
+            const sub = copyDir(srcPath, destPath, excludes, options);
+            result.copied.push(...sub.copied);
+            result.skipped.push(...sub.skipped);
+        } else if (!overwrite && fs.existsSync(destPath)) {
+            result.skipped.push(destPath);
         } else {
-            fs.copyFileSync(srcPath, destPath);
+            if (!dryRun) fs.copyFileSync(srcPath, destPath);
+            result.copied.push(destPath);
         }
     }
+
+    return result;
+}
+
+/**
+ * Copy selected files from one directory into another.
+ * Missing source files are ignored.
+ * @returns {{copied: string[], skipped: string[]}}
+ */
+function copyFiles(srcDir, destDir, names, options = {}) {
+    const { overwrite = true, dryRun = false } = options;
+    const result = { copied: [], skipped: [] };
+
+    for (const name of names) {
+        const srcPath = path.join(srcDir, name);
+        const destPath = path.join(destDir, name);
+        if (!fs.existsSync(srcPath)) continue;
+
+        if (!overwrite && fs.existsSync(destPath)) {
+            result.skipped.push(destPath);
+            continue;
+        }
+        if (!dryRun) {
+            fs.mkdirSync(destDir, { recursive: true });
+            fs.copyFileSync(srcPath, destPath);
+        }
+        result.copied.push(destPath);
+    }
+
+    return result;
 }
 
 /**
@@ -64,7 +119,11 @@ function readManifest(projectRoot) {
 }
 
 module.exports = {
+    INSTALL_DIR,
+    AI_TOOL_DIRS,
+    BOOTSTRAP_COMMANDS,
     calculateHash,
     copyDir,
+    copyFiles,
     readManifest
 };

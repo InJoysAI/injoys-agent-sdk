@@ -2,10 +2,17 @@
 
 const path = require('path');
 const fs = require('fs');
-const { execSync } = require('child_process');
+const { spawnSync } = require('child_process');
+const {
+  INSTALL_DIR,
+  AI_TOOL_DIRS,
+  BOOTSTRAP_COMMANDS,
+  copyDir,
+  copyFiles
+} = require('../src');
 
-const VERSION = '0.1.0';
 const PACKAGE_ROOT = path.join(__dirname, '..');
+const VERSION = require(path.join(PACKAGE_ROOT, 'package.json')).version;
 
 // Colors
 const colors = {
@@ -19,7 +26,7 @@ const colors = {
 const log = {
   info: (msg) => console.log(`${colors.green}[INFO]${colors.reset} ${msg}`),
   warn: (msg) => console.log(`${colors.yellow}[WARN]${colors.reset} ${msg}`),
-  error: (msg) => console.log(`${colors.red}[ERROR]${colors.reset} ${msg}`),
+  error: (msg) => console.error(`${colors.red}[ERROR]${colors.reset} ${msg}`),
   step: (msg) => console.log(`${colors.cyan}→${colors.reset} ${msg}`)
 };
 
@@ -38,150 +45,243 @@ InJoys Agent SDK CLI v${VERSION}
 Usage: ${cmd} <command> [options]
 
 Commands:
-  init [path]       Initialize InJoys Agent SDK in target project (default: current dir)
-  check-env         Check development environment toolchain
+  init [path]       Install InJoys Agent SDK into a project (default: current dir)
+  check-env         Check the project environment / development toolchain
   version           Show version
 
-Options:
+Options for init:
+  --tools <list>    Comma-separated AI tools to bootstrap commands for
+                    (${Object.keys(AI_TOOL_DIRS).join(', ')}, all). Default: all
+  --force           Overwrite files that already exist
+  --dry-run         Show what would be written without changing anything
+
+Global options:
   -h, --help        Show this help message
   -v, --version     Show version
 
 Examples:
   npx @injoysai/agent-sdk init
-  npx @injoysai/agent-sdk init ./my-project
+  npx @injoysai/agent-sdk init ./my-project --tools claude,cursor
+  npx @injoysai/agent-sdk init --dry-run
   npx @injoysai/agent-sdk check-env
 `);
 }
 
-// Copy directory recursively
-function copyDir(src, dest, excludes = []) {
-  if (!fs.existsSync(dest)) {
-    fs.mkdirSync(dest, { recursive: true });
-  }
+// Minimal flag parser: returns { positional, flags }
+function parseArgs(argv, valueFlags = []) {
+  const positional = [];
+  const flags = {};
 
-  const entries = fs.readdirSync(src, { withFileTypes: true });
-
-  for (const entry of entries) {
-    if (excludes.includes(entry.name)) continue;
-
-    const srcPath = path.join(src, entry.name);
-    const destPath = path.join(dest, entry.name);
-
-    if (entry.isDirectory()) {
-      copyDir(srcPath, destPath, excludes);
+  for (let i = 0; i < argv.length; i++) {
+    const arg = argv[i];
+    if (arg.startsWith('--')) {
+      const name = arg.slice(2);
+      if (valueFlags.includes(name)) {
+        const value = argv[i + 1];
+        if (value === undefined || value.startsWith('--')) {
+          throw new Error(`Option --${name} requires a value`);
+        }
+        flags[name] = value;
+        i++;
+      } else {
+        flags[name] = true;
+      }
     } else {
-      fs.copyFileSync(srcPath, destPath);
+      positional.push(arg);
     }
   }
+
+  return { positional, flags };
+}
+
+function resolveTools(value) {
+  const all = Object.keys(AI_TOOL_DIRS);
+  if (!value || value === 'all') return all;
+
+  const tools = value.split(',').map((t) => t.trim()).filter(Boolean);
+  const unknown = tools.filter((t) => !all.includes(t));
+  if (unknown.length > 0) {
+    throw new Error(`Unknown tool(s): ${unknown.join(', ')}. Supported: ${all.join(', ')}`);
+  }
+  return tools;
 }
 
 // Init command
-function initCommand(targetPath) {
-  const target = path.resolve(targetPath || '.');
+function initCommand(args) {
+  const { positional, flags } = parseArgs(args, ['tools']);
+  const target = path.resolve(positional[0] || '.');
+  const tools = resolveTools(flags.tools);
+  const options = { overwrite: Boolean(flags.force), dryRun: Boolean(flags['dry-run']) };
+  const rel = (p) => path.relative(target, p) || '.';
 
-  log.info(`Initializing InJoys Agent SDK in: ${target}`);
+  if (!fs.existsSync(target) || !fs.statSync(target).isDirectory()) {
+    throw new Error(`Target directory does not exist: ${target}`);
+  }
+
+  const templatesDir = path.join(PACKAGE_ROOT, 'templates');
+  const commandsDir = path.join(templatesDir, 'commands');
+  if (!fs.existsSync(templatesDir) || !fs.existsSync(commandsDir)) {
+    throw new Error(`Package is incomplete: templates not found in ${PACKAGE_ROOT}`);
+  }
+
+  log.info(`${options.dryRun ? '[dry-run] ' : ''}Initializing InJoys Agent SDK in: ${target}`);
   console.log('');
 
-  // Copy templates
-  const templatesDir = path.join(PACKAGE_ROOT, 'templates');
-  const contextDir = path.join(target, '.context');
+  const copied = [];
+  const skipped = [];
 
-  log.step('Creating .context/ directory...');
-  copyDir(templatesDir, contextDir, ['README.md', 'commands', 'scripts', 'templates']);
+  // 1. Templates -> design/context-dev (same layout as scripts/install.sh)
+  log.step(`Installing templates to ${INSTALL_DIR.split(path.sep).join('/')}/ ...`);
+  const installDir = path.join(target, INSTALL_DIR);
+  const tpl = copyDir(templatesDir, installDir, [], options);
+  copied.push(...tpl.copied);
+  skipped.push(...tpl.skipped);
 
-  // Copy rules
-  const rulesDir = path.join(PACKAGE_ROOT, 'rules');
+  // 2. Bootstrap commands for each selected AI tool
+  log.step('Installing bootstrap commands (/context-init, /context-check) ...');
+  for (const tool of tools) {
+    const dest = path.join(target, AI_TOOL_DIRS[tool]);
+    const res = copyFiles(commandsDir, dest, BOOTSTRAP_COMMANDS, options);
+    copied.push(...res.copied);
+    skipped.push(...res.skipped);
+    log.info(`${tool}: ${AI_TOOL_DIRS[tool].split(path.sep).join('/')}`);
+  }
 
-  log.step('Copying rule templates...');
-  if (fs.existsSync(rulesDir)) {
-    const rules = fs.readdirSync(rulesDir);
-    for (const rule of rules) {
-      const src = path.join(rulesDir, rule);
-      const destName = rule.replace('.template', '');
-      const dest = path.join(target, destName);
-
-      if (!fs.existsSync(dest)) {
-        fs.copyFileSync(src, dest);
-        log.info(`Created: ${destName}`);
-      } else {
-        log.warn(`Skipped (exists): ${destName}`);
+  // 3. Make helper scripts executable
+  if (!options.dryRun) {
+    const scriptsDir = path.join(installDir, 'scripts');
+    if (fs.existsSync(scriptsDir)) {
+      for (const name of fs.readdirSync(scriptsDir)) {
+        if (name.endsWith('.sh')) {
+          try {
+            fs.chmodSync(path.join(scriptsDir, name), 0o755);
+          } catch (e) {
+            // chmod is best-effort (e.g. on Windows file systems)
+          }
+        }
       }
     }
   }
 
-  // Copy commands based on detected AI tool
-  const commandsDir = path.join(PACKAGE_ROOT, 'templates', 'commands');
-
-  log.step('Copying command templates...');
-
-  // Detect AI tool and copy appropriate commands
-  const aiToolDirs = [
-    '.agent/workflows',
-    '.claude/commands',
-    '.cursor/commands',
-    '.devin/workflows'
-  ];
-
-  for (const destDir of aiToolDirs) {
-    const destPath = path.join(target, destDir);
-
-    if (fs.existsSync(commandsDir)) {
-      copyDir(commandsDir, destPath);
-      log.info(`Copied commands to: ${destDir}`);
-    }
+  console.log('');
+  log.info(`${copied.length} file(s) ${options.dryRun ? 'would be ' : ''}written`);
+  if (skipped.length > 0) {
+    log.warn(`${skipped.length} existing file(s) skipped (use --force to overwrite):`);
+    skipped.slice(0, 10).forEach((p) => console.log(`  - ${rel(p)}`));
+    if (skipped.length > 10) console.log(`  ... and ${skipped.length - 10} more`);
   }
+
+  if (options.dryRun) return;
 
   console.log('');
   log.info('✅ InJoys Agent SDK initialized successfully!');
   console.log('');
   console.log('Next steps:');
   console.log('  1. Run /context-init in your AI tool to generate context from your docs');
-  console.log('  2. Review .context/criterion.md for project constraints');
-  console.log('  3. Check standards/ for AI programming guidelines');
+  console.log(`  2. Read ${INSTALL_DIR.split(path.sep).join('/')}/README.md for the context framework usage`);
+  console.log(`  3. Install the full command set: bash ${INSTALL_DIR.split(path.sep).join('/')}/scripts/install-ai-commands.sh --tools all`);
+  console.log(`  4. (Codex) Install prompts: bash ${INSTALL_DIR.split(path.sep).join('/')}/scripts/install-codex-prompts.sh`);
+}
+
+function runProvider(cmd, args, cwd) {
+  const res = spawnSync(cmd, args, { cwd, stdio: 'inherit' });
+  if (res.error) throw res.error;
+  return res.status === null ? 1 : res.status;
+}
+
+function commandVersion(cmd, args = ['--version']) {
+  const res = spawnSync(cmd, args, { encoding: 'utf8' });
+  if (res.error || res.status !== 0) return null;
+  return (res.stdout || res.stderr || '').split('\n')[0].trim();
 }
 
 // Check env command
-function checkEnvCommand() {
-  const scriptPath = path.join(PACKAGE_ROOT, 'scripts', 'check-toolchain.sh');
+// Mirrors `/context-check env`: use the project's own provider if present,
+// otherwise fall back to a basic toolchain report.
+function checkEnvCommand(args) {
+  const { positional } = parseArgs(args);
+  const root = path.resolve(positional[0] || '.');
 
-  if (fs.existsSync(scriptPath)) {
-    log.info('Running environment check...');
-    console.log('');
-    try {
-      execSync(`bash "${scriptPath}"`, { stdio: 'inherit' });
-    } catch (e) {
-      // Script may exit with non-zero for missing tools
-    }
-  } else {
-    log.error('check-toolchain.sh not found');
-    process.exit(1);
+  const makefile = path.join(root, 'Makefile');
+  const script = path.join(root, 'scripts', 'check-env.sh');
+
+  if (fs.existsSync(makefile) && /^check-env\s*:/m.test(fs.readFileSync(makefile, 'utf8'))) {
+    log.info('Running `make check-env` ...');
+    process.exitCode = runProvider('make', ['check-env'], root);
+    return;
   }
+
+  if (fs.existsSync(script)) {
+    log.info('Running scripts/check-env.sh ...');
+    process.exitCode = runProvider('bash', [path.join('scripts', 'check-env.sh')], root);
+    return;
+  }
+
+  log.info('No project env provider (Makefile `check-env` target or scripts/check-env.sh) found.');
+  log.info('Basic toolchain report:');
+  console.log('');
+
+  const major = Number(process.versions.node.split('.')[0]);
+  const nodeOk = major >= 18;
+  console.log(`  ${nodeOk ? '✓' : '✗'} node ${process.versions.node}${nodeOk ? '' : ' (>=18 required)'}`);
+
+  const tools = [
+    { name: 'git', required: true },
+    { name: 'bash', required: false },
+    { name: 'tsp', required: false, note: 'TypeSpec compiler, for SSoT API definitions' },
+    { name: 'atlas', required: false, note: 'Atlas, for SSoT schema migrations' }
+  ];
+
+  let failed = !nodeOk;
+  for (const tool of tools) {
+    const version = commandVersion(tool.name);
+    if (version) {
+      console.log(`  ✓ ${tool.name} (${version})`);
+    } else if (tool.required) {
+      failed = true;
+      console.log(`  ✗ ${tool.name} not found (required)`);
+    } else {
+      console.log(`  - ${tool.name} not found (optional${tool.note ? `: ${tool.note}` : ''})`);
+    }
+  }
+
+  if (failed) process.exitCode = 1;
 }
 
 // Main
-const args = process.argv.slice(2);
-const command = args[0];
+function main() {
+  const args = process.argv.slice(2);
+  const command = args[0];
+  const rest = args.slice(1);
 
-switch (command) {
-  case 'init':
-    initCommand(args[1]);
-    break;
-  case 'check-env':
-    checkEnvCommand();
-    break;
-  case '-v':
-  case '--version':
-  case 'version':
-    console.log(`v${VERSION}`);
-    break;
-  case '-h':
-  case '--help':
-  case 'help':
-  case undefined:
-    showHelp();
-    break;
-  default:
-    log.error(`Unknown command: ${command}`);
-    showHelp();
-    process.exit(1);
+  switch (command) {
+    case 'init':
+      initCommand(rest);
+      break;
+    case 'check-env':
+      checkEnvCommand(rest);
+      break;
+    case '-v':
+    case '--version':
+    case 'version':
+      console.log(`v${VERSION}`);
+      break;
+    case '-h':
+    case '--help':
+    case 'help':
+    case undefined:
+      showHelp();
+      break;
+    default:
+      log.error(`Unknown command: ${command}`);
+      showHelp();
+      process.exit(1);
+  }
+}
+
+try {
+  main();
+} catch (e) {
+  log.error(e.message);
+  process.exit(1);
 }

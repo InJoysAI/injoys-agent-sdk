@@ -28,6 +28,16 @@ It unifies two core capabilities:
 npx @injoysai/agent-sdk init
 ```
 
+`init` installs the same layout as Method 2 (`design/context-dev/` plus the `/context-init` and `/context-check` commands). Existing files are kept unless you pass `--force`.
+
+| Option | Description |
+| --- | --- |
+| `--tools <list>` | Only bootstrap commands for the given tools (`antigravity,claude,cursor,devin,qoder`; default: all) |
+| `--force` | Overwrite files that already exist |
+| `--dry-run` | Show what would be written without changing anything |
+
+`npx @injoysai/agent-sdk check-env` runs the project's own provider (`make check-env` or `scripts/check-env.sh`) and falls back to a basic toolchain report.
+
 ### Method 2: One-Click Install
 
 Run the following command in your project root to install InJoys Agent SDK tools and standards:
