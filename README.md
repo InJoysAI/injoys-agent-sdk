@@ -14,9 +14,8 @@ It unifies two core capabilities:
 
 ## Features
 
-- **7 Core Commands**: `/context-init`, `/context-openspec`, `/context-openspec proposal <change-id> [roadmap-doc]`, `/context-interview`, `/context-start`, `/context-check`, `/context-update`
-- **Multi-Agent Support**: Ready-to-use commands for **Antigravity**, **Claude Code**, **Cursor**, **Devin**, **Codex**, and **Qoder**.
-- **Single Command Source**: All supported AI tools install from one shared command set to prevent drift.
+- **Six command files**: `/context-init`, `/context-openspec` (including the proposal subcommand), `/context-interview`, `/context-start`, `/context-check`, and `/context-update`.
+- **Shared command source**: Commands can be installed for Antigravity, Claude Code, Cursor, Devin, Qoder, and Grok. Codex prompts use a separate installer.
 - **SSoT Integration**: Templates for integrating Single Source of Truth (SSoT) definitions for Schema (Atlas) and API (TypeSpec).
 
 ## Installation
@@ -37,7 +36,7 @@ Run the following command in your project root to install InJoys Agent SDK tools
 curl -fsSL https://raw.githubusercontent.com/injoysai/injoys-agent-sdk/main/scripts/install.sh | bash
 ```
 
-By default, the installer bootstraps only `/context-init` and `/context-check`. The full command set is installed/generated after you run `/context-init`.
+The installer bootstraps `/context-init` and `/context-check` for Antigravity, Claude Code, Cursor, Devin, and Qoder, and attempts to install the same prompts into Codex's global prompts directory. After `/context-init`, the full command set is synchronized only to the target project's `.agent/workflows/`. Install commands for other tools with `design/context-dev/scripts/install-ai-commands.sh --tools <tool-list>`; install Codex prompts with `design/context-dev/scripts/install-codex-prompts.sh`.
 
 ### Method 3: Manual Installation (For Development)
 
@@ -66,8 +65,8 @@ cd injoys-agent-sdk
 5.  **Check Status** (`/context-check`):
     Check environment and OpenSpec status, or run reusable document reviews such as `review prd-tad`, `review assets`, and `review scope domain`.
 
-6.  **Update Context** (`/context-update`) *(planned)*:
-    Add, modify, delete, or fix context assets.
+6.  **Maintain Context** (`/context-update`):
+    `sync roadmap` and `sync proposal` have workflow instructions. `add`, `modify`, `delete`, and `fix` remain interface drafts; first confirm that the target project implements the requested operation.
 
 ## Documentation
 
@@ -77,8 +76,7 @@ cd injoys-agent-sdk
 
 See [ROADMAP.md](ROADMAP.md) for our development plan.
 
-**Current**: v0.2.0 - Published to npm with `injoys` CLI distribution and initial programmatic API  
-**Next**: v0.3.0 - Interactive CLI wizard with AI tool auto-detection and context file selection
+**Package version**: See [package.json](package.json). This repository provides Context/OpenSpec workflow templates; check the actual package and scripts for CLI capabilities and publication status.
 
 ## License
 

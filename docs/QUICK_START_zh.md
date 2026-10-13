@@ -27,7 +27,7 @@ npx @injoysai/agent-sdk init
 curl -fsSL https://raw.githubusercontent.com/injoysai/injoys-agent-sdk/main/scripts/install.sh | bash
 ```
 
-默认情况下，安装脚本只会 bootstrap `/context-init` 和 `/context-check`。完整命令集会在你运行 `/context-init` 后再安装/生成（包括 `/context-openspec`、`/context-start` 等）。
+安装脚本会将 `/context-init` 和 `/context-check` bootstrap 到 Antigravity、Claude Code、Cursor、Devin、Qoder 项目命令目录，并尝试安装到 Codex 全局 prompts。运行 `/context-init` 后，完整命令集只同步到项目 `.agent/workflows/`。其他工具可通过 `design/context-dev/scripts/install-ai-commands.sh --tools <工具列表>` 安装完整命令；Codex 可运行 `design/context-dev/scripts/install-codex-prompts.sh`。
 
 安装完成后，你会看到：
 - `design/context-dev/` — 上下文生成框架
@@ -55,7 +55,7 @@ PRD：@docs/product-overview.md
 - ✅ 归档源文档
 - ✅ 生成 `context-manifest.json`
 - ✅ 生成工程约束权威来源 `.context/criterion.md`
-- ✅ 为所选 AI 工具安装共享的完整 `/context-*` 命令集
+- ✅ 将完整 `/context-*` 命令集同步到 `.agent/workflows/`
 
 ---
 
@@ -277,8 +277,9 @@ node design/context-dev/tools/specflow/specflow.mjs --help
 
 ### Q: 如何更新 Context？
 ```bash
-/context-update modify domain   # 重新生成 domain 总结
-/context-update add @docs/new-spec.md  # 添加新文档
+/context-update sync roadmap --mode review  # 预览路线图同步
+/context-update sync proposal feat-user-login --mode review  # 预览提案同步
 ```
+`add`、`modify`、`delete`、`fix` 目前仍是接口草案；使用前先确认目标项目已有对应实现。
 
 ---

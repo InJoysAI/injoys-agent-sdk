@@ -1,7 +1,7 @@
 # Context Generation Templates
 
-> **用途**: 作为 Context/Agent 的"模板源"，安装到目标项目 `design/context-dev/`。  
-> **安装**: `./scripts/install.sh <目标项目路径>` 或远程 `curl` 安装。
+> **用途**: 作为 Context/Agent 的模板源，安装到目标项目 `design/context-dev/`。
+> **安装**: 在本仓库运行 `./scripts/install.sh <目标项目路径>`，或使用 README 中的远程安装命令。
 
 ---
 
@@ -32,23 +32,23 @@ templates/
     ├── AGENTS.md.template
     ├── CLAUDE.md.template
     ├── cursorrules.template
-    ├── windsurfrules.template
     ├── context-agents.md.template
 ```
 
 ---
 
-## 核心命令（7 个）
+## 命令（6 个）
 
 | 命令 | 阶段 | 用途 |
 |------|------|------|
-| `.agent/workflows/context-init.md` | 初始化 | 确认目标 + 可选环境检查 + 创建目录 + 归档源文档 |
-| `.agent/workflows/context-openspec.md` | 集成 | 生成文档总结 + 填充 config.yaml + 生成路线图 |
-| `.agent/workflows/context-openspec.md proposal <change-id> [roadmap-doc]` | 设计 | 基于路线图创建并校验提案，动态生成三层评审 Prompt |
-| `.agent/workflows/context-interview.md` | 设计 | 深度访谈完善技术规格或用户指定文档 |
-| `.agent/workflows/context-start.md` | 实施 | validate → SSoT-first → codegen → code → archive |
-| `.agent/workflows/context-check.md` | 检查 | 子命令: `env` / `manifest` / `tasks` / `proposal` / `plan` / `project` / `review` |
-| `.agent/workflows/context-update.md` | 维护 | 子命令: `add` / `modify` / `delete` / `fix` |
+| `commands/context-init.md` | 初始化 | 调用生成入口，收集源文档并安装项目内工作流 |
+| `commands/context-openspec.md` | 集成/设计 | 生成 Context/OpenSpec 项目资产，或创建提案 |
+| `commands/context-interview.md` | 设计 | 访谈并完善技术规格或用户指定文档 |
+| `commands/context-start.md` | 实施 | 校验提案、按 SSoT-first 流程实施并归档 |
+| `commands/context-check.md` | 检查 | 子命令: `env` / `manifest` / `tasks` / `proposal` / `plan` / `project` / `review` |
+| `commands/context-update.md` | 维护 | `sync roadmap|proposal` 有工作流；`add` / `modify` / `delete` / `fix` 为接口草案 |
+
+安装脚本首次只 bootstrap `context-init` 和 `context-check` 到项目级工具目录，并尝试安装 Codex 全局 prompts。初始化流程随后只将完整命令同步到 `.agent/workflows/`。若要为其他工具安装完整命令，运行 `design/context-dev/scripts/install-ai-commands.sh --tools antigravity,claude,cursor,devin,qoder,grok`；Codex 使用独立的 `install-codex-prompts.sh`。
 
 ---
 
@@ -89,7 +89,7 @@ PRD：@docs/product-overview.md
 架构：@docs/system-architecture.md
 ```
 
-初始化会将 `design/context-dev/commands/*.md` 同步到目标项目的 `.agent/workflows/`；不会询问 AI 工具类型，也不会安装其他工具的命令目录。若以后需要其他工具，可单独运行安装脚本，不属于 `.agent/workflows/context-init.md`。
+安装脚本会先 bootstrap 命令到若干工具目录；初始化流程自身不会询问 AI 工具类型，只会将完整命令同步到目标项目的 `.agent/workflows/`。需要其他工具的完整命令时，按上文单独运行安装脚本。
 
 ### 3. 初始化 OpenSpec (幂等增强)
 

@@ -14,8 +14,8 @@
 
 ## 功能特性
 
--   **7 个核心命令**：`/context-init`、`/context-openspec`、`/context-openspec proposal <change-id> [roadmap-doc]`、`/context-interview`、`/context-start`、`/context-check`、`/context-update`
--   **多 Agent 支持**：开箱即用的命令，支持 **Antigravity**、**Claude Code**、**Cursor**、**Devin**、**Codex** 和 **Qoder**。
+-   **6 个命令文件**：`/context-init`、`/context-openspec`（含 proposal 子命令）、`/context-interview`、`/context-start`、`/context-check`、`/context-update`。
+-   **共享命令源**：命令可安装到 Antigravity、Claude Code、Cursor、Devin、Qoder 和 Grok；Codex prompts 通过独立脚本安装。
 -   **SSoT 集成**：提供 Schema (Atlas) 和 API (TypeSpec) 的单一数据源（SSoT）集成模板。
 
 ## 安装指南
@@ -36,7 +36,7 @@ npx @injoysai/agent-sdk init
 curl -fsSL https://raw.githubusercontent.com/injoysai/injoys-agent-sdk/main/scripts/install.sh | bash
 ```
 
-默认情况下，安装脚本只会 bootstrap `/context-init` 和 `/context-check`。完整命令集会在你运行 `/context-init` 后再安装/生成。
+安装脚本会将 `/context-init` 和 `/context-check` bootstrap 到 Antigravity、Claude Code、Cursor、Devin、Qoder 及 Codex 全局 prompts（Codex 写入失败时会提示）。运行 `/context-init` 后，完整命令集仅同步到目标项目的 `.agent/workflows/`。其他工具可用 `design/context-dev/scripts/install-ai-commands.sh --tools <工具列表>` 手动安装完整命令；Codex 可运行 `design/context-dev/scripts/install-codex-prompts.sh`。
 
 ### 方式 3: 手动安装（用于开发）
 
@@ -65,8 +65,8 @@ cd injoys-agent-sdk
 5.  **检查状态** (`/context-check`)：
     检查环境 (`env`)、任务 (`tasks`) 或提案 (`proposal`)。
 
-6.  **更新上下文** (`/context-update`) *（规划中）*：
-    添加、修改、删除或修复上下文资产。
+6.  **维护上下文** (`/context-update`)：
+    `sync roadmap` 和 `sync proposal` 有对应工作流；`add`、`modify`、`delete`、`fix` 仍是接口草案，需先确认目标项目已实现对应能力。
 
 ## 文档资源
 
@@ -76,8 +76,7 @@ cd injoys-agent-sdk
 
 详见 [ROADMAP_zh.md](ROADMAP_zh.md)。
 
-**当前版本**: v0.2.0 - 已发布到 npm，并提供 `injoys` CLI 分发与初版编程接口  
-**下一版本**: v0.3.0 - 交互式 CLI 向导，支持 AI 工具自动检测与上下文文件选择
+**包版本**：以 [package.json](package.json) 为准。仓库模板提供 Context/OpenSpec 工作流；CLI 能力及发布状态请以实际包和脚本为准。
 
 ## 许可证
 

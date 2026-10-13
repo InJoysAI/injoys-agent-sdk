@@ -10,7 +10,6 @@
 | `AGENTS.md.template` | `AGENTS.md` | Antigravity |
 | `CLAUDE.md.template` | `CLAUDE.md` | Claude Code |
 | `cursorrules.template` | `.cursorrules` | Cursor |
-| `windsurfrules.template` | `.windsurfrules` | Devin |
 
 ## 占位符说明
 
@@ -30,7 +29,7 @@
 
 ## 使用方式
 
-模板由 `design/context-dev/AGENTS.md` 的 Step 6 自动调用。
+这些是可选的 AI 工具入口配置模板。当前 `context-init` 工作流不会自动生成这些文件；需要时由项目维护者按需复制并替换占位符。
 
 ## 准则引用与幂等更新
 
@@ -46,7 +45,4 @@
 
 ## 扩展新工具
 
-要添加新 AI 工具支持：
-1. 创建 `{工具名}.template` 文件
-2. 在 `AGENTS.md` Step 6.2 表格中添加条目
-3. 更新 `context-manifest.json` 的 `ai_tool_configs` schema
+增加共享命令安装目标时，更新 `templates/scripts/install-ai-commands.sh` 的工具映射和本文档；Codex prompts 由独立脚本处理。新增入口配置模板时，更新上方模板清单。Manifest 是否需要记录配置取决于对应功能是否已实现，当前初始化流程不会自动生成这些入口文件。

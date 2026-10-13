@@ -116,10 +116,9 @@ copy_codex_bootstrap "$SCRIPT_DIR/templates/commands"
 # -----------------------------------------------------------------------------
 # 4. Agent Configuration Templates (NOT installed by default)
 # -----------------------------------------------------------------------------
-# Agent-specific config files (.cursorrules, .windsurfrules, CLAUDE.md) are 
+# Agent-specific config files (.cursorrules, CLAUDE.md) are
 # NOT installed by default. Users should copy them manually if needed:
 #   - Cursor:     design/context-dev/templates/cursorrules.template -> .cursorrules
-#   - Devin:   design/context-dev/templates/windsurfrules.template -> .windsurfrules
 #   - Claude:     design/context-dev/templates/CLAUDE.md.template -> CLAUDE.md
 
 # -----------------------------------------------------------------------------
@@ -138,5 +137,4 @@ echo "  3. (Codex) Restart Codex to load prompts from ~/.codex/prompts/"
 echo ""
 echo "Optional: Install agent-specific config files:"
 echo "  - Cursor:   cp design/context-dev/templates/cursorrules.template .cursorrules"
-echo "  - Devin: cp design/context-dev/templates/windsurfrules.template .windsurfrules"
 echo "  - Claude:   cp design/context-dev/templates/CLAUDE.md.template CLAUDE.md"

@@ -27,7 +27,7 @@ npx @injoysai/agent-sdk init
 curl -fsSL https://raw.githubusercontent.com/injoysai/injoys-agent-sdk/main/scripts/install.sh | bash
 ```
 
-By default, the installer bootstraps only `/context-init` and `/context-check`. After you run `/context-init`, the full command set will be installed/generated (including `/context-openspec`, `/context-start`, etc.).
+The installer bootstraps `/context-init` and `/context-check` into the Antigravity, Claude Code, Cursor, Devin, and Qoder project command directories, and attempts to install them into Codex's global prompts. After `/context-init`, the full command set is synchronized only to the project's `.agent/workflows/`. Install the full set for other tools with `design/context-dev/scripts/install-ai-commands.sh --tools <tool-list>`; Codex prompts use `design/context-dev/scripts/install-codex-prompts.sh`.
 
 After installation, you'll see:
 - `design/context-dev/` — Context generation framework
@@ -55,7 +55,7 @@ Architecture: @docs/system-architecture.md
 - ✅ Archives source documents
 - ✅ Generates `context-manifest.json`
 - ✅ Generates `.context/criterion.md` as the engineering-constraint source of truth
-- ✅ Installs the full shared `/context-*` command set for the selected AI tools
+- ✅ Synchronizes the full `/context-*` command set to `.agent/workflows/`
 
 ---
 
@@ -277,8 +277,9 @@ Re-run `/context-start <proposalId>` to resume from checkpoint.
 
 ### Q: How to update Context?
 ```bash
-/context-update modify domain   # Regenerate domain summaries
-/context-update add @docs/new-spec.md  # Add new document
+/context-update sync roadmap --mode review  # Preview roadmap synchronization
+/context-update sync proposal feat-user-login --mode review  # Preview proposal synchronization
 ```
+`add`, `modify`, `delete`, and `fix` remain interface drafts; confirm that the target project has an implementation before using them.
 
 ---
