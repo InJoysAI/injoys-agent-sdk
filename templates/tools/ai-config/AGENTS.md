@@ -1,97 +1,26 @@
-# AI 工具配置指令
+# Context 命令安装指令
 
-> 当被 `design/context-dev/AGENTS.md` 调用时执行此文件。
+> 当被 `design/context-dev/AGENTS.md` 调用时，只安装项目内的 `.agent/workflows/` 命令。
 
----
+## 执行步骤
 
-## 🎯 执行指令
+1. 在目标项目根目录执行：
 
-依次执行以下步骤：
+   ```bash
+   bash design/context-dev/scripts/install-ai-commands.sh --tools antigravity
+   ```
 
----
+   命令源为 `design/context-dev/commands/*.md`。重复执行只同步同名命令文件，不删除 `.agent/workflows/` 中的其他文件。
 
-### Phase 1: 确认 AI 工具
+2. 核对 `.agent/workflows/` 中的 `context-*.md` 与命令源对应；若脚本失败，报告错误，不把本步骤标为完成。
+3. 执行 `@design/context-dev/tools/manifest/AGENTS.md`（mode: update），记录本次命令安装结果。
 
-**⛔ STOP - 必须询问用户**
+`context-init` **不询问 AI 工具类型**，也不向 `.cursor/commands/`、`.claude/commands/`、`.devin/workflows/`、`.qoder/commands/`、`.grok/commands/` 或全局 Codex prompts 安装命令。其他工具的手动安装脚本保留，但不属于初始化流程。
 
-向用户询问：
+## 完成后报告
 
-> "请选择需要配置的 AI 工具（可多选，逗号分隔）：
-> 1. Antigravity
-> 2. Cursor
-> 3. Claude
-> 4. Devin
-> 5. Codex
-> 6. Qoder
-> 7. Grok
-> 8. 全部"
-
-**❌ 禁止**: 未经用户确认直接执行 Phase 2
-
-**等待用户回复后再继续。**
-
----
-
-### Phase 2: 安装命令文件
-
-根据用户选择，执行安装脚本：
-
-```bash
-# 如果用户选择 "全部" 或 "8"
-bash design/context-dev/scripts/install-ai-commands.sh --tools all
-
-# 如果用户选择特定工具，用逗号分隔
-bash design/context-dev/scripts/install-ai-commands.sh --tools antigravity,cursor,grok
-```
-
----
-
-## 📂 工具目录映射
-
-| AI 工具 | 命令目录 |
-|---------|---------|
-| Antigravity | `.agent/workflows/` |
-| Claude | `.claude/commands/` |
-| Cursor | `.cursor/commands/` |
-| Devin | `.devin/workflows/` |
-| Codex | `~/.codex/prompts/` |
-| Qoder | `.qoder/commands/` |
-| Grok | `.grok/commands/` + `.claude/commands/`（兼容发现） |
-
-> **Grok 说明**：Grok 斜杠命令从 `.grok/commands/*.md` 与 `.claude/commands/*.md` 加载，**不会**读取 `.agent/workflows/`。与 Antigravity 同步时需同时安装 `grok`（或从 `.agent/workflows` 复制到上述目录）。
-
----
-
-## 📋 命令集
-
-每个工具目录包含以下命令文件：
-
-| 命令 | 用途 |
-|------|------|
-| `/context-init` | 初始化 `.context/` 目录 |
-| `/context-openspec` | 生成 context 总结 + OpenSpec 集成 |
-| `/context-openspec proposal <change-id> [roadmap-doc]` | 生成提案（可显式指定提案大纲/路线图文件） |
-| `/context-start` | 基于提案开始开发 |
-| `/context-check` | 环境检查 |
-| `/context-update` | 增量更新 context |
-
----
-
-### Phase 3: 更新 Manifest
-
-**执行**: `@design/context-dev/tools/manifest/AGENTS.md` (mode: update)
-
----
-
-## ✅ 完成后
-
-报告安装结果：
-
-```
-=== 已安装命令 ===
-✅ Antigravity: .agent/workflows/ (6 files)
-✅ Cursor: .cursor/commands/ (6 files)
-...
-
-🔁 Manifest 已更新
+```text
+=== Context 命令安装完成 ===
+✅ .agent/workflows/: 已同步 6 个 context 命令文件
+🔁 Manifest: 已更新 / 未变更
 ```

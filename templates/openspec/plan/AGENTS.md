@@ -1,6 +1,6 @@
 # Plan 生成指令
 
-> 当 `/context-openspec plan` 被调用时执行此文件。
+> 当 `.agent/workflows/context-openspec.md plan` 被调用时执行此文件。
 
 ---
 

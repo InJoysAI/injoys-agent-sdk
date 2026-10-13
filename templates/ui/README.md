@@ -1,6 +1,6 @@
 # UI Templates
 
-本目录用于从 **UI 设计规范** 生成 `.context/ui/` 目录下的结构化 UI 资产，供实现阶段（/context-start）引用。
+本目录用于从 **UI 设计规范** 生成 `.context/ui/` 目录下的结构化 UI 资产，供实现阶段（.agent/workflows/context-start.md）引用。
 
 ---
 
@@ -8,7 +8,7 @@
 
 | 文件 | 用途 |
 |------|------|
-| `AGENTS.md` | `/context-openspec ui` 的执行规则与 Prompt |
+| `AGENTS.md` | `.agent/workflows/context-openspec.md ui` 的执行规则与 Prompt |
 | `design_system.md` | 设计系统（颜色/字体/间距/组件约束） |
 | `design_tokens.json` | Design Tokens（Global/Alias/Component） |
 | `layout_grid.md` | 栅格与响应式断点 |

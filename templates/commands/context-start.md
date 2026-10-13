@@ -8,7 +8,7 @@ description: Implement an OpenSpec change (validate → SSoT → code → test �
 
 **用法**：
 ```bash
-/context-start <提案ID>
+.agent/workflows/context-start.md <提案ID>
 ```
 
 ---

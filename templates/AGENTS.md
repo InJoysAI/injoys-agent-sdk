@@ -1,7 +1,7 @@
 # Context 生成入口
 
 > **用途**: 读取此文件后，在**目标项目目录**生成 `.context/` 资产  
-> **触发**: `@design/context-dev/AGENTS.md` 或 `/context-init`
+> **触发**: `@design/context-dev/AGENTS.md` 或 `.agent/workflows/context-init.md`
 
 ---
 
@@ -13,7 +13,7 @@
 
 ### Step 1: 确认目标项目
 
-**检查用户是否已提供参数**（如 `/context-init PRD: xx; 架构: xx; 项目路径: xx`）：
+**检查用户是否已提供参数**（如 `.agent/workflows/context-init.md PRD: xx; 架构: xx; 项目路径: xx`）：
 
 | 参数 | 必需 | 缺失时询问 |
 |------|:----:|-----------|
@@ -61,15 +61,16 @@
 
 ---
 
-### Step 4: AI 工具配置
+### Step 4: 安装 Context 工作流命令
 
 > ⛔ **必须执行**，不得跳过
 
 **执行**: `@design/context-dev/tools/ai-config/AGENTS.md`
 
 > 该模块会：
-> - 询问用户选择的 AI 工具
-> - 生成对应的配置文件
+> - 不询问 AI 工具类型
+> - 只将 `design/context-dev/commands/*.md` 同步到目标项目的 `.agent/workflows/`
+> - 不安装其他 AI 工具命令
 
 **⚠️ Step 4 完成后必须继续 Step 5**
 
@@ -114,8 +115,8 @@
 
 🔁 Manifest: [已更新 / 未变更]
 
-🤖 AI 工具配置:
-- [工具名]: [已配置 / 跳过]
+🤖 Context 工作流命令:
+- .agent/workflows/: [已同步 / 失败]
 
 🏗️ SSoT 状态: [已初始化 / 跳过 (原因)]
 ```
@@ -129,5 +130,5 @@
 | 环境检查 (Provider) | 项目自定义 `Makefile check-env` 或 `scripts/check-env.sh` | 项目级环境检查（可选） |
 | 文档收集与生成 | `@design/context-dev/tools/docs/AGENTS.md` | 收集源文件并生成 .context/ |
 | Manifest | `@design/context-dev/tools/manifest/AGENTS.md` | 记录文件变化 |
-| AI 配置 | `@design/context-dev/tools/ai-config/AGENTS.md` | 配置 AI 工具 |
+| 命令安装 | `@design/context-dev/tools/ai-config/AGENTS.md` | 只同步 `.agent/workflows/` |
 | SSoT | `@design/context-dev/tools/SSoT/AGENTS.md` | 初始化 SSoT |

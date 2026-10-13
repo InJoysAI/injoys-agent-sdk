@@ -16,12 +16,12 @@ This project follows a project criterion. See: @.context/criterion.md
 
 | Command | Purpose |
 |---------|---------|
-| `/context-init` | Initialize Context |
-| `/context-openspec` | Initialize/enhance OpenSpec |
-| `/context-openspec proposal <change-id> [roadmap-doc]` | Create change proposal (optionally specify roadmap/outline doc) |
-| `/context-start` | Implement change |
-| `/context-check` | Check status |
-| `/context-update` | Maintain Context |
+| `.agent/workflows/context-init.md` | Initialize Context |
+| `.agent/workflows/context-openspec.md` | Initialize/enhance OpenSpec |
+| `.agent/workflows/context-openspec.md proposal <change-id> [roadmap-doc]` | Create change proposal (optionally specify roadmap/outline doc) |
+| `.agent/workflows/context-start.md` | Implement change |
+| `.agent/workflows/context-check.md` | Check status |
+| `.agent/workflows/context-update.md` | Maintain Context |
 
 ## Tech Stack Constraints
 

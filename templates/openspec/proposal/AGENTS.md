@@ -1,6 +1,6 @@
 # Context Proposal 指令
 
-> 当 `/context-openspec proposal` 被调用时执行此文件。
+> 当 `.agent/workflows/context-openspec.md proposal` 被调用时执行此文件。
 > 本指令增强 OpenSpec 标准提案流程，集成 Context 资产读取。
 
 ---
@@ -8,6 +8,15 @@
 ## 🎯 执行指令
 
 > ⛔ **必须依次执行所有步骤**，遵循 OpenSpec 规范。
+
+### 设计与用词要求（适用于提案、自检和评审 Prompt）
+
+- **防御措施须有具体理由**：新增校验、拒绝条件、重试、降级、兼容层或恢复机制时，简要说明实际触发场景、影响及已有机制为何不足。“未来可能需要”“更健壮”不能单独作为理由；必要的权限校验和数据完整性保护仍须保留。
+- **按实际影响处理失败**：正常状态变化、清理或缓存未命中不自动等于错误；局部失败不自动阻断无关操作。优先复用现有机制，重复校验或扩大阻断范围须有依据。
+- **不为完整而增加设计**：风险可以由已有机制覆盖、本次处理或说明接受理由；不为填满风险、监控等章节新增任务。理由写在现有相关条目中，不另建证明表或审批步骤。
+- **使用已有名称和普通表达**：沿用用户用语、项目名称和行业通用术语；同一概念保持同一名称。普通行为直接说明谁在什么条件下做什么，不另造名词、缩写或中英混合标签；确需新概念时简要定义，代码标识符和协议字段保持准确。
+- **上游措辞也需检查**：继承已批准的行为和约束，不必照抄生硬表述。若上游限制本身含糊、矛盾或疑似多余，指出来源与影响，不继续扩大，也不擅自删除有效约束。
+
 
 ---
 
@@ -17,14 +26,14 @@
 
 | 检查项 | 通过条件 | 失败处理 |
 |--------|---------|---------|
-| config.yaml | `openspec/config.yaml` 存在 | ⛔ STOP，先运行 `/context-openspec project` |
-| proposal-roadmap.md | `openspec/proposal-roadmap.md` 存在 | ⛔ STOP，先运行 `/context-openspec plan` |
+| config.yaml | `openspec/config.yaml` 存在 | ⛔ STOP，先运行 `.agent/workflows/context-openspec.md project` |
+| proposal-roadmap.md | `openspec/proposal-roadmap.md` 存在 | ⛔ STOP，先运行 `.agent/workflows/context-openspec.md plan` |
 | proposal-roadmap-Phase*.md（可选） | `openspec/proposal-roadmap-Phase*.md` 或 `openspec/proposal-roadmap-Phase-*.md` 存在 | 若存在，则作为补充规划文档一并读取 |
 | roadmap 条目匹配结果 | 能在 `openspec/proposal-roadmap.md` 中精确定位到目标 `<change-id>` 条目（或经用户确认按“新建提案”处理） | ⛔ STOP，先确认是“新建提案”还是“使用既有 roadmap 条目” |
 
 **命令参数**：
-- `/context-openspec proposal <change-id>`：创建提案时，必须携带 `openspec/proposal-roadmap.md` 中该 `<change-id>` 的条目内容
-- `/context-openspec proposal <change-id> <roadmap-doc>`：在上条基础上，额外读取 `<roadmap-doc>` 作为补充信息（不能替代 `openspec/proposal-roadmap.md` 的主条目）
+- `.agent/workflows/context-openspec.md proposal <change-id>`：创建提案时，必须携带 `openspec/proposal-roadmap.md` 中该 `<change-id>` 的条目内容
+- `.agent/workflows/context-openspec.md proposal <change-id> <roadmap-doc>`：在上条基础上，额外读取 `<roadmap-doc>` 作为补充信息（不能替代 `openspec/proposal-roadmap.md` 的主条目）
   - `roadmap-doc` 期望是一个**具体文件路径**（不建议传 `*` 通配符；若用户传了通配符，需先让用户确认要读取哪些具体文件）
 
 
@@ -255,6 +264,8 @@ return Err(AppError::new(codes::SessionNotFound, get_error_message(codes::Sessio
 
 > ⛔ **必须逐项自检并在失败时立即 STOP**（不要“先继续后补”）
 
+- [ ] 新增防御措施有具体场景与影响依据，没有无依据的重复检查、额外机制或扩大阻断
+- [ ] 已复用现有术语；普通行为未另造名称，上游生硬措辞已在不改变语义的前提下改写
 - [ ] `change-id` 唯一且 verb-led（必要时用 `ls openspec/changes/` 检查；冲突则换名）
 - [ ] 目录结构完整：`openspec/changes/<change-id>/` + `specs/<capability>/`
 - [ ] `proposal.md` 至少包含：`## Why`、`## What Changes`、`## Impact`（且 Impact 里包含 “关联 Context 资产” 表）
@@ -385,7 +396,7 @@ node design/context-dev/tools/specflow/specflow.mjs validate <change-id> --stric
 
 > ⛔ **必须在 Phase 4 验证通过后执行**。
 > ⛔ **输出的 Prompt 必须完整填入实际的 change-id 和 Phase 编号，不得保留任何 `<...>` 占位符**。
-> ⛔ **本 Phase 由 `/context-openspec proposal <change-id>` 自动执行，不需要用户额外请求**。
+> ⛔ **本 Phase 由 `.agent/workflows/context-openspec.md proposal <change-id>` 自动执行，不需要用户额外请求**。
 > 本 Phase 只生成评审 Prompt，不重复运行 Phase 4 的 Specflow 校验。
 
 ### 5.1 执行前数据汇总
@@ -406,7 +417,7 @@ node design/context-dev/tools/specflow/specflow.mjs validate <change-id> --stric
 
 ~~~markdown
 ```
-/context-check review proposal `<实际change-id>` 提案进行三层联合评审，评审对象包括：
+.agent/workflows/context-check.md review proposal `<实际change-id>` 提案进行三层联合评审，评审对象包括：
 - 大纲（Outline）：`<本次实际匹配的 roadmap 文件>` 中该提案的条目（补充来源：`<实际补充文件或无>`）
 - 提案内容（Proposal）：`openspec/changes/<实际change-id>/`（包含 proposal.md / tasks.md / specs/<实际capability>/spec.md，以及可能的 design.md）
 - 业务资产（Context）：`.context/` 目录下的权威文档
@@ -427,7 +438,7 @@ node design/context-dev/tools/specflow/specflow.mjs validate <change-id> --stric
 1. **业务目标对齐** — 大纲"业务目标"中的每条目标是否能在 `business_rules.md` 或 `user_journeys.md` 中找到对应的业务需求依据？是否有与 .context 冲突的目标？
 2. **关联资产覆盖度** — 大纲"关联 Context 资产"表格是否引用了该提案所涉及的全部 .context 文档？对照 `.context/` 实际目录，列出缺失引用和多余引用。
 3. **In/Out 边界与 .context 对齐** — 大纲的 In 范围是否与 .context 所定义的功能边界和业务规则一致？Out 范围是否遗漏了 `edge_cases.md` 中已知的需要明确排除的边缘场景？
-4. **验收标准与约束对齐** — 大纲的验收标准是否覆盖了 `criterion.md` 中相关的 MUST/MUST NOT 要求？是否有可操作的验证方式（日志/指标值/API 响应）？标注主观模糊或缺失量化指标的条目。
+4. **验收标准与约束对齐** — 大纲的验收标准是否覆盖了 `criterion.md` 中相关的 MUST/MUST NOT 要求？是否有可操作的验证方式（日志/指标值/API 响应）？标注无法验证的条目；仅在需求确有数值要求时检查量化指标。
 5. **风险覆盖完整度** — 对照 `risks_and_debt.md` 中的 RISK-xxx 列表，大纲风险表是否覆盖了所有与该提案相关的风险？标注遗漏的 RISK-xxx 及其严重程度。
 
 **输出**：
@@ -435,7 +446,7 @@ node design/context-dev/tools/specflow/specflow.mjs validate <change-id> --stric
 - 业务目标对照表（| 大纲目标 | .context 依据 | 对齐状态 ✅/⚠️/❌ |）
 - 缺失 / 多余的资产引用列表
 - In/Out 边界问题清单（遗漏的边缘场景、与 .context 冲突的范围定义）
-- 验收标准问题列表（触发 MUST/MUST NOT 遗漏或缺失量化指标的条目）
+- 验收标准问题列表（触发 MUST/MUST NOT 遗漏或无法验证的条目）
 - 遗漏 RISK-xxx 列表（含风险等级）
 
 ---
@@ -481,7 +492,7 @@ node design/context-dev/tools/specflow/specflow.mjs validate <change-id> --stric
 4. 接口契约分析（上下游耦合、破坏性变更影响范围）
 5. 技术与交付风险（触发条件 + 影响 + 缓解 + 责任归属）
 6. 待澄清问题（P0 阻塞 / P1 重要 / P2 建议）
-7. 可执行修改建议（M-n 编号 + 修改位置 + 验收口径 + 监控指标）
+7. 可执行修改建议（M-n 编号 + 修改位置 + 验收口径；监控指标仅在有实际观测需求时补充）
 
 **输出报告**：
 1. **综合结论**（PASS / PASS (Conditional) / MODIFY / FAIL）及各阶段小结
@@ -494,6 +505,8 @@ node design/context-dev/tools/specflow/specflow.mjs validate <change-id> --stric
 8. 修改建议（M-n 编号 + 涉及层（大纲/提案/两者）+ 修改位置 + 具体内容 + 验收口径）
 
 **质量要求**：
+- 检查新增防御措施的触发场景、影响及必要性；不能仅凭“更健壮”判定缺陷或要求追加任务，已有机制覆盖或有依据地接受风险均可。允许无修改建议。
+- 检查重复或新造术语，建议用已有名称或普通句子替换；保留准确的代码标识符和协议术语。问题源于上游时指出来源，不因“已冻结”而照抄含糊要求。
 - 所有结论必须引用具体文件路径 + 章节/行号，禁止泛泛而谈
 - MUST/MUST NOT 必须逐条扫描，BR-xxx 必须逐条映射，不可合并或跳过
 - 修改建议须明确指出应改"大纲"还是"提案内容"或"两者均需同步"
@@ -513,7 +526,7 @@ AI 在输出 Prompt 前必须完成以下自检，确认**全部通过**再输�
 - [ ] 权威对照源均已在 Manifest 登记且实际存在，不包含幽灵路径
 - [ ] Prompt 全文无任何 `<...>` 占位符
 
-> ⏸️ **将上方 Prompt 复制至新对话运行评审**；建议在评审结论为 PASS 或 PASS (Conditional) 后，再继续实施（`/context-start <change-id>`）。
+> ⏸️ **将上方 Prompt 复制至新对话运行评审**；建议在评审结论为 PASS 或 PASS (Conditional) 后，再继续实施（`.agent/workflows/context-start.md <change-id>`）。
 
 ---
 
@@ -549,5 +562,5 @@ Roadmap 对齐:
 
 下一步:
 - 复制 Phase 5 Prompt 至新对话运行三阶段评审
-- 评审通过后开始实施: /context-start <实际 change-id>
+- 评审通过后开始实施: .agent/workflows/context-start.md <实际 change-id>
 ```

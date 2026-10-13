@@ -25,8 +25,8 @@ templates/
 ├── commands/               # 工具无关的唯一 /context-* 命令源
 ├── scripts/
 │   ├── context-gen.sh             # Hash/引导脚本
-│   ├── install-ai-commands.sh     # 安装完整 /context-* 命令集
-│   └── install-codex-prompts.sh   # 安装 Codex prompts 到 ~/.codex/prompts
+│   ├── install-ai-commands.sh     # 安装 /context-* 命令（初始化仅选 antigravity）
+│   └── install-codex-prompts.sh   # 可选手动安装 Codex prompts
 └── templates/             # AI 工具入口文件模板
     ├── README.md          # 占位符说明
     ├── AGENTS.md.template
@@ -42,13 +42,13 @@ templates/
 
 | 命令 | 阶段 | 用途 |
 |------|------|------|
-| `/context-init` | 初始化 | 确认目标 + 可选环境检查 + 创建目录 + 归档源文档 |
-| `/context-openspec` | 集成 | 生成文档总结 + 填充 config.yaml + 生成路线图 |
-| `/context-openspec proposal <change-id> [roadmap-doc]` | 设计 | 基于路线图创建并校验提案，动态生成三层评审 Prompt |
-| `/context-interview` | 设计 | 深度访谈完善技术规格或用户指定文档 |
-| `/context-start` | 实施 | validate → SSoT-first → codegen → code → archive |
-| `/context-check` | 检查 | 子命令: `env` / `manifest` / `tasks` / `proposal` / `plan` / `project` / `review` |
-| `/context-update` | 维护 | 子命令: `add` / `modify` / `delete` / `fix` |
+| `.agent/workflows/context-init.md` | 初始化 | 确认目标 + 可选环境检查 + 创建目录 + 归档源文档 |
+| `.agent/workflows/context-openspec.md` | 集成 | 生成文档总结 + 填充 config.yaml + 生成路线图 |
+| `.agent/workflows/context-openspec.md proposal <change-id> [roadmap-doc]` | 设计 | 基于路线图创建并校验提案，动态生成三层评审 Prompt |
+| `.agent/workflows/context-interview.md` | 设计 | 深度访谈完善技术规格或用户指定文档 |
+| `.agent/workflows/context-start.md` | 实施 | validate → SSoT-first → codegen → code → archive |
+| `.agent/workflows/context-check.md` | 检查 | 子命令: `env` / `manifest` / `tasks` / `proposal` / `plan` / `project` / `review` |
+| `.agent/workflows/context-update.md` | 维护 | 子命令: `add` / `modify` / `delete` / `fix` |
 
 ---
 
@@ -83,16 +83,18 @@ curl -fsSL https://raw.githubusercontent.com/injoysai/injoys-agent-sdk/main/scri
 ### 2. 初始化 Context
 
 ```
-/context-init
+.agent/workflows/context-init.md
 目标项目：/path/to/your-project
 PRD：@docs/product-overview.md
 架构：@docs/system-architecture.md
 ```
 
+初始化会将 `design/context-dev/commands/*.md` 同步到目标项目的 `.agent/workflows/`；不会询问 AI 工具类型，也不会安装其他工具的命令目录。若以后需要其他工具，可单独运行安装脚本，不属于 `.agent/workflows/context-init.md`。
+
 ### 3. 初始化 OpenSpec (幂等增强)
 
 ```
-/context-openspec
+.agent/workflows/context-openspec.md
 ```
 
 - 创建 `openspec/` 目录结构
@@ -102,7 +104,7 @@ PRD：@docs/product-overview.md
 ### 4. 创建提案
 
 ```
-/context-openspec proposal feat-user-login
+.agent/workflows/context-openspec.md proposal feat-user-login
 ```
 
 - 读取 `openspec/proposal-roadmap.md` 定位条目
@@ -112,13 +114,13 @@ PRD：@docs/product-overview.md
 也可以显式指定“提案大纲文档”（例如某个 Phase 文件）：
 
 ```
-/context-openspec proposal feat-user-login openspec/proposal-roadmap-Phase3.md
+.agent/workflows/context-openspec.md proposal feat-user-login openspec/proposal-roadmap-Phase3.md
 ```
 
 ### 5. 开始实施
 
 ```
-/context-start <提案ID>
+.agent/workflows/context-start.md <提案ID>
 ```
 
 执行流程：
@@ -132,25 +134,25 @@ PRD：@docs/product-overview.md
 
 ```bash
 # 检查任务进度
-/context-check tasks <提案ID>
+.agent/workflows/context-check.md tasks <提案ID>
 
 # 检查提案完整性
-/context-check proposal <提案ID>
+.agent/workflows/context-check.md proposal <提案ID>
 
 # 检查环境
-/context-check env
+.agent/workflows/context-check.md env
 
 # PRD 与架构双向追溯（路径可由 Manifest 自动解析）
-/context-check review prd-tad
+.agent/workflows/context-check.md review prd-tad
 
 # 全量生成资产、Manifest、README、Integration Index 四方同步
-/context-check review assets
+.agent/workflows/context-check.md review assets
 
 # 单模块生成资产与源文档核对
-/context-check review scope domain
+.agent/workflows/context-check.md review scope domain
 
 # Manifest 当前状态与扁平审计历史校验
-/context-check manifest
+.agent/workflows/context-check.md manifest
 ```
 
 `context-manifest.json` 只保存当前源文件、生成资产和最近同步状态。完整同步/决策历史使用 `.context/history/context-sync.jsonl`，禁止通过 `previous_sync` 递归嵌套进 Manifest。

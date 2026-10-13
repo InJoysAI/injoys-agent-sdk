@@ -1,6 +1,6 @@
 # Plan Check 指令
 
-> 当 `/context-check plan` 被调用时执行此文件。
+> 当 `.agent/workflows/context-check.md plan` 被调用时执行此文件。
 > 遵循 `@design/context-dev/check/AGENTS.md` 通用审查协议。
 
 ---
@@ -21,7 +21,7 @@
 | `.context/context-manifest.json` | ✅ | 用于读取 Context 资产 |
 
 **结果**：
-- ❌ 缺失必需文件 → 失败，提示先运行 `/context-openspec plan`
+- ❌ 缺失必需文件 → 失败，提示先运行 `.agent/workflows/context-openspec.md plan`
 - ✅ 所有必需文件存在 → 继续
 
 ---

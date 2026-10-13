@@ -47,7 +47,7 @@
 > ⚠️ **棕地项目提醒**：
 > 检测到遗留系统分析文件。SSoT 将按新项目标准初始化。
 > - 遗留系统的 Schema/API 对齐请在**改造提案**中处理
-> - 使用 `/context-openspec plan` 生成包含改造阶段的路线图
+> - 使用 `.agent/workflows/context-openspec.md plan` 生成包含改造阶段的路线图
 > - 参考 `legacy_system_analysis.md` 了解现有系统约束
 
 ### 0.4 输出决策

@@ -16,12 +16,12 @@
 
 | 命令 | 用途 |
 |------|------|
-| `/context-init` | 初始化 Context |
-| `/context-openspec` | 初始化/增强 OpenSpec |
-| `/context-openspec proposal <change-id> [roadmap-doc]` | 创建变更提案（可显式指定提案大纲/路线图文件） |
-| `/context-start` | 实施变更 |
-| `/context-check` | 检查状态 |
-| `/context-update` | 维护 Context |
+| `.agent/workflows/context-init.md` | 初始化 Context |
+| `.agent/workflows/context-openspec.md` | 初始化/增强 OpenSpec |
+| `.agent/workflows/context-openspec.md proposal <change-id> [roadmap-doc]` | 创建变更提案（可显式指定提案大纲/路线图文件） |
+| `.agent/workflows/context-start.md` | 实施变更 |
+| `.agent/workflows/context-check.md` | 检查状态 |
+| `.agent/workflows/context-update.md` | 维护 Context |
 
 ## 技术栈约束
 

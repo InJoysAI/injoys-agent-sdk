@@ -22,7 +22,7 @@ Supported subcommands:
 - `fix <path>`: fix metadata/links/format only (no business-content change)
 - `archive <change-id>`: archive a completed change and (optionally) sync specs (delta → main)
 
-If the target project still uses separate commands (`/context-add`, `/context-modify`, ...), this command describes the unified interface you should implement.
+If the target project still uses separate commands (`.agent/workflows/context-add.md`, `.agent/workflows/context-modify.md`, ...), this command describes the unified interface you should implement.
 
 ## sync
 
@@ -81,16 +81,16 @@ node design/context-dev/tools/specflow/specflow.mjs validate <change-id> --stric
 
 2. 提案一致性检查（结合 Context 资产）：
 ```bash
-/context-check proposal <change-id>
+.agent/workflows/context-check.md proposal <change-id>
 ```
 
 3. 开放式核对（重点核对“实现是否导致 Context 需要更新”）：
 ```bash
-/context-check review "核对提案 <change-id> 的实现与 .context 资产一致性；如不一致，更新对应 .context 文件并同步 manifest"
+.agent/workflows/context-check.md review "核对提案 <change-id> 的实现与 .context 资产一致性；如不一致，更新对应 .context 文件并同步 manifest"
 ```
 
-> 若发现不一致：优先用 `/context-update fix <path>`（仅修复 metadata/links/format）；
-> 若确需更新业务含义/约束内容：使用 `/context-update modify <scope>` 或直接修改目标 `.context/**` 文件，并在修复后更新 manifest。
+> 若发现不一致：优先用 `.agent/workflows/context-update.md fix <path>`（仅修复 metadata/links/format）；
+> 若确需更新业务含义/约束内容：使用 `.agent/workflows/context-update.md modify <scope>` 或直接修改目标 `.context/**` 文件，并在修复后更新 manifest。
 >
 > ⚠️ 如果本仓库尚未落地 `fix/modify`：请改为 **STOP 并请求用户确认** 是否要现在补齐实现；或由用户指定要更新的具体 `.context/**` 文件与期望改动后再继续。
 

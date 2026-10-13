@@ -12,7 +12,7 @@ description: 深度访谈以完善技术规格或用户指定的文档说明书
 基于现有文档进行深度访谈并更新该文档。
 
 ```
-/context-interview
+.agent/workflows/context-interview.md
 目标文档: @openspec/proposal-roadmap.md
 ```
 
@@ -20,7 +20,7 @@ description: 深度访谈以完善技术规格或用户指定的文档说明书
 从对话开始探索需求或技术细节，根据主题更新对应的 `.context/` 文件。
 
 ```
-/context-interview
+.agent/workflows/context-interview.md
 主题: 用户认证的业务规则
 ```
 
@@ -41,7 +41,7 @@ description: 深度访谈以完善技术规格或用户指定的文档说明书
 ## 交互示例
 
 ```
-用户: /context-interview
+用户: .agent/workflows/context-interview.md
       主题: 用户认证的业务规则
 
 AI:   [读取 .context/domain/business_rules.md 现有内容...]

@@ -1,6 +1,6 @@
 # Project 生成指令
 
-> 当 `/context-openspec project` 被调用时执行此文件。
+> 当 `.agent/workflows/context-openspec.md project` 被调用时执行此文件。
 
 ---
 
@@ -31,7 +31,7 @@
 
 生成前，对本次实际读取的 `.context` 文件计算 **Context-SHA256** 组合指纹；将来源列表与指纹写入 YAML 顶部注释。来源内容或指纹未变化时，不重写文件。
 
-#### Context-SHA256 算法（规范性 · 生成与 `/context-check project` 必须一致）
+#### Context-SHA256 算法（规范性 · 生成与 `.agent/workflows/context-check.md project` 必须一致）
 
 输入集合 = Phase 1 实际读取的资产路径（已跳过 `README.md` / `openspec/` / `source/`；**包含** `.context/criterion.md`）。
 
@@ -66,7 +66,7 @@
 # Generated from: .context/context-manifest.json + listed Context assets
 # Context-SHA256: <sha256>
 # Context-SHA256-Algo: path-nl-content-then-join-hex  # optional marker; algorithm defined in design/context-dev/openspec/project/AGENTS.md
-# DO NOT EDIT: regenerate with /context-openspec project
+# DO NOT EDIT: regenerate with .agent/workflows/context-openspec.md project
 schema: spec-driven
 
 context: |

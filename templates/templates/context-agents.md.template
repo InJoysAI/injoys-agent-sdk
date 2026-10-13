@@ -45,9 +45,9 @@
 
 ## 更新规则
 
-- **增量更新**: 使用 `/context-update` 重生成变更文件
-- **新增源文档**: 使用 `/context-update` 添加新源文件
-- **全量重生成**: 删除 `context-manifest.json` 后重新运行 `/context-init`
+- **增量更新**: 使用 `.agent/workflows/context-update.md` 重生成变更文件
+- **新增源文档**: 使用 `.agent/workflows/context-update.md` 添加新源文件
+- **全量重生成**: 删除 `context-manifest.json` 后重新运行 `.agent/workflows/context-init.md`
 - **历史边界**: Manifest 只保留最近同步状态；完整历史追加到 `history/context-sync.jsonl`，禁止 `previous_sync` 递归链
 
 ## 与 OpenSpec 集成
@@ -60,9 +60,9 @@
 
 | 命令 | 用途 |
 |------|------|
-| `/context-init` | 初始化 .context/ 目录 |
-| `/context-check` | 检查工具链与 MCP |
-| `/context-openspec` | 生成 context 总结 + OpenSpec 集成 |
-| `/context-openspec proposal <change-id> [roadmap-doc]` | 生成变更提案（可显式指定提案大纲/路线图文件） |
-| `/context-start` | 基于提案开始开发 |
-| `/context-update` | 增量更新 context |
+| `.agent/workflows/context-init.md` | 初始化 .context/ 目录 |
+| `.agent/workflows/context-check.md` | 检查工具链与 MCP |
+| `.agent/workflows/context-openspec.md` | 生成 context 总结 + OpenSpec 集成 |
+| `.agent/workflows/context-openspec.md proposal <change-id> [roadmap-doc]` | 生成变更提案（可显式指定提案大纲/路线图文件） |
+| `.agent/workflows/context-start.md` | 基于提案开始开发 |
+| `.agent/workflows/context-update.md` | 增量更新 context |

@@ -20,7 +20,7 @@
 | `{{project_root}}` | 用户输入 | 项目根目录绝对路径 |
 | `{{schema_path}}` | criterion.md | Schema 迁移目录 (默认 `SSoT/schema/migrations/`) |
 | `{{api_path}}` | criterion.md | API 定义路径 (默认 `SSoT/api/main.tsp`) |
-| `{{proposal_command}}` | criterion.md | 提案命令 (默认 `/context-openspec proposal <change-id> [roadmap-doc]`) |
+| `{{proposal_command}}` | criterion.md | 提案命令 (默认 `.agent/workflows/context-openspec.md proposal <change-id> [roadmap-doc]`) |
 | `{{tech_stack_constraints}}` | tech_stack.md | 技术栈约束 (MUST/SHOULD) |
 | `{{must_not_rules}}` | criterion.md | 禁止规则 |
 | `{{constraints}}` | criterion.md | 通用约束 |
@@ -35,7 +35,7 @@
 ## 准则引用与幂等更新
 
 - `.context/criterion.md` 是项目约束的权威来源，入口文件必须引用它以确保运行期必读。
-- `/context-init` 生成入口文件时，应当覆盖/更新入口文件中的“准则引用”部分；推荐将入口文件视为可再生文件。
+- `.agent/workflows/context-init.md` 生成入口文件时，应当覆盖/更新入口文件中的“准则引用”部分；推荐将入口文件视为可再生文件。
 - 若需要在“保留人工内容”的同时更新准则引用，可在入口文件中使用标记块并仅更新标记块内部内容（实现侧策略）：
 
 ```markdown

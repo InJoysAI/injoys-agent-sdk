@@ -1,0 +1,139 @@
+# Phase {{PHASE_NO}}: {{PHASE_NAME}}
+
+> **返回总纲**: [proposal-roadmap.md](./proposal-roadmap.md)
+> **状态**: {{PHASE_STATUS}}
+> **来源**: {{SOURCE_DOCS}}
+> **预计工作量与周期**: {{PHASE_ESTIMATE_OR_PENDING}}
+
+> 本文件承载阶段完整计划；提案块按实际数量重复。里程碑、风险、迁移、运维、KPI 等按需保留，无适用内容时删除或说明。示例条数不是要求。沿用项目术语，不为填满模板增加设计。
+
+## 阶段目标与范围
+
+- 目标与交付结果：{{PHASE_GOAL}}
+- In / Out：{{PHASE_SCOPE}}
+- 适用约束：{{PHASE_CONSTRAINTS}}
+
+## 提案详情
+
+### 提案 {{PROPOSAL_NO}}: {{PROPOSAL_TITLE}}
+
+**Change ID:** `{{CHANGE_ID}}`  
+**优先级:** {{PRIORITY}}（P0/P1/P2）  
+**预计时间:** {{ESTIMATE}}  
+**状态:** {{STATUS}}（proposed/in-progress/done）
+
+**业务目标（Business Goal）**:
+- {{BUSINESS_GOAL_1}}
+- {{BUSINESS_GOAL_2}}
+- {{BUSINESS_GOAL_3}}
+
+**范围边界（In / Out）**:
+
+| 类型 | 内容 |
+|------|------|
+| ✅ In | {{IN_SCOPE_1}} |
+| ✅ In | {{IN_SCOPE_2}} |
+| ✅ In | {{IN_SCOPE_3}} |
+| ❌ Out | {{OUT_SCOPE_1}} |
+| ❌ Out | {{OUT_SCOPE_2}} |
+| ❌ Out | {{OUT_SCOPE_3}} |
+
+> [!NOTE]
+> {{NOTE_SCOPE_OR_ASSUMPTION}}
+
+**关联 Context 资产**:
+
+| Scope | 关联资产 | 关联说明 |
+|-------|---------|----------|
+| criterion | `.context/criterion.md` | 必须遵守的约束 |
+| {{SCOPE_1}} | `{{ASSET_PATH_1}}` | {{RELATION_1}} |
+| {{SCOPE_2}} | `{{ASSET_PATH_2}}` | {{RELATION_2}} |
+| {{SCOPE_3}} | `{{ASSET_PATH_3}}` | {{RELATION_3}} |
+
+**关键任务**:
+1. {{TASK_1}} ({{TASK_1_EST}})
+2. {{TASK_2}} ({{TASK_2_EST}})
+3. {{TASK_3}} ({{TASK_3_EST}})
+4. {{TASK_4}} ({{TASK_4_EST}})
+5. {{TASK_5}} ({{TASK_5_EST}})
+
+**里程碑**:
+
+| 里程碑 | 预计时间 | 验收标准 |
+|--------|----------|----------|
+| {{MILESTONE_1}} | {{MILESTONE_1_EST}} | {{MILESTONE_1_CRITERIA}} |
+| {{MILESTONE_2}} | {{MILESTONE_2_EST}} | {{MILESTONE_2_CRITERIA}} |
+| {{MILESTONE_3}} | {{MILESTONE_3_EST}} | {{MILESTONE_3_CRITERIA}} |
+
+**风险与处理决定（按需）**:
+
+| 风险 | 影响 | 处理决定及理由 |
+|------|------|----------|
+| {{RISK_1}} | {{RISK_1_IMPACT}} | {{RISK_1_MITIGATION}} |
+| {{RISK_2}} | {{RISK_2_IMPACT}} | {{RISK_2_MITIGATION}} |
+| {{RISK_3}} | {{RISK_3_IMPACT}} | {{RISK_3_MITIGATION}} |
+
+**迁移与回滚（Change Management）**:
+- {{CHANGE_MGMT_1}}
+- {{CHANGE_MGMT_2}}
+- {{CHANGE_MGMT_3}}
+
+**运维与支持（Ops/Support）**:
+- {{OPS_SUPPORT_1}}
+- {{OPS_SUPPORT_2}}
+- {{OPS_SUPPORT_3}}
+
+**成功指标（KPI）**:
+- {{KPI_1}}
+- {{KPI_2}}
+- {{KPI_3}}
+
+**验证标准**:
+
+| 验收项 | 验收条件 | 验收方式 |
+|--------|----------|----------|
+| {{ACCEPTANCE_ITEM_1}} | {{ACCEPTANCE_CRITERIA_1}} | {{ACCEPTANCE_METHOD_1}} |
+| {{ACCEPTANCE_ITEM_2}} | {{ACCEPTANCE_CRITERIA_2}} | {{ACCEPTANCE_METHOD_2}} |
+| {{ACCEPTANCE_ITEM_3}} | {{ACCEPTANCE_CRITERIA_3}} | {{ACCEPTANCE_METHOD_3}} |
+
+**验收场景（可选，建议 BDD）**:
+
+```gherkin
+{{GATE_SCENARIOS_GHERKIN}}
+```
+
+**跨提案场景（仅有实际关联时填写）**:
+
+| 场景 | 对应提案 | 纳入验收的条件 |
+|------|----------|------------------|
+| {{NON_GATE_SCENARIO_1}} | `{{NON_GATE_CHANGE_1}}` | {{NON_GATE_UPGRADE_1}} |
+| {{NON_GATE_SCENARIO_2}} | `{{NON_GATE_CHANGE_2}}` | {{NON_GATE_UPGRADE_2}} |
+
+**验收与跟踪清单（可选）**:
+
+| 项目 | 验收/交付物 | 验收方式 | 负责人 | 截止点 |
+|------|-------------|----------|--------|--------|
+| {{TRACK_ITEM_1}} | {{TRACK_DELIVERABLE_1}} | {{TRACK_METHOD_1}} | {{OWNER_1}} | {{DUE_1}} |
+| {{TRACK_ITEM_2}} | {{TRACK_DELIVERABLE_2}} | {{TRACK_METHOD_2}} | {{OWNER_2}} | {{DUE_2}} |
+| {{TRACK_ITEM_3}} | {{TRACK_DELIVERABLE_3}} | {{TRACK_METHOD_3}} | {{OWNER_3}} | {{DUE_3}} |
+
+**依赖**:
+- 前置: {{DEPENDS_ON}}
+- 被依赖: {{DEPENDENTS}}
+- 约束: {{DEPENDENCY_CONSTRAINTS}}
+
+
+## 执行顺序与依赖
+
+{{PHASE_EXECUTION_ORDER_AND_PARALLEL_WORK}}
+
+- 跨阶段前置条件：{{CROSS_PHASE_DEPENDENCIES_OR_NONE}}
+- 提供给后续阶段的能力：{{DOWNSTREAM_DELIVERABLES_OR_NONE}}
+
+## 阶段整体验收
+
+{{PHASE_ACCEPTANCE_AND_VERIFICATION}}
+
+## 待决事项（按需）
+
+{{OPEN_QUESTIONS_OR_NONE}}

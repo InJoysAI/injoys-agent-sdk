@@ -125,12 +125,12 @@ bash design/context-dev/scripts/check-context-manifest.sh
 
 **示例**:
 ```
-/context-check review prd-tad
-/context-check review assets
-/context-check review core
-/context-check review scope db
-/context-check review proposal feat-example
-/context-check review "检查 api_strategy.md 的错误响应格式"
+.agent/workflows/context-check.md review prd-tad
+.agent/workflows/context-check.md review assets
+.agent/workflows/context-check.md review core
+.agent/workflows/context-check.md review scope db
+.agent/workflows/context-check.md review proposal feat-example
+.agent/workflows/context-check.md review "检查 api_strategy.md 的错误响应格式"
 ```
 
 **执行流程**：

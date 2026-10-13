@@ -1,7 +1,7 @@
 # DB 总结生成入口
 
 > **用途**: 从数据库设计文档生成结构化的数据库设计总结。  
-> **触发**: `/context-openspec db` 或由 `design/context-dev/AGENTS.md` Step 5.2 调用。
+> **触发**: `.agent/workflows/context-openspec.md db` 或由 `design/context-dev/AGENTS.md` Step 5.2 调用。
 
 ---
 
