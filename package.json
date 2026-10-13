@@ -11,11 +11,10 @@
         "bin/",
         "src/",
         "templates/",
-        "scripts/",
-        "standards/"
+        "scripts/"
     ],
     "scripts": {
-        "test": "echo \"No tests yet\" && exit 0"
+        "test": "node --test tests/cli.test.js"
     },
     "keywords": [
         "ai",
