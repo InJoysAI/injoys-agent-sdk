@@ -103,19 +103,21 @@ function copyFiles(srcDir, destDir, names, options = {}) {
 /**
  * Read and parse context manifest
  * @param {string} projectRoot - Project root path
- * @returns {object|null} Manifest object or null
+ * @returns {object|null} Manifest object, or null when the manifest does not exist
+ * @throws {Error} When the manifest exists but cannot be read or parsed
  */
 function readManifest(projectRoot) {
     const manifestPath = path.join(projectRoot, '.context', 'context-manifest.json');
 
-    if (fs.existsSync(manifestPath)) {
-        try {
-            return JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
-        } catch (e) {
-            return null;
-        }
+    if (!fs.existsSync(manifestPath)) {
+        return null;
     }
-    return null;
+
+    try {
+        return JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+    } catch (e) {
+        throw new Error(`Invalid context manifest at ${manifestPath}: ${e.message}`);
+    }
 }
 
 module.exports = {

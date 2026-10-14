@@ -33,6 +33,6 @@ dist/
 build/
 coverage/
 
-temp/
-test/
+/temp/
+/test/
 # examples/
