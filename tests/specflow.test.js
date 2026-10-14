@@ -100,3 +100,138 @@ test('bundled specflow regression test passes inside an installed project', () =
   const res = spawnSync(process.execPath, ['--test', file], { cwd: dir, env, encoding: 'utf8' });
   assert.equal(res.status, 0, res.stdout + res.stderr);
 });
+
+// ---- archive / spec sync -------------------------------------------------
+
+const REQ = (title, body = 'System MUST do it.') =>
+  `### Requirement: ${title}\n${body}\n\n#### Scenario: ok\n- **WHEN** run\n- **THEN** done\n`;
+
+const MAIN_SPEC = (...reqs) => `# auth Specification\n\n## Purpose\nLogin.\n\n## Requirements\n${reqs.join('\n')}`;
+
+function change(dir, id, deltaSpec, { capability = 'auth', mainSpec } = {}) {
+  assert.equal(specflow(dir, ['new', id, '--capability', capability]).status, 0);
+  const base = path.join(dir, 'openspec/changes', id);
+  fs.writeFileSync(path.join(base, 'proposal.md'), '# x\n## Why\nw\n## What Changes\nc\n## Impact\ni\n');
+  fs.writeFileSync(path.join(base, 'tasks.md'), '- [x] done\n- [x] specflow validate\n- [x] specflow archive\n');
+  fs.writeFileSync(path.join(base, 'specs', capability, 'spec.md'), deltaSpec);
+  if (mainSpec !== undefined) {
+    const main = path.join(dir, 'openspec/specs', capability, 'spec.md');
+    fs.mkdirSync(path.dirname(main), { recursive: true });
+    fs.writeFileSync(main, mainSpec);
+  }
+  return base;
+}
+
+const mainSpecOf = (dir, capability = 'auth') =>
+  fs.readFileSync(path.join(dir, 'openspec/specs', capability, 'spec.md'), 'utf8');
+
+test('archive keeps sections after "## Requirements" and inserts new requirements before them', () => {
+  const dir = project();
+  change(dir, 'add-logout', `## ADDED Requirements\n\n${REQ('Logout')}`, {
+    mainSpec: MAIN_SPEC(REQ('Login')) + '\n## Notes\nKeep this section.\n',
+  });
+  const res = specflow(dir, ['archive', 'add-logout', '--yes']);
+  assert.equal(res.status, 0, res.stdout + res.stderr);
+
+  const main = mainSpecOf(dir);
+  assert.ok(main.includes('### Requirement: Logout'));
+  assert.ok(main.includes('## Notes\nKeep this section.'), 'trailing section must survive');
+  assert.ok(
+    main.indexOf('### Requirement: Logout') < main.indexOf('## Notes'),
+    'new requirement must be placed inside "## Requirements", before "## Notes"',
+  );
+});
+
+test('archive does not lose a trailing section when the last requirement is removed or modified', () => {
+  const dir = project();
+  change(
+    dir,
+    'drop-login',
+    `## REMOVED Requirements\n\n${REQ('Login')}\n## MODIFIED Requirements\n\n${REQ('Session', 'System MUST expire sessions.')}`,
+    { mainSpec: MAIN_SPEC(REQ('Login'), REQ('Session')) + '\n## Notes\nKeep this section.\n' },
+  );
+  assert.equal(specflow(dir, ['archive', 'drop-login', '--yes']).status, 0);
+  const main = mainSpecOf(dir);
+  assert.ok(!main.includes('### Requirement: Login'));
+  assert.ok(main.includes('System MUST expire sessions.'));
+  assert.ok(main.includes('## Notes\nKeep this section.'));
+});
+
+test('RENAMED requirements are validated, applied on archive, and reported', () => {
+  const dir = project();
+  const renamed = '## RENAMED Requirements\n- FROM: `### Requirement: Login`\n- TO: `### Requirement: Sign in`\n';
+  change(dir, 'rename-login', renamed, { mainSpec: MAIN_SPEC(REQ('Login', 'System MUST allow login.')) });
+
+  const validate = specflow(dir, ['validate', 'rename-login', '--strict']);
+  assert.equal(validate.status, 0, 'a RENAMED-only delta is a valid change: ' + validate.stdout);
+
+  const res = specflow(dir, ['archive', 'rename-login', '--yes']);
+  assert.equal(res.status, 0, res.stdout + res.stderr);
+  assert.match(res.stdout, /Renamed requirement: Login -> Sign in/, 'archive must print each applied change');
+
+  const main = mainSpecOf(dir);
+  assert.ok(main.includes('### Requirement: Sign in\nSystem MUST allow login.'));
+  assert.ok(!main.includes('### Requirement: Login'));
+});
+
+test('RENAMED followed by MODIFIED of the new name works', () => {
+  const dir = project();
+  const delta =
+    '## RENAMED Requirements\n- FROM: `### Requirement: Login`\n- TO: `### Requirement: Sign in`\n\n' +
+    `## MODIFIED Requirements\n\n${REQ('Sign in', 'System MUST allow sign in with MFA.')}`;
+  change(dir, 'rename-modify', delta, { mainSpec: MAIN_SPEC(REQ('Login')) });
+  assert.equal(specflow(dir, ['archive', 'rename-modify', '--yes']).status, 0);
+  const main = mainSpecOf(dir);
+  assert.ok(main.includes('System MUST allow sign in with MFA.'));
+  assert.ok(!main.includes('### Requirement: Login'));
+  assert.equal((main.match(/### Requirement: Sign in/g) || []).length, 1, 'no duplicate requirement');
+});
+
+test('archive refuses an unresolvable RENAMED and leaves everything untouched', () => {
+  const dir = project();
+  const mainSpec = MAIN_SPEC(REQ('Login'));
+  const base = change(
+    dir,
+    'bad-rename',
+    '## RENAMED Requirements\n- FROM: `### Requirement: Does Not Exist`\n- TO: `### Requirement: Other`\n',
+    { mainSpec },
+  );
+  const res = specflow(dir, ['archive', 'bad-rename', '--yes', '--no-validate']);
+  assert.notEqual(res.status, 0);
+  assert.match(res.stdout + res.stderr, /Does Not Exist/);
+  assert.ok(fs.existsSync(base), 'change must not be moved');
+  assert.equal(mainSpecOf(dir), mainSpec, 'main spec must not be modified');
+});
+
+test('validate rejects a malformed RENAMED section in strict mode', () => {
+  const dir = project();
+  change(dir, 'bad-shape', `## ADDED Requirements\n\n${REQ('A')}\n## RENAMED Requirements\n- FROM: \`### Requirement: A\`\n`);
+  const res = specflow(dir, ['validate', 'bad-shape', '--strict']);
+  assert.notEqual(res.status, 0);
+  assert.match(res.stdout, /RENAMED/);
+});
+
+test('multi-capability archive writes nothing when one capability cannot be applied', () => {
+  const dir = project();
+  const mainA = MAIN_SPEC(REQ('Login'));
+  const base = change(dir, 'two-caps', `## ADDED Requirements\n\n${REQ('Logout')}`, { mainSpec: mainA });
+  const capB = path.join(base, 'specs', 'billing');
+  fs.mkdirSync(capB, { recursive: true });
+  fs.writeFileSync(
+    path.join(capB, 'spec.md'),
+    '## RENAMED Requirements\n- FROM: `### Requirement: Nope`\n- TO: `### Requirement: Never`\n',
+  );
+  const res = specflow(dir, ['archive', 'two-caps', '--yes', '--no-validate']);
+  assert.notEqual(res.status, 0);
+  assert.equal(mainSpecOf(dir), mainA, 'the capability that could be applied must not be written either');
+  assert.ok(fs.existsSync(base));
+});
+
+test('uppercase [X] checkboxes are accepted by validate and counted by status', () => {
+  const dir = project();
+  const base = change(dir, 'upper-x', `## ADDED Requirements\n\n${REQ('A')}`);
+  fs.writeFileSync(path.join(base, 'tasks.md'), '- [X] only uppercase boxes\n');
+  assert.equal(specflow(dir, ['validate', 'upper-x', '--strict']).status, 0);
+  const status = JSON.parse(specflow(dir, ['status', 'upper-x', '--json']).stdout);
+  assert.deepEqual(status.taskStats, { total: 1, checked: 1, unchecked: 0 });
+});
