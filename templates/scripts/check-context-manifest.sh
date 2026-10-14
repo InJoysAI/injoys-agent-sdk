@@ -30,6 +30,14 @@ if ! jq -e '[paths | select(.[-1] == "previous_sync")] | length == 0' "$manifest
   exit 1
 fi
 
+# sources[].content_hash is optional (older manifests have none), but when present
+# it must be a lowercase hex SHA-256 so incremental change detection can rely on it.
+if ! jq -e '[(.sources // {}) | to_entries[] | .value | objects | .content_hash? | select(. != null)
+             | select((type == "string" and test("^[0-9a-f]{64}$")) | not)] | length == 0' "$manifest_path" >/dev/null; then
+  echo "ERROR: sources[].content_hash must be a 64-character lowercase hex SHA-256" >&2
+  exit 1
+fi
+
 history_rel=$(jq -r '.context_sync_history.path // empty' "$manifest_path")
 if [[ -z "$history_rel" ]]; then
   echo "ERROR: context_sync_history.path is required" >&2
@@ -37,9 +45,23 @@ if [[ -z "$history_rel" ]]; then
 fi
 
 history_path="$project_root/$history_rel"
-if [[ ! -f "$history_path" ]]; then
-  echo "ERROR: Context sync history not found: $history_path" >&2
-  exit 1
+
+history_lines=0
+if [[ -f "$history_path" ]]; then
+  history_lines=$(awk 'NF { count += 1 } END { print count + 0 }' "$history_path")
+fi
+
+# No sync event has been recorded yet (e.g. right after /context-init): the history
+# file is created by the first `context-update sync`, so it may be missing or empty
+# as long as the manifest does not claim a sync already happened.
+if (( history_lines == 0 )); then
+  if jq -e '(.last_context_sync // null) != null' "$manifest_path" >/dev/null; then
+    echo "ERROR: last_context_sync is set but the Context sync history is missing or empty: $history_path" >&2
+    exit 1
+  fi
+  echo "Context manifest OK (${manifest_bytes}/${max_manifest_bytes} bytes)"
+  echo "Context sync history: no events yet (created by the first context sync)"
+  exit 0
 fi
 
 if ! jq -e -s '
@@ -56,7 +78,6 @@ if ! jq -e -s '
   exit 1
 fi
 
-history_lines=$(awk 'NF { count += 1 } END { print count + 0 }' "$history_path")
 history_events=$(jq -s 'length' "$history_path")
 if [[ "$history_lines" != "$history_events" ]]; then
   echo "ERROR: Context sync history must contain exactly one JSON event per non-empty line" >&2

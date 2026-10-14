@@ -104,6 +104,8 @@
 
 3. **执行分析** — 执行 `@design/context-dev/legacy/AGENTS.md` 直接读取原始路径生成 `legacy_system_analysis.md`
 
+复制每个源文档时同时计算其 SHA-256，由 Manifest 更新流程写入 `sources.<KEY>.content_hash`（见 `@design/context-dev/tools/manifest/AGENTS.md`），用于之后判断源文件是否变更。
+
 > ⚠️ **源文档只读**: `source/` 目录中的文件为权威来源，谨慎修改。
 
 每个子目录生成 `README.md` 说明（作为快速索引）。
@@ -157,8 +159,8 @@
 
 ```
 === 源文档归档 ===
-✅ PRD.md → .context/domain/PRD.md (复制)
-✅ TDS.md → .context/architecture/TDS.md (复制)
+✅ PRD.md → .context/domain/source/PRD.md (复制)
+✅ TDS.md → .context/architecture/source/TDS.md (复制)
 ⏩ DB: 跳过（未提供）
 
 === 根目录文件 ===

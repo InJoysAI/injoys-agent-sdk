@@ -38,7 +38,7 @@ Supported subcommands:
 bash design/context-dev/scripts/check-context-manifest.sh
 ```
 
-检查 JSON/JSONL 可解析、Manifest 不含 `previous_sync`、历史为扁平事件、最新 `context_sync` 事件与 `last_context_sync` 对齐，并限制 Manifest 不超过 32 KiB。
+检查 JSON/JSONL 可解析、Manifest 不含 `previous_sync`、历史为扁平事件、最新 `context_sync` 事件与 `last_context_sync` 对齐、`sources[].content_hash`（若有）为合法 SHA-256，并限制 Manifest 不超过 32 KiB。尚无同步事件的新项目（`last_context_sync` 为 `null`）视为通过。
 
 ---
 
