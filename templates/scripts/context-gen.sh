@@ -42,11 +42,24 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
+# SHA-256 of a file; works with shasum (macOS), sha256sum (Linux) or openssl.
+sha256_of() {
+  if command -v sha256sum >/dev/null 2>&1; then
+    sha256sum "$1" | cut -d ' ' -f 1
+  elif command -v shasum >/dev/null 2>&1; then
+    shasum -a 256 "$1" | cut -d ' ' -f 1
+  elif command -v openssl >/dev/null 2>&1; then
+    openssl dgst -sha256 "$1" | awk '{print $NF}'
+  else
+    echo "❌ No SHA-256 tool found (need sha256sum, shasum or openssl)" >&2
+    return 1
+  fi
+}
+
 calculate_hash() {
   local file=$1
   if [ -f "$file" ]; then
-    local hash=$(shasum -a 256 "$file" | cut -d ' ' -f 1)
-    echo "$hash"
+    sha256_of "$file"
   else
     echo ""
   fi

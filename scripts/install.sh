@@ -22,7 +22,7 @@ else
     
     # Create temp directory for downloads
     TEMP_DIR=$(mktemp -d)
-    trap "rm -rf $TEMP_DIR" EXIT
+    trap 'rm -rf "$TEMP_DIR"' EXIT
     
     # Download and extract the repository
     echo "  - Downloading repository archive..."
@@ -30,7 +30,7 @@ else
     curl -fsSL "$ARCHIVE_URL" | tar -xz -C "$TEMP_DIR"
     
     # Set SCRIPT_DIR to the extracted directory
-    SCRIPT_DIR="$TEMP_DIR/injoys-agent-sdk-$BRANCH"
+    SCRIPT_DIR="$(find "$TEMP_DIR" -mindepth 1 -maxdepth 1 -type d | head -n 1)"
     
     if [ ! -d "$SCRIPT_DIR/templates" ]; then
         echo "❌ Error: Failed to download repository"

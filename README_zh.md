@@ -28,6 +28,16 @@
 npx @injoysai/agent-sdk init
 ```
 
+`init` 与方式 2 安装的布局一致（`design/context-dev/`，并 bootstrap `/context-init` 和 `/context-check`）。已存在的文件默认保留，传入 `--force` 才会覆盖。
+
+| 选项 | 说明 |
+| --- | --- |
+| `--tools <list>` | 仅为指定工具 bootstrap 命令（`antigravity,claude,cursor,devin,qoder`，默认全部） |
+| `--force` | 覆盖已存在的文件 |
+| `--dry-run` | 只显示将要写入的内容，不做任何修改 |
+
+`npx @injoysai/agent-sdk check-env` 会优先运行项目自己的 provider（`make check-env` 或 `scripts/check-env.sh`），没有时输出基础工具链报告。
+
 ### 方式 2: 一键安装
 
 在你的项目根目录下运行以下命令安装 InJoys Agent SDK 工具和规范：

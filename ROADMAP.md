@@ -26,7 +26,7 @@ This document outlines the development roadmap for InJoys Agent SDK.
 
 - [x] Publish to npm as `@injoysai/agent-sdk`
 - [x] Package and distribute `injoys` CLI via npm
-- [x] CLI command: `add`
+- [ ] CLI command: `add`
 - [x] `npx @injoysai/agent-sdk init` one-liner support
 - [x] Programmatic API for Node.js integration
 
