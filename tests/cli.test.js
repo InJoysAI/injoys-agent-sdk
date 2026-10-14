@@ -111,3 +111,17 @@ test('copyDir honours overwrite=false and dryRun', () => {
   assert.equal(dry.copied.length, 1);
   assert.equal(fs.readFileSync(path.join(dest, 'a.txt'), 'utf8'), 'old');
 });
+
+test('readManifest: null when missing, throws with the path when corrupt', () => {
+  const { readManifest } = require('../src');
+  const dir = tmp();
+  assert.equal(readManifest(dir), null);
+
+  const file = path.join(dir, '.context', 'context-manifest.json');
+  fs.mkdirSync(path.dirname(file), { recursive: true });
+  fs.writeFileSync(file, '{ not json');
+  assert.throws(() => readManifest(dir), (e) => e.message.includes('context-manifest.json'));
+
+  fs.writeFileSync(file, '{"version":1}');
+  assert.deepEqual(readManifest(dir), { version: 1 });
+});

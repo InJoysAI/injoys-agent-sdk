@@ -22,8 +22,6 @@
 
 ### 方式 1: NPX
 
-> ⚠️ **发布到 npm 后可用** - 请暂时使用方式 2。
-
 ```bash
 npx @injoysai/agent-sdk init
 ```

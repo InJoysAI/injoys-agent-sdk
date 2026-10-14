@@ -89,3 +89,10 @@ test('context-gen.sh computes SHA-256 without relying on shasum', { skip: proces
   assert.equal(res.status, 0, res.stderr);
   assert.ok(res.stdout.includes(expected), res.stdout);
 });
+
+test('bundled specflow regression test passes inside an installed project', () => {
+  const dir = project();
+  const file = 'design/context-dev/tools/specflow/specflow-empty-capability.test.mjs';
+  const res = spawnSync(process.execPath, ['--test', file], { cwd: dir, encoding: 'utf8' });
+  assert.equal(res.status, 0, res.stdout + res.stderr);
+});

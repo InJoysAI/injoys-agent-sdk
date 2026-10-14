@@ -22,8 +22,6 @@ It unifies two core capabilities:
 
 ### Method 1: NPX
 
-> ⚠️ **Available after publishing to npm** - Use Method 2 for now.
-
 ```bash
 npx @injoysai/agent-sdk init
 ```
