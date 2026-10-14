@@ -70,15 +70,25 @@
 
    | 类型 | 示例 | 特征 |
    |------|------|------|
-   | 数据层基础 | `feat-infra-dual-db`, `feat-infra-rls` | 所有写数据库的功能依赖 |
+   | 数据层基础 | `feat-infra-db`, `feat-infra-migrations` | 所有写数据库的功能依赖 |
    | 认证基础 | `feat-auth-register`, `feat-auth-sso` | 所有需要用户身份的功能依赖 |
    | API 契约 | `feat-infra-typespec` | 所有 API 实现依赖 |
-   | 合规前置 | `feat-compliance-age-gate`, `feat-compliance-geoblock` | 认证功能依赖 |
+   | 合规前置（仅当 `criterion.md` / domain 资产中存在合规前置要求时） | 按该要求命名，如 `feat-compliance-*` | 受该要求约束的功能依赖 |
+
+   > 以上仅为命名示例，Phase 与提案必须来自 `.context/` 资产，不得照搬示例。
 
 5. **条件性内容**：
    - 若 `.context/db/` 存在 → 包含数据库相关 Phase
    - 若 `.context/ui/` 存在 → 包含 UI 相关 Phase
    - 若 `.context/legacy/` 存在 → 包含遗留系统改造 Phase（Phase 0）
+
+### 2.1.1 可选：分 Phase 细化文件
+
+默认只生成 `openspec/proposal-roadmap.md`（索引/总览）。仅当用户明确要求，或某个 Phase 的提案过多（>8 个）、总览已难以阅读时，才为该 Phase 额外生成 `openspec/proposal-roadmap-Phase<N>.md`：
+
+- 模板：`design/context-dev/templates/proposal-roadmap-phase.md.template`
+- 总览中该 Phase 保留标题、目标和提案 ID 索引，并链接到 Phase 文件；提案条目以 Phase 文件为细化来源
+- 提案 ID、依赖关系须与总览一致，不得两处各写一套
 
 ### 2.2 棕地项目特殊规则
 

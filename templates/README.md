@@ -84,7 +84,7 @@ openspec/changes/<id>/  →  /context-start <id> 实施并归档
 | `{{api_path}}` | API 定义路径 (默认 `SSoT/api/main.tsp`) |
 | `{{generated_at}}` | 生成时间戳 |
 
-详见 `templates/templates/README.md`。
+详见 `design/context-dev/templates/README.md`。
 
 ---
 
@@ -102,7 +102,7 @@ curl -fsSL https://raw.githubusercontent.com/injoysai/injoys-agent-sdk/main/scri
 
 ### 2. 初始化 Context（归档源文档）
 
-先自备 PRD 与架构设计文档（`templates/templates/PRD.md.template`、`TAD.md.template` 可作参考，非必需；总结生成按章节语义解析，不依赖固定编号）。
+先自备 PRD 与架构设计文档（`design/context-dev/templates/PRD.md.template`、`TAD.md.template` 可作参考，非必需；总结生成按章节语义解析，不依赖固定编号）。
 
 ```
 .agent/workflows/context-init.md

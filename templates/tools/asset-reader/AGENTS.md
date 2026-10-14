@@ -109,8 +109,8 @@ for scope in ["architecture", "domain", "db", "ui", "legacy"]:
 
 ```json
 "sources": {
-    "PRD": { "archived_to": ".context/domain/source/InJoysAI-Product-Overview.md" },
-    "ARCHITECTURE": { "archived_to": ".context/architecture/source/InJoysAI-System-Architecture-Design.md" }
+    "PRD": { "archived_to": ".context/domain/source/Product-Overview.md" },
+    "ARCHITECTURE": { "archived_to": ".context/architecture/source/System-Architecture-Design.md" }
 }
 ```
 
@@ -174,5 +174,5 @@ for scope in ["architecture", "domain", "db", "ui", "legacy"]:
 - .context/history/context-sync.jsonl (审计日志，不注入项目上下文)
 
 回溯读取（若有）:
-- .context/architecture/source/InJoysAI-*.md
+- .context/architecture/source/*.md
 ```

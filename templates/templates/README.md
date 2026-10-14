@@ -11,6 +11,16 @@
 | `CLAUDE.md.template` | `CLAUDE.md` | Claude Code |
 | `cursorrules.template` | `.cursorrules` | Cursor |
 
+## 参考模板（不由工作流自动使用）
+
+| 模板文件 | 用途 |
+|---------|------|
+| `PRD.md.template` / `TAD.md.template` | 自备 PRD / 技术架构文档时的参考结构（`/context-init` 的输入，可选） |
+| `module-contract.md.template` / `module-audit.md.template` / `module-check.md.template` | 模块契约/审计/检查的提示词模板，需要时手工复制使用；示例中的 ID 仅为示意 |
+| `proposal-roadmap-phase.md.template` | `/context-openspec plan` 在需要分 Phase 细化时使用 |
+
+提案工件模板（`proposal/spec/design/tasks.md.template`）有两处：`design/context-dev/templates/openspec/`（`specflow new` 使用）和 `design/context-dev/templates/proposal/`（保留，勿删）。
+
 ## 占位符说明
 
 | 占位符 | 来源 | 说明 |
