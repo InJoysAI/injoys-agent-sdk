@@ -19,7 +19,21 @@ import fs from "node:fs";
 import path from "node:path";
 import process from "node:process";
 
-const REPO_ROOT = process.cwd();
+const CHANGE_ID_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+
+// Walk up from the current directory to the project root (the directory that
+// contains `openspec/`), so the CLI also works from sub-directories.
+function findRepoRoot(start) {
+  let dir = start;
+  for (;;) {
+    if (fs.existsSync(path.join(dir, "openspec"))) return dir;
+    const parent = path.dirname(dir);
+    if (parent === dir) return start;
+    dir = parent;
+  }
+}
+
+const REPO_ROOT = findRepoRoot(process.cwd());
 
 function die(message, exitCode = 1) {
   process.stderr.write(`${message}\n`);
@@ -90,7 +104,14 @@ function getTemplates() {
   };
 }
 
+function assertChangeId(changeId) {
+  if (!CHANGE_ID_RE.test(String(changeId))) {
+    die(`Invalid change-id '${changeId}'. Expected kebab-case (a-z, 0-9, '-').`);
+  }
+}
+
 function changeDir(changeId) {
+  assertChangeId(changeId);
   return path.join(REPO_ROOT, "openspec", "changes", changeId);
 }
 
@@ -458,9 +479,12 @@ function cmdTemplates({ flags }) {
 function cmdNew({ args, flags }) {
   const changeId = args[0];
   if (!changeId) die("Usage: specflow new <change-id> [--capability <capability>] [--title <title>]");
-  if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(changeId)) die(`Invalid change-id '${changeId}'. Expected kebab-case.`);
+  assertChangeId(changeId);
 
   const capability = String(flags.get("capability") || "capability");
+  if (!CHANGE_ID_RE.test(capability)) {
+    die(`Invalid capability '${capability}'. Expected kebab-case (a-z, 0-9, '-').`);
+  }
   const title = String(flags.get("title") || changeId);
 
   const templates = getTemplates();
@@ -600,6 +624,21 @@ function cmdArchive({ args, flags }) {
     }
   }
 
+  const src = changeDir(changeId);
+  const archiveDir = path.join(REPO_ROOT, "openspec", "changes", "archive");
+  const dstName = `${todayISO()}-${changeId}`;
+  const dst = path.join(archiveDir, dstName);
+
+  if (!fileExists(src)) die(`Change directory not found: openspec/changes/${changeId}`);
+  if (fileExists(dst)) die(`Archive target already exists: openspec/changes/archive/${dstName}`);
+
+  // Confirm BEFORE touching main specs or moving anything.
+  if (!yes) {
+    process.stdout.write("Archive will move the change directory and (optionally) sync specs.\n");
+    process.stdout.write("Re-run with --yes to proceed.\n");
+    process.exit(1);
+  }
+
   const deltaSpecs = findDeltaSpecs(changeId);
   const syncSummary = [];
   if (!skipSpecs) {
@@ -610,20 +649,7 @@ function cmdArchive({ args, flags }) {
     }
   }
 
-  const src = changeDir(changeId);
-  const archiveDir = path.join(REPO_ROOT, "openspec", "changes", "archive");
   ensureDir(archiveDir);
-  const dstName = `${todayISO()}-${changeId}`;
-  const dst = path.join(archiveDir, dstName);
-
-  if (fileExists(dst)) die(`Archive target already exists: openspec/changes/archive/${dstName}`);
-
-  if (!yes) {
-    process.stdout.write("Archive will move the change directory and (optionally) sync specs.\n");
-    process.stdout.write("Re-run with --yes to proceed.\n");
-    process.exit(1);
-  }
-
   fs.renameSync(src, dst);
 
   process.stdout.write("=== Specflow Archive Complete ===\n");

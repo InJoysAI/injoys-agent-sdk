@@ -26,7 +26,7 @@
 
 - [x] 发布到 npm (`@injoysai/agent-sdk`)
 - [x] 通过 npm 打包并分发 `injoys` CLI
-- [x] CLI 命令: `add`
+- [ ] CLI 命令: `add`
 - [x] `npx @injoysai/agent-sdk init` 一键支持
 - [x] Node.js 编程接口
 
