@@ -30,14 +30,22 @@
 
 ### Phase 2: 变更检测
 
-**对比 `sources` 节点中记录的源文件路径与当前实际文件**。
+**对比 `sources` 节点中记录的源文件与当前实际文件**。
+
+内容是否变化按以下顺序判断（仅针对 `status: archived` 的源）：
+
+1. 计算 `path` 指向的当前文件的 SHA-256，与 `content_hash` 比较。
+2. 旧版 Manifest 没有 `content_hash`：改为逐字节比较 `path` 与 `archived_to` 的归档副本。
+3. 归档副本也不存在：视为已变更（`UPDATE`）。
+
+`status: referenced` 的源（如遗留代码库）不跟踪内容，只检查 `path` 是否仍然存在。
 
 | 对比结果 | 标记 | 处理 |
 |---------|------|------|
-| 文件相同 | `SKIP` | 跳过 |
-| 文件内容变更 | `UPDATE` | 重新生成 |
-| Manifest 无此源 | `NEW` | 询问：补充/替换？ |
-| 当前无此源 | `ORPHAN` | 询问：保留/删除？ |
+| 内容相同 | `SKIP` | 跳过 |
+| 内容变更 | `UPDATE` | 重新生成，并刷新 `content_hash` |
+| 当前提供了、Manifest 里没有的源 | `NEW` | 询问：补充/替换？ |
+| Manifest 里有、`path` 已不存在的源 | `ORPHAN` | 询问：保留/删除？ |
 
 ---
 
@@ -117,6 +125,7 @@
     "path": "docs/InJoysAI-Product-Overview.md",
     "archived_to": ".context/domain/source/InJoysAI-Product-Overview.md",
     "type": "product_requirements",
+    "content_hash": "<源文件的 SHA-256，64 位小写 hex>",
     "status": "archived"
   },
   "ARCHITECTURE": {
@@ -148,8 +157,12 @@
 
 | status | 说明 |
 |--------|------|
-| `archived` | 源文件已复制到 `source/` 目录 |
-| `referenced` | 仅记录引用（遗留代码库不复制） |
+| `archived` | 源文件已复制到 `source/` 目录，并记录 `content_hash` |
+| `referenced` | 仅记录引用（遗留代码库不复制），没有 `content_hash` |
+
+**`content_hash`**：被归档源文件原始字节的 SHA-256（64 位小写 hex），在复制归档时写入，源文件被重新归档（`UPDATE`）时刷新。
+计算方式任选其一：`sha256sum <file>`、`shasum -a 256 <file>`、`bash design/context-dev/scripts/context-gen.sh <file>`（输出中的 `SHA256`）。
+该字段可选（旧版 Manifest 没有），但存在时必须是合法的 SHA-256，`check-context-manifest.sh` 会校验格式。
 
 #### generated_files 节点：
 
@@ -192,6 +205,7 @@
 
 #### 同步状态与审计历史
 
+- 尚未发生过任何同步（刚 `/context-init` 之后）时，`last_context_sync` 为 `null`，历史文件可以不存在或为空；校验脚本此时通过。首次 `context-update sync` 会创建历史文件，此后 `last_context_sync` 必须与最新的 `context_sync` 事件一致。
 - `last_context_sync` 只保存最近一次同步的当前状态：`source`、可选 `workflow/change_id`、`authority`、`mode`、`synced_at`、`updated_context_files` 与 `history_path`。
 - Manifest 中禁止出现 `previous_sync`，禁止保存递归历史链，禁止把详细差异报告或领域决策堆入 `last_context_sync`。
 - 完整事件以单行 JSON 追加到 `.context/history/context-sync.jsonl`；每条记录必须是独立对象，并至少包含 `event_type` 与 ISO 8601 `synced_at`。

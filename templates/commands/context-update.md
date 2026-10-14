@@ -41,14 +41,14 @@ If the target project still uses separate commands (`.agent/workflows/context-ad
 ## add
 > ⚠️ 若仓库未实现该子命令：STOP（不要“按文档想象实现”直接改文件）。
 1. Require `<source>` (e.g. `@docs/Security.md`). Ask user where it should land (which `.context/**` file to merge into or create).
-2. Calculate SHA256 for the new source file and record it in `.context/context-manifest.json`.
+2. Calculate SHA256 for the new source file and record it as `sources.<KEY>.content_hash` in `.context/context-manifest.json`.
 3. Update target Context file content + its Metadata `Source`.
 4. Update manifest `generated_files` for the touched outputs.
 
 ## modify
 > ⚠️ 若仓库未实现该子命令：STOP（不要“按文档想象实现”直接改文件）。
 1. Require `<scope>` (e.g. `prd`, `arch`, `db`, `ui`, or a specific output file path).
-2. Recompute source hash and compare with manifest `content_hash`.
+2. Recompute the source hash and compare it with `sources.<KEY>.content_hash` in the manifest (see `tools/manifest/AGENTS.md`; without a stored hash, compare the source with its archived copy).
 3. Regenerate only impacted `.context/**` outputs; keep template structure.
 4. Update Metadata timestamps + manifest entries.
 

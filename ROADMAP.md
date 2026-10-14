@@ -11,7 +11,7 @@ This document outlines the development roadmap for InJoys Agent SDK.
 - [x] Context generation framework (.context/ structure)
 - [x] Multi-agent support (Antigravity, Claude Code, Cursor, Devin, Codex, Qoder)
 - [x] Project Criterion and rule templates
-- [x] SSoT integration templates (Atlas HCL, TypeSpec)
+- [x] SSoT integration templates (Goose migrations, TypeSpec)
 - [x] Shell-based installation script
 - [x] Initial Node.js CLI (`init`, `check-env`)
 - [x] Bilingual documentation (EN/ZH)
@@ -52,7 +52,7 @@ This document outlines the development roadmap for InJoys Agent SDK.
 
 **Full SSoT Integration**
 
-- [ ] Built-in Atlas HCL code generation
+- [ ] Built-in Goose migration workflow
 - [ ] Built-in TypeSpec compilation
 - [ ] OpenSpec proposal workflow automation
 - [ ] GitHub Actions integration

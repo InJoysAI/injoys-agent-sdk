@@ -174,13 +174,16 @@ function artifactStatus(changeId) {
   return { changeId, artifacts, ready, isComplete, executionComplete, taskStats };
 }
 
+// One definition for "a task checkbox line", shared by `status` and `validate`.
+const TASK_CHECKBOX_RE = /^\s*-\s+\[([ xX\/])\]\s+/;
+
 function getTaskCheckboxStats(tasksText) {
   const lines = String(tasksText || "").split(/\r?\n/);
   let total = 0;
   let checked = 0;
   let unchecked = 0;
   for (const line of lines) {
-    const m = line.match(/^\s*-\s+\[([ xX\/])\]\s+/);
+    const m = line.match(TASK_CHECKBOX_RE);
     if (!m) continue;
     total += 1;
     if (m[1].toLowerCase() === "x") checked += 1;
@@ -200,6 +203,13 @@ function splitRequirementBlocks(markdown) {
   let current = null;
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
+    // A level-2 heading (e.g. "## Notes", "## MODIFIED Requirements") ends the
+    // current requirement; its content is not part of any requirement.
+    if (/^##\s+\S/.test(line)) {
+      if (current) blocks.push(current);
+      current = null;
+      continue;
+    }
     const m = line.match(/^### Requirement:\s*(.+)\s*$/);
     if (m) {
       if (current) blocks.push(current);
@@ -210,6 +220,25 @@ function splitRequirementBlocks(markdown) {
   }
   if (current) blocks.push(current);
   return blocks;
+}
+
+// RENAMED sections list pairs like:
+//   - FROM: `### Requirement: Old name`
+//   - TO: `### Requirement: New name`
+function parseRenames(sectionText) {
+  const froms = [];
+  const tos = [];
+  for (const line of String(sectionText || "").split(/\r?\n/)) {
+    const m = line.match(/^\s*[-*]\s*(FROM|TO)\s*:\s*`?\s*(?:###\s*Requirement:\s*)?(.+?)\s*`?\s*$/i);
+    if (!m) continue;
+    (m[1].toUpperCase() === "FROM" ? froms : tos).push(m[2].trim());
+  }
+  const pairs = froms.map((from, i) => ({ from, to: tos[i] })).filter((p) => p.to);
+  return { pairs, froms: froms.length, tos: tos.length };
+}
+
+function renamesAreWellFormed(info) {
+  return info.pairs.length > 0 && info.froms === info.tos;
 }
 
 function validateDeltaSpec(specText, { strict }) {
@@ -225,8 +254,19 @@ function validateDeltaSpec(specText, { strict }) {
     issues.push({ level: "error", message: "Spec contains unresolved placeholders like '{{...}}'." });
   }
 
+  const sections = parseDeltaSections(specText);
+  const renameInfo = sections.has("RENAMED") ? parseRenames(sections.get("RENAMED")) : null;
+  if (renameInfo && !renamesAreWellFormed(renameInfo)) {
+    issues.push({
+      level: strict ? "error" : "warning",
+      message: "RENAMED Requirements must list matching '- FROM: `### Requirement: <old>`' and '- TO: `### Requirement: <new>`' lines.",
+    });
+  }
+
   const requirementBlocks = splitRequirementBlocks(specText);
   if (requirementBlocks.length === 0) {
+    // A change that only renames requirements has no requirement blocks of its own.
+    if (renameInfo && renameInfo.pairs.length > 0) return issues;
     issues.push({ level: "error", message: "No requirements found. Expected at least one '### Requirement:' block." });
     return issues;
   }
@@ -271,7 +311,7 @@ function validateProposal(proposalText, { strict }) {
 
 function validateTasks(tasksText, { strict, changeId }) {
   const issues = [];
-  const hasCheckbox = /^\s*-\s+\[[ x\/]\]\s+/m.test(tasksText);
+  const hasCheckbox = String(tasksText || "").split(/\r?\n/).some((line) => TASK_CHECKBOX_RE.test(line));
   if (!hasCheckbox) {
     issues.push({ level: "error", message: "tasks.md has no markdown checkboxes. Expected lines like '- [ ] ...'." });
   }
@@ -338,11 +378,8 @@ function getMainSpecPath(capability) {
   return path.join(REPO_ROOT, "openspec", "specs", capability, "spec.md");
 }
 
-function ensureMainSpecSkeleton(capability) {
-  const mainPath = getMainSpecPath(capability);
-  if (fileExists(mainPath)) return;
-  const content = `# ${capability} Specification\n\n## Purpose\nTBD\n\n## Requirements\n`;
-  writeIfMissing(mainPath, content);
+function mainSpecSkeleton(capability) {
+  return `# ${capability} Specification\n\n## Purpose\nTBD\n\n## Requirements\n`;
 }
 
 function parseDeltaSections(deltaText) {
@@ -370,27 +407,32 @@ function parseDeltaSections(deltaText) {
 }
 
 function parseMainRequirements(mainText) {
-  // Returns { before, requirementsText, after } around "## Requirements"
+  // Splits a main spec into: everything before "## Requirements", the requirement
+  // blocks, and any level-2 sections that follow them (e.g. "## Notes").
   const m = mainText.match(/^##\s+Requirements\s*$/m);
   if (!m) {
     return { before: mainText.trimEnd() + "\n\n", requirementsText: "", after: "" };
   }
 
-  const idx = m.index;
-  const before = mainText.slice(0, idx);
-  const afterStart = idx + m[0].length;
-  const after = mainText.slice(afterStart);
-  return { before, requirementsText: after, after: "" };
+  const before = mainText.slice(0, m.index);
+  const rest = mainText.slice(m.index + m[0].length);
+  const next = rest.match(/^##\s+\S.*$/m);
+  return {
+    before,
+    requirementsText: next ? rest.slice(0, next.index) : rest,
+    after: next ? rest.slice(next.index) : "",
+  };
 }
 
-function applyDeltaToMain({ capability, deltaText }) {
-  ensureMainSpecSkeleton(capability);
+// Computes the new text of a capability's main spec WITHOUT touching the disk.
+// `problems` are conditions that make the change unsafe to archive.
+function renderMainSpec({ capability, deltaText }) {
   const mainPath = getMainSpecPath(capability);
-  const mainText = readText(mainPath);
+  const mainText = fileExists(mainPath) ? readText(mainPath) : mainSpecSkeleton(capability);
 
   const sections = parseDeltaSections(deltaText);
 
-  const { before, requirementsText } = parseMainRequirements(mainText);
+  const { before, requirementsText, after } = parseMainRequirements(mainText);
   const existingBlocks = splitRequirementBlocks(requirementsText);
   const existingByTitle = new Map(existingBlocks.map((b) => [b.title, b]));
 
@@ -406,11 +448,35 @@ function applyDeltaToMain({ capability, deltaText }) {
   }
 
   const summary = [];
+  const problems = [];
 
   const addedText = sections.get("ADDED") ?? "";
   const modifiedText = sections.get("MODIFIED") ?? "";
   const removedText = sections.get("REMOVED") ?? "";
-  const renamedText = sections.get("RENAMED") ?? "";
+
+  // RENAMED first, so MODIFIED/REMOVED can refer to the new names.
+  if (sections.has("RENAMED")) {
+    const renames = parseRenames(sections.get("RENAMED"));
+    if (!renamesAreWellFormed(renames)) {
+      problems.push("RENAMED section is malformed: expected matching '- FROM:' / '- TO:' lines.");
+    }
+    for (const { from, to } of renames.pairs) {
+      const block = existingByTitle.get(from);
+      if (!block) {
+        problems.push(`RENAMED: requirement '${from}' not found in openspec/specs/${capability}/spec.md`);
+        continue;
+      }
+      if (existingByTitle.has(to)) {
+        problems.push(`RENAMED: target name '${to}' already exists in openspec/specs/${capability}/spec.md`);
+        continue;
+      }
+      existingByTitle.delete(from);
+      block.title = to;
+      block.lines[0] = `### Requirement: ${to}`;
+      existingByTitle.set(to, block);
+      summary.push(`Renamed requirement: ${from} -> ${to}`);
+    }
+  }
 
   for (const block of splitRequirementBlocks(addedText)) {
     const existed = existingByTitle.has(block.title);
@@ -430,10 +496,6 @@ function applyDeltaToMain({ capability, deltaText }) {
     else summary.push(`Remove requested but not found: ${block.title}`);
   }
 
-  if (renamedText.trim().length > 0) {
-    summary.push("RENAMED section present: manual review recommended (not auto-applied).");
-  }
-
   // Rebuild requirements section in stable order: keep original order if possible, then append new.
   const orderedTitles = [];
   for (const b of existingBlocks) {
@@ -447,22 +509,27 @@ function applyDeltaToMain({ capability, deltaText }) {
     .map((t) => existingByTitle.get(t).lines.join("\n").trimEnd())
     .join("\n\n") + "\n";
 
-  const rebuilt = `${before.trimEnd()}\n\n## Requirements\n${rebuiltReq}`;
-  fs.writeFileSync(mainPath, rebuilt, "utf8");
+  let text = `${before.trimEnd()}\n\n## Requirements\n${rebuiltReq}`;
+  if (after.trim().length > 0) text += `\n${after.trimEnd()}\n`;
+
+  return { capability, mainPath, text, summary, problems, retireIfEmpty: existingByTitle.size === 0 };
+}
+
+function writeMainSpec(plan) {
+  ensureDir(path.dirname(plan.mainPath));
+  fs.writeFileSync(plan.mainPath, plan.text, "utf8");
 
   // Retire an empty capability only when the merged main spec has no
   // requirements and the directory contains no other artifacts. This keeps
   // partially removed capabilities (with any remaining requirement) intact.
-  if (existingByTitle.size === 0) {
-    const capabilityDir = path.dirname(mainPath);
+  if (plan.retireIfEmpty) {
+    const capabilityDir = path.dirname(plan.mainPath);
     const entries = fs.readdirSync(capabilityDir);
     if (entries.length === 1 && entries[0] === "spec.md") {
       fs.rmSync(capabilityDir, { recursive: true, force: true });
-      summary.push(`Retired empty capability directory: ${path.relative(REPO_ROOT, capabilityDir)}`);
+      plan.summary.push(`Retired empty capability directory: ${path.relative(REPO_ROOT, capabilityDir)}`);
     }
   }
-
-  return summary;
 }
 
 function cmdTemplates({ flags }) {
@@ -632,22 +699,31 @@ function cmdArchive({ args, flags }) {
   if (!fileExists(src)) die(`Change directory not found: openspec/changes/${changeId}`);
   if (fileExists(dst)) die(`Archive target already exists: openspec/changes/archive/${dstName}`);
 
-  // Confirm BEFORE touching main specs or moving anything.
+  // 1) Work out every main-spec update in memory first. Nothing is written yet,
+  //    so a problem in any capability leaves the project completely untouched.
+  const plans = [];
+  if (!skipSpecs) {
+    for (const d of findDeltaSpecs(changeId)) {
+      plans.push(renderMainSpec({ capability: d.capability, deltaText: readText(d.path) }));
+    }
+    const problems = plans.flatMap((p) => p.problems.map((m) => `${p.capability}: ${m}`));
+    if (problems.length > 0) {
+      process.stdout.write(`❌ Refusing to archive ${changeId}: the spec changes cannot be applied cleanly.\n`);
+      for (const m of problems) process.stdout.write(`- ${m}\n`);
+      process.stdout.write("Nothing was changed. Fix the delta spec, or use --skip-specs to archive without syncing specs.\n");
+      process.exit(2);
+    }
+  }
+
+  // 2) Confirm BEFORE touching main specs or moving anything.
   if (!yes) {
     process.stdout.write("Archive will move the change directory and (optionally) sync specs.\n");
     process.stdout.write("Re-run with --yes to proceed.\n");
     process.exit(1);
   }
 
-  const deltaSpecs = findDeltaSpecs(changeId);
-  const syncSummary = [];
-  if (!skipSpecs) {
-    for (const d of deltaSpecs) {
-      const deltaText = readText(d.path);
-      const s = applyDeltaToMain({ capability: d.capability, deltaText });
-      syncSummary.push({ capability: d.capability, summary: s });
-    }
-  }
+  // 3) Apply.
+  for (const plan of plans) writeMainSpec(plan);
 
   ensureDir(archiveDir);
   fs.renameSync(src, dst);
@@ -655,10 +731,9 @@ function cmdArchive({ args, flags }) {
   process.stdout.write("=== Specflow Archive Complete ===\n");
   process.stdout.write(`✅ Archived to: openspec/changes/archive/${dstName}/\n`);
   process.stdout.write(`Specs sync: ${skipSpecs ? "skipped" : "applied"}\n`);
-  if (!skipSpecs) {
-    for (const s of syncSummary) {
-      process.stdout.write(`- ${s.capability}: ${s.summary.length} change(s)\n`);
-    }
+  for (const plan of plans) {
+    process.stdout.write(`- ${plan.capability}: ${plan.summary.length} change(s)\n`);
+    for (const line of plan.summary) process.stdout.write(`    · ${line}\n`);
   }
 }
 

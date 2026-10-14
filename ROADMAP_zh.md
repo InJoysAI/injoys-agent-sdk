@@ -11,7 +11,7 @@
 - [x] 上下文生成框架 (.context/ 结构)
 - [x] 多 Agent 支持 (Antigravity, Claude Code, Cursor, Devin, Codex, Qoder)
 - [x] 项目准则和规则模板
-- [x] SSoT 集成模板 (Atlas HCL, TypeSpec)
+- [x] SSoT 集成模板 (Goose 迁移, TypeSpec)
 - [x] Shell 安装脚本
 - [x] 初版 Node.js CLI（`init`, `check-env`）
 - [x] 双语文档 (中/英)
@@ -52,7 +52,7 @@
 
 **完整 SSoT 集成**
 
-- [ ] 内置 Atlas HCL 代码生成
+- [ ] 内置 Goose 迁移工作流
 - [ ] 内置 TypeSpec 编译
 - [ ] OpenSpec 提案工作流自动化
 - [ ] GitHub Actions 集成
