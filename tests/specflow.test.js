@@ -93,6 +93,10 @@ test('context-gen.sh computes SHA-256 without relying on shasum', { skip: proces
 test('bundled specflow regression test passes inside an installed project', () => {
   const dir = project();
   const file = 'design/context-dev/tools/specflow/specflow-empty-capability.test.mjs';
-  const res = spawnSync(process.execPath, ['--test', file], { cwd: dir, encoding: 'utf8' });
+  // `node --test` sets NODE_TEST_CONTEXT for its children; a nested `node --test`
+  // would then report through events and its exit code would not reflect failures.
+  const env = { ...process.env };
+  delete env.NODE_TEST_CONTEXT;
+  const res = spawnSync(process.execPath, ['--test', file], { cwd: dir, env, encoding: 'utf8' });
   assert.equal(res.status, 0, res.stdout + res.stderr);
 });
