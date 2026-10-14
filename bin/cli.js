@@ -229,7 +229,7 @@ function checkEnvCommand(args) {
     { name: 'git', required: true },
     { name: 'bash', required: false },
     { name: 'tsp', required: false, note: 'TypeSpec compiler, for SSoT API definitions' },
-    { name: 'atlas', required: false, note: 'Atlas, for SSoT schema migrations' }
+    { name: 'goose', required: false, note: 'Goose, for SSoT schema migrations' }
   ];
 
   let failed = !nodeOk;

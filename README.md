@@ -10,13 +10,13 @@
 
 It unifies two core capabilities:
 1.  **Context Generation Framework**: Automatically generates high-quality, structured context (`.context/`) for AI agents from project documentation (PRDs, Architecture specs).
-2.  **AI Programming Standards**: Defines "Project Criterion" and workflows (OpenSpec, Atlas HCL, TypeSpec) to ensure AI-generated code is robust, secure, and compliant.
+2.  **AI Programming Standards**: Defines "Project Criterion" and workflows (OpenSpec, Goose, TypeSpec) to ensure AI-generated code is robust, secure, and compliant.
 
 ## Features
 
 - **Six command files**: `/context-init`, `/context-openspec` (including the proposal subcommand), `/context-interview`, `/context-start`, `/context-check`, and `/context-update`.
 - **Shared command source**: Commands can be installed for Antigravity, Claude Code, Cursor, Devin, Qoder, and Grok. Codex prompts use a separate installer.
-- **SSoT Integration**: Templates for integrating Single Source of Truth (SSoT) definitions for Schema (Atlas) and API (TypeSpec).
+- **SSoT Integration**: Templates for integrating Single Source of Truth (SSoT) definitions for Schema (Goose SQL migrations) and API (TypeSpec).
 
 ## Installation
 

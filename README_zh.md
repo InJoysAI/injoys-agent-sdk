@@ -10,13 +10,13 @@
 
 它统一了两项核心能力：
 1.  **Context Generation Framework（上下文生成框架）**：根据项目文档（PRD、架构规范）自动为 AI Agent 生成高质量、结构化的上下文资产（`.context/`）。
-2.  **AI Programming Standards（AI 编程规范）**：定义"项目准则"和工作流（OpenSpec, Atlas HCL, TypeSpec），确保 AI 生成的代码健壮、安全且合规。
+2.  **AI Programming Standards（AI 编程规范）**：定义"项目准则"和工作流（OpenSpec, Goose, TypeSpec），确保 AI 生成的代码健壮、安全且合规。
 
 ## 功能特性
 
 -   **6 个命令文件**：`/context-init`、`/context-openspec`（含 proposal 子命令）、`/context-interview`、`/context-start`、`/context-check`、`/context-update`。
 -   **共享命令源**：命令可安装到 Antigravity、Claude Code、Cursor、Devin、Qoder 和 Grok；Codex prompts 通过独立脚本安装。
--   **SSoT 集成**：提供 Schema (Atlas) 和 API (TypeSpec) 的单一数据源（SSoT）集成模板。
+-   **SSoT 集成**：提供 Schema (Goose SQL 迁移) 和 API (TypeSpec) 的单一数据源（SSoT）集成模板。
 
 ## 安装指南
 
