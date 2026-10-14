@@ -1,0 +1,32 @@
+## ADDED Requirements
+
+### Requirement: {{REQUIREMENT_TITLE}}
+系统必须（MUST）{{REQUIREMENT_DESCRIPTION}}
+
+#### Scenario: {{SCENARIO_NAME}}
+- **WHEN** {{CONDITION}}
+- **THEN** {{EXPECTED_RESULT}}
+- **AND** {{ADDITIONAL_EXPECTATION}}
+
+#### Scenario: {{SCENARIO_NAME_2}}
+- **WHEN** {{CONDITION_2}}
+- **THEN** {{EXPECTED_RESULT_2}}
+
+---
+
+## MODIFIED Requirements
+
+### Requirement: {{EXISTING_REQUIREMENT_TITLE}}
+[完整的修改后需求内容 - 必须包含所有原有内容加修改]
+
+#### Scenario: {{MODIFIED_SCENARIO_NAME}}
+- **WHEN** {{MODIFIED_CONDITION}}
+- **THEN** {{MODIFIED_EXPECTED_RESULT}}
+
+---
+
+## REMOVED Requirements
+
+### Requirement: {{REMOVED_REQUIREMENT_TITLE}}
+**Reason**: {{REMOVAL_REASON}}
+**Migration**: {{MIGRATION_PATH}}

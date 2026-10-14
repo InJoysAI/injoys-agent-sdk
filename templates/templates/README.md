@@ -19,7 +19,7 @@
 | `module-contract.md.template` / `module-audit.md.template` / `module-check.md.template` | 模块契约/审计/检查的提示词模板，需要时手工复制使用；示例中的 ID 仅为示意 |
 | `proposal-roadmap-phase.md.template` | `/context-openspec plan` 在需要分 Phase 细化时使用 |
 
-提案工件模板位于 `design/context-dev/templates/openspec/`（`proposal/spec/design/tasks.md.template`），由 specflow 使用。
+提案工件模板（`proposal/spec/design/tasks.md.template`）有两处：`design/context-dev/templates/openspec/`（`specflow new` 使用）和 `design/context-dev/templates/proposal/`（保留，勿删）。
 
 ## 占位符说明
 

@@ -1,0 +1,152 @@
+# 技术设计文档
+
+## Context
+
+### 背景
+{{BACKGROUND}}
+
+### 约束条件
+1. **技术约束**：
+   - {{TECH_CONSTRAINT_1}}
+   - {{TECH_CONSTRAINT_2}}
+
+2. **产品约束**：
+   - {{PRODUCT_CONSTRAINT_1}}
+   - {{PRODUCT_CONSTRAINT_2}}
+
+3. **架构约束**：
+   - {{ARCHITECTURE_CONSTRAINT_1}}
+   - {{ARCHITECTURE_CONSTRAINT_2}}
+
+### 利益相关者
+- **产品团队**：{{STAKEHOLDER_PRODUCT}}
+- **开发团队**：{{STAKEHOLDER_DEV}}
+- **用户**：{{STAKEHOLDER_USER}}
+
+## Goals / Non-Goals
+
+### Goals（目标）
+1. **核心目标**：
+   - {{GOAL_1}}
+   - {{GOAL_2}}
+
+2. **性能目标**：
+   - {{PERF_GOAL_1}}
+   - {{PERF_GOAL_2}}
+
+### Non-Goals（非目标）
+1. **不在此提案范围内**：
+   - {{NON_GOAL_1}}
+   - {{NON_GOAL_2}}
+
+2. **明确排除**：
+   - {{EXCLUSION_1}}
+
+## Decisions
+
+### Decision 1: {{DECISION_TITLE}}
+
+**决策**：{{DECISION}}
+
+**理由**：
+1. {{REASON_1}}
+2. {{REASON_2}}
+
+**替代方案**：
+- **{{ALTERNATIVE_1}}**：{{ALT_1_DESC}}
+- **{{ALTERNATIVE_2}}**：{{ALT_2_DESC}}
+
+**权衡**：
+- ✅ 优势：{{PROS}}
+- ⚠️ 劣势：{{CONS}}
+
+## Data Model
+
+### {{MODEL_NAME}} 表结构
+
+```sql
+CREATE TABLE IF NOT EXISTS {{TABLE_NAME}} (
+  {{COLUMN_DEFINITIONS}}
+);
+```
+
+## Component Architecture
+
+### 组件层次结构
+
+```
+{{COMPONENT_TREE}}
+```
+
+### 状态管理
+
+```typescript
+{{STATE_INTERFACE}}
+```
+
+## Risks / Trade-offs
+
+### Risk 1: {{RISK_TITLE}}
+
+**风险等级**：{{RISK_LEVEL}}
+
+**缓解措施**：
+1. {{MITIGATION_1}}
+2. {{MITIGATION_2}}
+
+**回退方案**：
+- {{FALLBACK}}
+
+## Migration Plan
+
+### 数据迁移
+
+**场景**：{{MIGRATION_SCENARIO}}
+
+```typescript
+{{MIGRATION_CODE}}
+```
+
+### 回滚计划
+
+**如果需要回滚**：
+1. {{ROLLBACK_STEP_1}}
+2. {{ROLLBACK_STEP_2}}
+
+## Open Questions
+
+### Q1: {{QUESTION_1}}
+
+**问题**：{{QUESTION_DETAIL}}
+
+**影响**：{{IMPACT}}
+
+**决策者**：{{DECISION_MAKER}}
+
+**截止日期**：{{DEADLINE}}
+
+**决定**：{{DECISION_RESULT}}
+
+## Performance Targets
+
+| 指标 | 目标值 | 测试方法 |
+|------|--------|----------|
+| {{METRIC_1}} | {{TARGET_1}} | {{TEST_METHOD_1}} |
+| {{METRIC_2}} | {{TARGET_2}} | {{TEST_METHOD_2}} |
+
+## Security Considerations
+
+### 数据安全
+- {{SECURITY_1}}
+- {{SECURITY_2}}
+
+### 隐私合规
+- {{PRIVACY_1}}
+- {{PRIVACY_2}}
+
+## Success Metrics
+
+| 指标 | 目标值 | 说明 |
+|------|--------|------|
+| {{SUCCESS_METRIC_1}} | {{SUCCESS_TARGET_1}} | {{SUCCESS_DESC_1}} |
+| {{SUCCESS_METRIC_2}} | {{SUCCESS_TARGET_2}} | {{SUCCESS_DESC_2}} |
