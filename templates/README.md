@@ -10,30 +10,50 @@
 ```
 templates/
 ├── README.md              # 本文件
-├── AGENTS.md              # Context 生成器入口
+├── AGENTS.md              # /context-init 入口（归档源文档 + 根文件 + SSoT，共 Step 1–6）
 ├── criterion.md           # 项目准则模板（工程约束 SSoT）
-├── architecture/
-│   └── AGENTS.md          # 架构总结生成（MVP）
-├── domain/
-│   └── AGENTS.md          # 领域总结生成（MVP）
-├── db/
-│   └── AGENTS.md          # 数据库设计总结
-├── ui/
-│   └── AGENTS.md          # UI 总结生成（可选）
+├── architecture/          # 架构总结生成（由 /context-openspec 调用）
+├── domain/                # 领域总结生成（由 /context-openspec 调用）
+├── db/                    # 数据库设计总结（可选）
+├── ui/                    # UI 总结生成（可选）
+├── legacy/                # 遗留系统分析（可选）
 ├── openspec/
-│   └── AGENTS.md          # OpenSpec 增强规范
-├── commands/               # 工具无关的唯一 /context-* 命令源
+│   ├── AGENTS.md          # /context-openspec 路由与一键模式
+│   ├── project/           # 生成 openspec/config.yaml
+│   ├── plan/              # 生成 openspec/proposal-roadmap.md
+│   └── proposal/          # 创建并校验提案
+├── start/                 # /context-start 实施流程
+├── check/                 # /context-check 各子检查
+├── update/                # /context-update（sync roadmap|proposal）
+├── tools/                 # 内部模块：docs / manifest / SSoT / ai-config / asset-reader / integration / specflow
+├── commands/              # 工具无关的唯一 /context-* 命令源
 ├── scripts/
 │   ├── context-gen.sh             # Hash/引导脚本
 │   ├── install-ai-commands.sh     # 安装 /context-* 命令（初始化仅选 antigravity）
-│   └── install-codex-prompts.sh   # 可选手动安装 Codex prompts
-└── templates/             # AI 工具入口文件模板
-    ├── README.md          # 占位符说明
-    ├── AGENTS.md.template
-    ├── CLAUDE.md.template
-    ├── cursorrules.template
-    ├── context-agents.md.template
+│   ├── install-codex-prompts.sh   # 可选手动安装 Codex prompts
+│   └── check-context-manifest.sh  # Manifest 校验（需要 jq）
+└── templates/             # 各类文档/入口文件模板（PRD、TAD、roadmap、AI 工具入口等）
+    └── README.md          # 占位符说明
 ```
+
+---
+
+## 流水线总览
+
+```
+需求文档 + 架构文档（自备）
+   │  /context-init          归档到 .context/*/source/，生成 criterion/README/AGENTS，初始化 SSoT
+   ▼
+.context 源文档归档
+   │  /context-openspec      生成 domain/architecture/db/ui 总结 → config.yaml → proposal-roadmap.md
+   ▼
+.context 资产 + openspec/config.yaml + proposal-roadmap.md
+   │  /context-openspec proposal <id>    创建并校验提案
+   ▼
+openspec/changes/<id>/  →  /context-start <id> 实施并归档
+```
+
+> `/context-init` **只归档，不生成总结**；总结、`config.yaml`、`proposal-roadmap.md` 都由 `/context-openspec` 生成。
 
 ---
 
@@ -80,7 +100,9 @@ templates/
 curl -fsSL https://raw.githubusercontent.com/injoysai/injoys-agent-sdk/main/scripts/install.sh | bash -s /path/to/your-project
 ```
 
-### 2. 初始化 Context
+### 2. 初始化 Context（归档源文档）
+
+先自备 PRD 与架构设计文档（`templates/templates/PRD.md.template`、`TAD.md.template` 可作参考，非必需；总结生成按章节语义解析，不依赖固定编号）。
 
 ```
 .agent/workflows/context-init.md
@@ -89,17 +111,22 @@ PRD：@docs/product-overview.md
 架构：@docs/system-architecture.md
 ```
 
+产出：`.context/{domain,architecture,...}/source/` 源文档归档、`criterion.md`、`README.md`、`AGENTS.md`、Manifest，并按架构文档判断是否初始化 `SSoT/`。此步**不生成** domain / architecture 等总结。
+
 安装脚本会先 bootstrap 命令到若干工具目录；初始化流程自身不会询问 AI 工具类型，只会将完整命令同步到目标项目的 `.agent/workflows/`。需要其他工具的完整命令时，按上文单独运行安装脚本。
 
-### 3. 初始化 OpenSpec (幂等增强)
+### 3. 生成 Context 总结与 OpenSpec 资产（幂等）
 
 ```
 .agent/workflows/context-openspec.md
 ```
 
-- 创建 `openspec/` 目录结构
+一键模式按顺序执行：
+- 生成 `.context/domain/`、`architecture/` 总结（存在 `db/`、`ui/` 源文档时同样生成）
 - 确保 `openspec/` 目录结构存在
-- 生成 `openspec/config.yaml` + `openspec/proposal-roadmap.md`
+- 生成 `openspec/config.yaml` 与 `openspec/proposal-roadmap.md`
+
+也可单独运行子命令：`domain` / `architecture` / `db` / `ui` / `legacy` / `project` / `plan`。
 
 ### 4. 创建提案
 
