@@ -2,8 +2,11 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
 import { execFileSync } from "node:child_process";
+import { fileURLToPath } from "node:url";
 
-const root = path.resolve(import.meta.dirname, "../../../../");
+// import.meta.dirname needs Node >= 20.11; derive it from import.meta.url for Node 18.
+const here = path.dirname(fileURLToPath(import.meta.url));
+const root = path.resolve(here, "../../../../");
 const cli = path.join(root, "design/context-dev/tools/specflow/specflow.mjs");
 const stamp = `specflow-empty-${process.pid}`;
 const archive = path.join(root, "openspec/changes/archive");
