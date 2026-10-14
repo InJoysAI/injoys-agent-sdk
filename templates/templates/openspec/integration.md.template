@@ -38,7 +38,7 @@ When executing OpenSpec workflows, you **MUST** read the following `.context/` a
 1. **Project-level Prerequisites and Required Reading**:
    - `CONTEXT_ASSET_INDEX` block in this file — Determine which `.context/**` assets exist and must be read for this project
    - `.context/criterion.md` — Understand hard constraints (MUST/MUST NOT)
-   - `openspec/config.yaml` — Project config (OPSX injected context). If absent and recorded in `context-manifest.json#pending_generation`, stop proposal creation and generate the project-level OpenSpec integration first.
+   - `openspec/config.yaml` — Project config (project context injected into proposal creation). If absent and recorded in `context-manifest.json#pending_generation`, stop proposal creation and generate the project-level OpenSpec integration first.
    - `openspec/proposal-roadmap.md` — Roadmap index/overview (**OR** the user-provided `roadmap-doc`, if passed). If neither exists, stop proposal creation; do not treat the pending path as an existing file.
 
 2. **Read As Needed** (if present per `CONTEXT_ASSET_INDEX`):

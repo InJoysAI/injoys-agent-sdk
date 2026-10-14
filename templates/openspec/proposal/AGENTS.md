@@ -49,7 +49,7 @@
 
 **额外读取**（proposal 专用）：
 - `.context/openspec/integration.md` — Context 读取规范
-- `openspec/config.yaml` — 从 Context 生成的项目上下文快照（OPSX 注入上下文）
+- `openspec/config.yaml` — 从 Context 生成的项目上下文快照（供提案创建使用的项目上下文）
 - `openspec/proposal-roadmap.md` — 规划文档（索引/总览，且必须提取 `<change-id>` 对应条目正文）
 - `openspec/proposal-roadmap-Phase*.md` / `openspec/proposal-roadmap-Phase-*.md` — 分 Phase 规划（若存在，视为更细粒度计划）
 
@@ -146,18 +146,18 @@ ls openspec/specs/         # 已有的 specs（capabilities）
 
 ## Phase 2: 创建提案
 
-> ⛔ **执行 OpenSpec 官方提案创建流程**
+> ⛔ **按本节流程创建提案（使用本仓库 specflow 工具）**
 
-### 2.0 推荐：优先使用 OPSX 的 artifact 流程生成提案骨架
+### 2.0 推荐：使用 specflow 生成提案骨架
 
-> 目标：避免漏文件/漏顺序；让“提案创建”与新版 OpenSpec/OPSX 的工作流保持一致。
+> 目标：避免漏文件/漏顺序，骨架直接来自 `design/context-dev/templates/openspec/` 模板。
 
-**优先流程**（若项目启用了 OPSX 命令）：
-1. 使用 `/opsx:new` 创建/选择变更目录（确保 `openspec/changes/<change-id>/` 存在且被 OpenSpec 识别）
-2. 使用 `/opsx:continue` 按 artifact 顺序生成提案所需文件（proposal/tasks/specs/...）
+**优先流程**：
+1. 运行 `node design/context-dev/tools/specflow/specflow.mjs new <change-id> [--capability <capability>] [--title <title>]`，创建 `openspec/changes/<change-id>/` 及 proposal/tasks/spec 骨架
+2. 按 `node design/context-dev/tools/specflow/specflow.mjs instructions <artifact> --change <change-id>` 的要求逐个填充工件（proposal/tasks/specs/design）
 3. 回到本指令继续执行下面的 **2.1 强约束** 与后续自检/验证
 
-**fallback**（若无法使用 OPSX 命令）：继续执行下方的手工创建流程（创建目录结构与交付物）。
+**fallback**（`specflow new` 不可用时）：按下方步骤手工创建目录结构与交付物。
 
 ### 2.0.1 将 roadmap 快照绑定到提案内容（强制）
 
