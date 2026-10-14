@@ -1,7 +1,7 @@
 # Domain 总结生成入口
 
 > **用途**: 从 PRD 产品需求文档生成结构化的业务领域总结。  
-> **触发**: `.agent/workflows/context-openspec.md domain` 或由 `design/context-dev/AGENTS.md` Step 5.2 调用。
+> **触发**: `.agent/workflows/context-openspec.md domain`，或由 `.agent/workflows/context-openspec.md`（无参数一键模式）按顺序调用。`/context-init` 只归档源文档，不会生成本模块的总结。
 
 ---
 
@@ -52,6 +52,8 @@
 优先读取目标项目内的 `docs/Standard_PRD_Guidelines.md`（若存在），否则按以下内置「章节→输出」映射解析 PRD：
 
 ### 核心提取项
+
+> 下表的章节**编号仅为示例**：不同 PRD 的章节顺序和编号各不相同（例如随包的 `templates/PRD.md.template` 编号就与此不同）。解析时按章节**标题与内容语义**匹配，不依赖编号；找不到对应内容时在输出中标注“PRD 未提供”，不得编造。
 
 | PRD 章节 | 提取内容 | 输出目标 |
 |---------|---------|---------|

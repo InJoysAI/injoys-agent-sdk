@@ -1,7 +1,7 @@
 # Architecture 总结生成入口
 
 > **用途**: 从架构设计文档生成结构化的架构总结。  
-> **触发**: `.agent/workflows/context-openspec.md architecture` 或由 `design/context-dev/AGENTS.md` Step 5.2 调用。
+> **触发**: `.agent/workflows/context-openspec.md architecture`，或由 `.agent/workflows/context-openspec.md`（无参数一键模式）按顺序调用。`/context-init` 只归档源文档，不会生成本模块的总结。
 
 ---
 

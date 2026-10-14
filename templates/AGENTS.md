@@ -119,6 +119,8 @@
 - .agent/workflows/: [已同步 / 失败]
 
 🏗️ SSoT 状态: [已初始化 / 跳过 (原因)]
+
+➡️ 下一步: 运行 `.agent/workflows/context-openspec.md`（一键）生成 domain / architecture / db / ui 总结、`openspec/config.yaml` 和 `openspec/proposal-roadmap.md`
 ```
 
 ---
