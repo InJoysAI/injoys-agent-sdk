@@ -29,7 +29,7 @@
 
 | 识别项 | 说明 | 示例 |
 |--------|------|------|
-| source | `roadmap` 或 `proposal` | `sync proposal feat-video-submit` |
+| source | `roadmap` 或 `proposal` | `sync proposal feat-user-login` |
 | target | 默认 `.context/**` | roadmap/proposal → context |
 | scope | 全量 / 单个 phase / 单个文件 / 单个 change | `phase3` / `proposal-roadmap-Phase3.md` |
 | mode | `review` / `apply` | `--mode apply` |
@@ -105,9 +105,9 @@
 
 | 来源 | 目标 Context |
 |------|--------------|
-| `feat-copy-input` | `domain/business_rules.md`, `domain/user_journeys.md`, `domain/source/MagicCrayon-Product-Overview.md` |
-| `feat-subtitle-composition` | `criterion.md`, `domain/business_rules.md`, `architecture/system_design.md`, `architecture/source/MagicCrayon-Architecture-Design.md` |
-| `feat-workflow-session` | `architecture/system_design.md`, `domain/user_journeys.md`, 相关 `source/` |
+| `feat-user-login` | `domain/business_rules.md`, `domain/user_journeys.md`, `domain/source/<PRD 文件>` |
+| `feat-report-export` | `criterion.md`, `domain/business_rules.md`, `architecture/system_design.md`, `architecture/source/<架构文档>` |
+| `feat-session-management` | `architecture/system_design.md`, `domain/user_journeys.md`, 相关 `source/` |
 
 ---
 

@@ -95,8 +95,6 @@
     "openspec": []
   },
   "pending_generation": {},
-  "ssot": {},
-  "ai_tools": {},
   "context_sync_history": {
     "path": ".context/history/context-sync.jsonl",
     "format": "jsonl",
@@ -122,15 +120,15 @@
 ```json
 "sources": {
   "PRD": {
-    "path": "docs/InJoysAI-Product-Overview.md",
-    "archived_to": ".context/domain/source/InJoysAI-Product-Overview.md",
+    "path": "docs/Product-Overview.md",
+    "archived_to": ".context/domain/source/Product-Overview.md",
     "type": "product_requirements",
     "content_hash": "<源文件的 SHA-256，64 位小写 hex>",
     "status": "archived"
   },
   "ARCHITECTURE": {
-    "path": "docs/InJoysAI-System-Architecture-Design.md",
-    "archived_to": ".context/architecture/source/InJoysAI-System-Architecture-Design.md",
+    "path": "docs/System-Architecture-Design.md",
+    "archived_to": ".context/architecture/source/System-Architecture-Design.md",
     "type": "system_architecture",
     "status": "archived"
   },

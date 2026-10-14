@@ -80,7 +80,7 @@
 | 资产 | 校验规则 |
 |------|---------|
 | `architecture/security_policy.md` | 涉及安全的功能应有相应提案 |
-| `ui/design_spec.md` | 涉及 UI 的功能应有相应提案 |
+| `ui/design_system.md` | 涉及 UI 的功能应有相应提案 |
 | `db/*.md` | 涉及数据库的功能应有相应提案 |
 
 **示例**：
@@ -110,14 +110,14 @@
 **基础设施类型检查**：
 | 类型 | 关键词 | 校验规则 |
 |------|--------|---------|
-| 数据层 | `dual-db`, `rls`, `migration` | 所有写数据库的提案必须依赖这些 |
+| 数据层 | `db`, `migration`, `rls` | 所有写数据库的提案必须依赖这些 |
 | 认证层 | `auth-register`, `auth-sso` | 需要用户身份的提案必须依赖认证 |
 | API 契约 | `typespec`, `api-contract` | API 实现提案必须依赖契约定义 |
-| 合规前置 | `age-gate`, `geoblock` | 认证提案必须依赖合规检查 |
+| 合规前置（仅当 Context 资产中存在合规前置要求） | `compliance` | 受该要求约束的提案必须依赖合规检查 |
 
 **示例**：
- - ❌ `feat-lesson-eprp-session` 排在 `feat-infra-rls` 之前
- - ❌ `feat-auth-register` 无依赖，但应依赖 `feat-infra-dual-db`
+ - ❌ `feat-report-export` 排在 `feat-infra-db` 之前
+ - ❌ `feat-auth-register` 无依赖，但应依赖 `feat-infra-db`
  - ⚠️ 基础设施提案 `feat-infra-typespec` 不在 Phase 1
 
 ### 4.3 功能覆盖校验
