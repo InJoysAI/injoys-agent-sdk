@@ -95,6 +95,11 @@
 | 数据模型 | Schema, 数据模型, ERD, 实体 | `data_architecture.md` | 可选 |
 | 运行时流程 | Runtime, 流程, Sequence, 状态机 | `runtime_view.md` | 可选 |
 | 跨切面 | 日志, 监控, 缓存, 错误处理, Logging | `cross_cutting_concepts.md` | 可选 |
+| 介绍与目标 | Goals, 目标, 质量目标, Quality Goals, 利益相关方 | `introduction_and_goals.md` | 可选 |
+| 约束 | Constraints, 约束, 限制, 合规, 组织约束 | `constraints.md` | 可选 |
+| 上下文与边界 | Context, 上下文, Boundary, 边界, 外部系统 | `context_view.md` | 可选 |
+| 构建块视图 | Container, 容器, Component, 组件, 模块划分 | `container_component_view.md` | 可选 |
+| 架构决策 | ADR, 决策记录, Decision, 选型理由 | `adr_template.md`（按每条决策实例化为 `adr_<编号>_<主题>.md`） | 可选 |
 
 ### 0.3 输出生成计划
 
@@ -243,6 +248,19 @@ Risk, Debt, 风险, 债务, 技术债, 隐患
 # Output Format
 使用 `risks_and_debt.md` 模板格式输出。
 ```
+
+### 5. 填充其余按需文件（Phase 0 命中才生成）
+
+对 Phase 0 命中的 `api_strategy.md`、`deployment_view.md`、`data_architecture.md`、`runtime_view.md`、`cross_cutting_concepts.md`、`introduction_and_goals.md`、`constraints.md`、`context_view.md`、`container_component_view.md`、ADR：
+
+- 以「模板引用」表中的对应模板为结构，只填充源文档有依据的内容；无依据的小节标注 `N/A – 源文档未提供`
+- 不得为了凑齐文件而生成空壳；未命中的文件不生成
+- 与 `system_design.md` 重复的内容只保留摘要并指向详细文件，避免两处各写一套
+- 每个文件顶部添加 Metadata 区块
+
+### 6. 生成 `architecture/README.md`
+
+为 architecture 目录生成 `README.md` 快速索引：列出本次实际生成的文件（一行说明用途）、`source/` 中的源文档，以及“总结与源文档冲突时以 `source/` 为准”的提示。README 同样登记到 Manifest（`generated_files.architecture`）。
 
 ---
 

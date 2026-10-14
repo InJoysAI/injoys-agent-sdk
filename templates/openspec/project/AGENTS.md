@@ -25,7 +25,7 @@
 
 ---
 
-### Phase 3: 生成 config.yaml
+### Phase 2: 生成 config.yaml
 
 生成/更新 `openspec/config.yaml`，用于 OPSX 注入规划上下文。该文件是 `.context/` 权威资产的**只读派生快照**，不得引入来源资产中不存在的新约束，也不得手工维护。
 
@@ -90,17 +90,19 @@ rules:
 
 | 章节 | 来源 | 必须 |
 |------|------|:----:|
-| Purpose | criterion.md | ✅ |
+| Purpose | domain/business_rules.md 的业务背景/目标；其次 `.context/README.md` | ✅ |
 | Tech Stack | tech_stack.md | ✅ |
 | Code Style | criterion.md / tech_stack.md | ✅ |
 | Architecture Patterns | system_design.md | ✅ |
-| Testing Strategy | testing_strategy.md | ✅ |
-| **Git Workflow** | criterion.md / 项目约定 | ✅ |
+| Testing Strategy | testing_strategy.md（domain） | ⚠️ 若存在 |
+| Git Workflow | criterion.md 中若有分支/提交约定 | ⚠️ 若存在 |
 | Domain Context | business_rules.md + user_journeys.md | ✅ |
 | Important Constraints | criterion.md (MUST/MUST NOT) | ✅ |
 | External Dependencies | system_design.md / tech_stack.md | ✅ |
-| UI Guidelines | design_spec.md | ⚠️ 若存在 |
-| Database Design | schema_design.md | ⚠️ 若存在 |
+| UI Guidelines | ui/design_system.md | ⚠️ 若存在 |
+| Database Design | db/schema_design.md | ⚠️ 若存在 |
+
+**缺失来源处理**：标记“必须”的章节若所列来源资产均未提供对应内容，写 `N/A – 来源资产未提供`；标记“若存在”的章节来源不存在时整节省略。**不得**为填满章节而编造来源资产中没有的内容或约定。
 
 `rules` 建议最少包含：
 - `tasks`: 任务拆分粒度、SSoT-first、验证/归档要求

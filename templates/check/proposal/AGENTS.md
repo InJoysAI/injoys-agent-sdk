@@ -157,7 +157,7 @@ node design/context-dev/tools/specflow/specflow.mjs validate <change-id> --stric
 | 资产 | 触发条件 | 校验规则 |
 |------|---------|---------|
 | `architecture/security_policy.md` | 涉及认证、存储、API | 必须符合安全策略 |
-| `ui/design_spec.md` | 涉及 UI 变更 | 必须引用设计规范 |
+| `ui/design_system.md` | 涉及 UI 变更 | 必须引用设计规范 |
 | `db/*.md` | 涉及数据库变更 | 必须符合数据规范 |
 
 **校验方法**：
