@@ -51,6 +51,8 @@
 
 ### Phase 2: 创建目录结构
 
+> ⛔ **只为用户实际提供了文档的类别创建目录**。没有 DB / UI / 遗留文档时，**不要**创建对应的 `.context/db/`、`.context/ui/`、`.context/legacy/`（含 `source/`），不要为它们写“未提供”的占位 README，也不要在 Manifest 的 `generated_files` / `pending_generation` 中登记。需要时（补充文档后）由 `context-update` 创建。
+
 创建以下目录（若不存在）：
 - `.context/`
 - `.context/architecture/`
@@ -108,7 +110,7 @@
 
 > ⚠️ **源文档只读**: `source/` 目录中的文件为权威来源，谨慎修改。
 
-每个子目录生成 `README.md` 说明（作为快速索引）。
+每个**已创建**的子目录生成 `README.md` 说明（作为快速索引）；未创建的类别不生成。
 
 ---
 
@@ -119,6 +121,7 @@
 | `README.md` | 生成目录说明 |
 | `criterion.md` | 读取 `@design/context-dev/criterion.md` 模板并填充占位符 |
 | `AGENTS.md` | 使用 `templates/context-agents.md.template` |
+| `{项目根目录}/AGENTS.md` | 使用 `templates/AGENTS.md.template`，见下文“项目根目录 AGENTS.md” |
 
 **criterion.md 填充规则**：
 - 从架构文档**提取技术栈约束**填入 `{{...}}` 占位符
@@ -128,7 +131,14 @@
 **AGENTS.md 填充规则**：
 - 将 `{{context_directory_tree}}` 替换为生成当时实际存在及本次计划生成的 `.context/` 目录树
 - 目录树必须包含根资产、已存在的分域资产、OpenSpec Context 资产及实际 `source/` 文件
+- **只列实际存在的目录和文件**：未创建的类别、空的 `source/` 目录都不要写进目录树（git 不跟踪空目录）
 - 后续 Manifest 的 `generated_files` 发生变化时，由 Manifest 更新流程同步刷新目录树
+
+**项目根目录 AGENTS.md 规则**（这是 init 唯一生成的 AI 入口文件，不生成 `CLAUDE.md`、`.cursorrules` 等其他工具的入口文件）：
+- 使用 `templates/AGENTS.md.template`；只有 `{{project_name}}`、`{{proposal_command}}` 两个占位符需要替换
+- 文件不存在 → 新建
+- 文件已存在 → **只替换 `<!-- CONTEXT-DEV:START -->` 与 `<!-- CONTEXT-DEV:END -->` 之间的内容**；没有标记块则把标记块插入到文件开头的一级标题之后；标记块之外的人工内容一律保留
+- 该文件位于 `.context/` 之外，**不登记**到 Manifest 的 `generated_files`
 
 > 💡 criterion.md 是唯一需要解析源文档的文件，用于提取技术约束。
 
