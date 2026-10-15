@@ -134,11 +134,26 @@
 - **只列实际存在的目录和文件**：未创建的类别、空的 `source/` 目录都不要写进目录树（git 不跟踪空目录）
 - 后续 Manifest 的 `generated_files` 发生变化时，由 Manifest 更新流程同步刷新目录树
 
-**项目根目录 AGENTS.md 规则**（这是 init 唯一生成的 AI 入口文件，不生成 `CLAUDE.md`、`.cursorrules` 等其他工具的入口文件）：
-- 使用 `templates/AGENTS.md.template`；只有 `{{project_name}}`、`{{proposal_command}}` 两个占位符需要替换
+**项目根目录 AGENTS.md 规则**（init 生成的 AI 入口文件只有 `AGENTS.md`，外加下面一个只做导入的 `CLAUDE.md`；不生成 `.cursorrules` 等其他工具的入口文件）：
+- 使用 `templates/AGENTS.md.template`；需要替换的占位符：`{{project_name}}`、`{{proposal_command}}`、`{{must_not_summary}}`
 - 文件不存在 → 新建
 - 文件已存在 → **只替换 `<!-- CONTEXT-DEV:START -->` 与 `<!-- CONTEXT-DEV:END -->` 之间的内容**；没有标记块则把标记块插入到文件开头的一级标题之后；标记块之外的人工内容一律保留
 - 该文件位于 `.context/` 之外，**不登记**到 Manifest 的 `generated_files`
+
+**`{{must_not_summary}}`（关键禁止项摘要）生成规则**：
+- **只从 `.context/criterion.md` 提取**：各章节中的 `MUST NOT` 条目，以及“安全约束”等章节里写明“禁止 / 严禁 / 铁律”的条款；不得加入 criterion.md 中不存在的规则，也不得改变其含义
+- 精炼为最多 10 条，每条一句，句末标注来源章节，如 `（criterion §4）`；优先放安全、不可逆、会造成数据/资金损失的条款
+- criterion.md 没有任何此类条款时，写：`（criterion.md 暂未定义禁止项）`
+- 这是 criterion.md 的**派生内容**：criterion.md 变更后必须同步刷新（见下），冲突时以 criterion.md 为准
+
+**项目根目录 CLAUDE.md 规则**（让 Claude Code 也能读到同一份入口；Claude Code 只读 `CLAUDE.md`，不读 `AGENTS.md`）：
+- 使用 `templates/CLAUDE.md.template`，内容只有一行 `@AGENTS.md`（导入），**不放任何其他内容**，避免两份入口各写一套
+- 文件不存在 → 新建
+- 文件已存在且已导入 `@AGENTS.md`（标记块内或任意位置）→ 不改动
+- 文件已存在但没有导入 → 在文件开头插入标记块（`<!-- CONTEXT-DEV:START -->` … `<!-- CONTEXT-DEV:END -->`），其余人工内容一律保留
+- 不登记到 Manifest
+
+**何时刷新根目录 AGENTS.md 的标记块**：`/context-init` 结束时，以及此后任何修改 `.context/criterion.md` 的流程（SSoT 选型写入、`context-update`）完成后，都要按上述规则重新生成 `{{must_not_summary}}` 并替换标记块内容。
 
 > 💡 criterion.md 是唯一需要解析源文档的文件，用于提取技术约束。
 
