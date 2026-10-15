@@ -50,8 +50,9 @@ Commands:
   version           Show version
 
 Options for init:
-  --tools <list>    Comma-separated AI tools to bootstrap commands for
-                    (${Object.keys(AI_TOOL_DIRS).join(', ')}, all). Default: all
+  --tools <list>    Also bootstrap commands for these AI tools, in addition to
+                    .agent/workflows (${Object.keys(AI_TOOL_DIRS).join(', ')}, all).
+                    Default: .agent/workflows only
   --force           Overwrite files that already exist
   --dry-run         Show what would be written without changing anything
 
@@ -61,7 +62,7 @@ Global options:
 
 Examples:
   npx @injoysai/agent-sdk init
-  npx @injoysai/agent-sdk init ./my-project --tools claude,cursor
+  npx @injoysai/agent-sdk init ./my-project --tools claude
   npx @injoysai/agent-sdk init --dry-run
   npx @injoysai/agent-sdk check-env
 `);
@@ -94,16 +95,21 @@ function parseArgs(argv, valueFlags = []) {
   return { positional, flags };
 }
 
+// `.agent/workflows` (antigravity) is always installed: it is where /context-init
+// syncs the full command set. Other tools are opt-in via --tools.
+const DEFAULT_TOOLS = ['antigravity'];
+
 function resolveTools(value) {
   const all = Object.keys(AI_TOOL_DIRS);
-  if (!value || value === 'all') return all;
+  if (!value) return DEFAULT_TOOLS;
+  if (value === 'all') return all;
 
   const tools = value.split(',').map((t) => t.trim()).filter(Boolean);
   const unknown = tools.filter((t) => !all.includes(t));
   if (unknown.length > 0) {
     throw new Error(`Unknown tool(s): ${unknown.join(', ')}. Supported: ${all.join(', ')}`);
   }
-  return tools;
+  return [...new Set([...DEFAULT_TOOLS, ...tools])];
 }
 
 // Init command
@@ -179,8 +185,8 @@ function initCommand(args) {
   console.log('Next steps:');
   console.log('  1. Run /context-init in your AI tool to generate context from your docs');
   console.log(`  2. Read ${INSTALL_DIR.split(path.sep).join('/')}/README.md for the context framework usage`);
-  console.log(`  3. Install the full command set: bash ${INSTALL_DIR.split(path.sep).join('/')}/scripts/install-ai-commands.sh --tools all`);
-  console.log(`  4. (Codex) Install prompts: bash ${INSTALL_DIR.split(path.sep).join('/')}/scripts/install-codex-prompts.sh`);
+  console.log(`  3. (Optional) Install commands for other AI tools: bash ${INSTALL_DIR.split(path.sep).join('/')}/scripts/install-ai-commands.sh --tools <list>`);
+  console.log(`  4. (Optional, Codex) Install prompts: bash ${INSTALL_DIR.split(path.sep).join('/')}/scripts/install-codex-prompts.sh`);
 }
 
 function runProvider(cmd, args, cwd) {

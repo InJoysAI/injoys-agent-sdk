@@ -26,11 +26,11 @@ It unifies two core capabilities:
 npx @injoysai/agent-sdk init
 ```
 
-`init` installs the same layout as Method 2 (`design/context-dev/` plus the `/context-init` and `/context-check` commands). Existing files are kept unless you pass `--force`.
+`init` installs the same layout as Method 2 (`design/context-dev/` plus the `/context-init` and `/context-check` commands in `.agent/workflows/`). Existing files are kept unless you pass `--force`.
 
 | Option | Description |
 | --- | --- |
-| `--tools <list>` | Only bootstrap commands for the given tools (`antigravity,claude,cursor,devin,qoder`; default: all) |
+| `--tools <list>` | Also bootstrap commands for these tools, in addition to `.agent/workflows` (`antigravity,claude,cursor,devin,qoder,all`; default: `.agent/workflows` only) |
 | `--force` | Overwrite files that already exist |
 | `--dry-run` | Show what would be written without changing anything |
 
@@ -44,7 +44,7 @@ Run the following command in your project root to install InJoys Agent SDK tools
 curl -fsSL https://raw.githubusercontent.com/injoysai/injoys-agent-sdk/main/scripts/install.sh | bash
 ```
 
-The installer bootstraps `/context-init` and `/context-check` for Antigravity, Claude Code, Cursor, Devin, and Qoder, and attempts to install the same prompts into Codex's global prompts directory. After `/context-init`, the full command set is synchronized only to the target project's `.agent/workflows/`. Install commands for other tools with `design/context-dev/scripts/install-ai-commands.sh --tools <tool-list>`; install Codex prompts with `design/context-dev/scripts/install-codex-prompts.sh`.
+The installer bootstraps `/context-init` and `/context-check` into the project's `.agent/workflows/` only; it creates no other tool directories and writes nothing outside the project. After `/context-init`, the full command set is synchronized to `.agent/workflows/`, and a root `AGENTS.md` is generated to point the AI at `.context/`, `.agent/` and `openspec/`. For other tools, run `design/context-dev/scripts/install-ai-commands.sh --tools <tool-list>`; for Codex, run `design/context-dev/scripts/install-codex-prompts.sh`.
 
 ### Method 3: Manual Installation (For Development)
 

@@ -26,11 +26,11 @@
 npx @injoysai/agent-sdk init
 ```
 
-`init` 与方式 2 安装的布局一致（`design/context-dev/`，并 bootstrap `/context-init` 和 `/context-check`）。已存在的文件默认保留，传入 `--force` 才会覆盖。
+`init` 与方式 2 安装的布局一致（`design/context-dev/`，并在 `.agent/workflows/` 中 bootstrap `/context-init` 和 `/context-check`）。已存在的文件默认保留，传入 `--force` 才会覆盖。
 
 | 选项 | 说明 |
 | --- | --- |
-| `--tools <list>` | 仅为指定工具 bootstrap 命令（`antigravity,claude,cursor,devin,qoder`，默认全部） |
+| `--tools <list>` | 在 `.agent/workflows` 之外，额外为指定工具 bootstrap 命令（`antigravity,claude,cursor,devin,qoder,all`；默认仅 `.agent/workflows`） |
 | `--force` | 覆盖已存在的文件 |
 | `--dry-run` | 只显示将要写入的内容，不做任何修改 |
 
@@ -44,7 +44,7 @@ npx @injoysai/agent-sdk init
 curl -fsSL https://raw.githubusercontent.com/injoysai/injoys-agent-sdk/main/scripts/install.sh | bash
 ```
 
-安装脚本会将 `/context-init` 和 `/context-check` bootstrap 到 Antigravity、Claude Code、Cursor、Devin、Qoder 及 Codex 全局 prompts（Codex 写入失败时会提示）。运行 `/context-init` 后，完整命令集仅同步到目标项目的 `.agent/workflows/`。其他工具可用 `design/context-dev/scripts/install-ai-commands.sh --tools <工具列表>` 手动安装完整命令；Codex 可运行 `design/context-dev/scripts/install-codex-prompts.sh`。
+安装脚本只会把 `/context-init` 和 `/context-check` bootstrap 到项目的 `.agent/workflows/`，不创建其他工具目录，也不写入项目之外的位置。运行 `/context-init` 后，完整命令集同步到 `.agent/workflows/`，并在项目根目录生成 `AGENTS.md`，指引 AI 阅读 `.context/`、`.agent/` 和 `openspec/`。其他工具可用 `design/context-dev/scripts/install-ai-commands.sh --tools <工具列表>` 手动安装；Codex 可运行 `design/context-dev/scripts/install-codex-prompts.sh`。
 
 ### 方式 3: 手动安装（用于开发）
 

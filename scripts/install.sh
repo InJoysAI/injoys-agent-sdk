@@ -46,83 +46,24 @@ mkdir -p "$TARGET_DIR/design/context-dev"
 cp -r "$SCRIPT_DIR/templates/"* "$TARGET_DIR/design/context-dev/"
 
 # -----------------------------------------------------------------------------
-# 1.1 Install command sources (for post-init script installs)
+# 2. Install AI Workflows (.agent/workflows only)
 # -----------------------------------------------------------------------------
-# Command sources are already installed via templates copy above (lines 44-46)
+# Only the project-level `.agent/workflows/` is installed. No other tool directories
+# (.claude/.cursor/.devin/.qoder) and nothing outside the project (e.g. ~/.codex).
+# Command sources live in design/context-dev/commands/ (copied above); install
+# commands for other AI tools on demand:
+#   bash design/context-dev/scripts/install-ai-commands.sh --tools <list>
+#   bash design/context-dev/scripts/install-codex-prompts.sh   # Codex (global)
+echo "  - Installing AI workflows to .agent/workflows ..."
+mkdir -p "$TARGET_DIR/.agent/workflows"
 
-# -----------------------------------------------------------------------------
-# 2. Install Standards (Optional - commented out)
-# -----------------------------------------------------------------------------
-# Standards are available in the repo but not installed by default.
-# Uncomment below if needed:
-# echo "  - Installing standards to design/ai-dev..."
-# mkdir -p "$TARGET_DIR/design/ai-dev"
-# cp -r "$SCRIPT_DIR/standards/"* "$TARGET_DIR/design/ai-dev/"
-
-
-# -----------------------------------------------------------------------------
-# 3. Install AI Workflows (CI/CD & Commands)
-# -----------------------------------------------------------------------------
-echo "  - Installing AI workflows..."
-
-copy_workflows() {
-  local tool_dir="$1"
-  local target_dir="$2"
-
-  mkdir -p "$target_dir"
-
-  # Minimal bootstrap: only install init + env check by default.
-  # The full command set is generated/installed after `/context-init`.
-  cp "$tool_dir/context-init.md" "$target_dir/" 2>/dev/null || true
-  cp "$tool_dir/context-check.md" "$target_dir/" 2>/dev/null || true
-}
-
-# Antigravity
-copy_workflows "$SCRIPT_DIR/templates/commands" "$TARGET_DIR/.agent/workflows"
-
-# Claude Code
-copy_workflows "$SCRIPT_DIR/templates/commands" "$TARGET_DIR/.claude/commands"
-
-# Cursor
-copy_workflows "$SCRIPT_DIR/templates/commands" "$TARGET_DIR/.cursor/commands"
-
-# Devin
-copy_workflows "$SCRIPT_DIR/templates/commands" "$TARGET_DIR/.devin/workflows"
-
-# Qoder
-copy_workflows "$SCRIPT_DIR/templates/commands" "$TARGET_DIR/.qoder/commands"
-
-# Codex (global prompts directory)
-copy_codex_bootstrap() {
-  local tool_dir="$1"
-  local dest_dir="$HOME/.codex/prompts"
-
-  mkdir -p "$dest_dir" 2>/dev/null || true
-
-  # Minimal bootstrap: only install init + env check by default.
-  cp "$tool_dir/context-init.md" "$dest_dir/" 2>/dev/null || true
-  cp "$tool_dir/context-check.md" "$dest_dir/" 2>/dev/null || true
-
-  if [ -f "$dest_dir/context-init.md" ] || [ -f "$dest_dir/context-check.md" ]; then
-    echo "  - Codex prompts installed to: $dest_dir (restart Codex to load prompts)"
-  else
-    echo "  - ⚠️  Codex prompts not installed (cannot write to $dest_dir)."
-    echo "    Run later: bash $TARGET_DIR/design/context-dev/scripts/install-codex-prompts.sh"
-  fi
-}
-
-copy_codex_bootstrap "$SCRIPT_DIR/templates/commands"
+# Minimal bootstrap: only install init + env check here.
+# The full command set is synced to .agent/workflows by `/context-init`.
+cp "$SCRIPT_DIR/templates/commands/context-init.md" "$TARGET_DIR/.agent/workflows/" 2>/dev/null || true
+cp "$SCRIPT_DIR/templates/commands/context-check.md" "$TARGET_DIR/.agent/workflows/" 2>/dev/null || true
 
 # -----------------------------------------------------------------------------
-# 4. Agent Configuration Templates (NOT installed by default)
-# -----------------------------------------------------------------------------
-# Agent-specific config files (.cursorrules, CLAUDE.md) are
-# NOT installed by default. Users should copy them manually if needed:
-#   - Cursor:     design/context-dev/templates/cursorrules.template -> .cursorrules
-#   - Claude:     design/context-dev/templates/CLAUDE.md.template -> CLAUDE.md
-
-# -----------------------------------------------------------------------------
-# 5. Helper Script
+# 3. Helper Script
 # -----------------------------------------------------------------------------
 chmod +x "$TARGET_DIR/design/context-dev/scripts/context-gen.sh" 2>/dev/null || true
 chmod +x "$TARGET_DIR/design/context-dev/scripts/install-ai-commands.sh" 2>/dev/null || true
@@ -132,9 +73,9 @@ echo "✅ Installation complete!"
 echo ""
 echo "Next steps:"
 echo "  1. Review 'design/context-dev/README.md' for context framework usage."
-echo "  2. Run '/context-init' in your AI tool to generate initial context assets."
-echo "  3. (Codex) Restart Codex to load prompts from ~/.codex/prompts/"
+echo "  2. Run '.agent/workflows/context-init.md' in your AI tool to generate initial context assets."
+echo "     (/context-init also creates a root AGENTS.md that points the AI to .context/, .agent/ and openspec/.)"
 echo ""
-echo "Optional: Install agent-specific config files:"
-echo "  - Cursor:   cp design/context-dev/templates/cursorrules.template .cursorrules"
-echo "  - Claude:   cp design/context-dev/templates/CLAUDE.md.template CLAUDE.md"
+echo "Optional: install commands for other AI tools:"
+echo "  - bash design/context-dev/scripts/install-ai-commands.sh --tools claude,cursor,devin,qoder"
+echo "  - bash design/context-dev/scripts/install-codex-prompts.sh   # Codex (global prompts)"
