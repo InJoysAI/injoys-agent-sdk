@@ -38,16 +38,22 @@ test('init installs templates to design/context-dev and bootstrap commands', () 
   assert.ok(fs.existsSync(path.join(dir, 'design/context-dev/tools/specflow/specflow.mjs')));
   assert.ok(!fs.existsSync(path.join(dir, '.context')), 'init must not create .context/');
 
-  for (const rel of Object.values(AI_TOOL_DIRS)) {
-    assert.ok(fs.existsSync(path.join(dir, rel, 'context-init.md')), `${rel}/context-init.md`);
-    assert.ok(fs.existsSync(path.join(dir, rel, 'context-check.md')), `${rel}/context-check.md`);
-    assert.ok(!fs.existsSync(path.join(dir, rel, 'context-start.md')), 'only bootstrap commands are installed');
+  const rel = AI_TOOL_DIRS.antigravity;
+  assert.equal(rel, '.agent/workflows');
+  assert.ok(fs.existsSync(path.join(dir, rel, 'context-init.md')), `${rel}/context-init.md`);
+  assert.ok(fs.existsSync(path.join(dir, rel, 'context-check.md')), `${rel}/context-check.md`);
+  assert.ok(!fs.existsSync(path.join(dir, rel, 'context-start.md')), 'only bootstrap commands are installed');
+
+  // Other AI tools are opt-in: nothing is written outside .agent/workflows by default.
+  for (const [tool, other] of Object.entries(AI_TOOL_DIRS)) {
+    if (tool === 'antigravity') continue;
+    assert.ok(!fs.existsSync(path.join(dir, other)), `${other} must not be created by default`);
   }
 });
 
 test('init does not overwrite existing files without --force', () => {
   const dir = tmp();
-  const file = path.join(dir, '.claude/commands/context-init.md');
+  const file = path.join(dir, '.agent/workflows/context-init.md');
   fs.mkdirSync(path.dirname(file), { recursive: true });
   fs.writeFileSync(file, 'mine');
 
@@ -65,11 +71,20 @@ test('init --dry-run writes nothing', () => {
   assert.deepEqual(fs.readdirSync(dir), []);
 });
 
-test('init --tools limits the AI tool directories', () => {
+test('init --tools adds extra AI tool directories on top of .agent/workflows', () => {
   const dir = tmp();
   assert.equal(run(['init', dir, '--tools', 'claude']).status, 0);
+  assert.ok(fs.existsSync(path.join(dir, '.agent/workflows/context-init.md')));
   assert.ok(fs.existsSync(path.join(dir, '.claude/commands/context-init.md')));
   assert.ok(!fs.existsSync(path.join(dir, '.cursor')));
+});
+
+test('init --tools all installs every supported tool directory', () => {
+  const dir = tmp();
+  assert.equal(run(['init', dir, '--tools', 'all']).status, 0);
+  for (const rel of Object.values(AI_TOOL_DIRS)) {
+    assert.ok(fs.existsSync(path.join(dir, rel, 'context-init.md')), `${rel}/context-init.md`);
+  }
 });
 
 test('init rejects unknown tools and missing target', () => {
