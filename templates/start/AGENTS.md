@@ -85,11 +85,12 @@ node design/context-dev/tools/specflow/specflow.mjs validate <提案ID> --strict
 
 ## Phase 3: 检查 SSoT 需求
 
-**动态读取**：从 `.context/criterion.md` Section 2（三维约束体系）和 Section 7（SSoT 文件路径）获取已启用的 SSoT 层：
+**动态读取**：从 `.context/criterion.md` Section 2（三维约束体系）和 Section 7（SSoT 文件路径与工具链）获取已启用的 SSoT 层：
 
 1. 读取 `.context/criterion.md` Section 2 确定已启用的 SSoT 层
-2. 读取 Section 7 获取各层的实际文件路径
+2. 读取 §7.1 获取各层的实际文件路径，§7.2 获取各层的**校验命令、生成命令和产物位置**
 3. 对每个已启用层，确认对应 SSoT 文件存在
+4. 后续 SSoT-first 步骤中的“Codegen”一律指 §7.2 中记录的生成命令；不得自行换工具
 
 | criterion.md 中的 SSoT 层 | SSoT-first 执行顺序 |
 |---------------------------|-------------------|
@@ -137,7 +138,7 @@ node design/context-dev/tools/specflow/specflow.mjs validate <提案ID> --strict
 
 - 按 `tasks.md` 中的顺序执行
 - 若涉及 SSoT → 先改 SSoT 文件 → Codegen → 业务代码
-- 若涉及 API 契约（如 `SSoT/api/main.tsp`）→ **必须优先使用 SSoT 代码生成产物**
+- 若涉及 API 契约（路径见 criterion.md §7.1）→ **必须优先使用 §7.2 记录的生成产物**
   - 服务端接口层（controller/handler/route）与服务层应优先消费 generated types/models
   - 禁止在业务代码中重复手写与契约等价的 DTO（除非有明确注释说明“非契约扩展字段”）
   - 具体生成目录与接入位置按项目技术栈确定（例如 TS/Go/Rust 等）

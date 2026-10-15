@@ -212,7 +212,7 @@ node design/context-dev/tools/specflow/specflow.mjs templates
 3. 编写 `openspec/changes/<change-id>/proposal.md`、`openspec/changes/<change-id>/tasks.md`
 4. 创建 `openspec/changes/<change-id>/specs/<capability>/spec.md` delta 文件
 5. 若需要技术设计/架构决策，创建 `openspec/changes/<change-id>/design.md`（以 `node design/context-dev/tools/specflow/specflow.mjs instructions design --change <change-id>` 的要求为准）
-6. 增加以 SSoT 为首的步骤：验证是否需要更改 schema/API 合约；如果不需要，则添加明确的“SSoT 未更改”检查，以及 `node design/context-dev/tools/specflow/specflow.mjs validate <change-id> --strict` + `node design/context-dev/tools/specflow/specflow.mjs archive <change-id> --yes --no-validate` 的任务；如果需要，则包括创建 Goose 迁移 (`SSoT/schema/migrations/`) 和 `SSoT/api/main.tsp` 的更新以及相应的代码生成（codegen）。
+6. 增加以 SSoT 为首的步骤：验证是否需要更改 schema/API 合约；如果不需要，则添加明确的“SSoT 未更改”检查，以及 `node design/context-dev/tools/specflow/specflow.mjs validate <change-id> --strict` + `node design/context-dev/tools/specflow/specflow.mjs archive <change-id> --yes --no-validate` 的任务；如果需要，则包括按 `.context/criterion.md` §7 记录的工具更新对应层的契约（数据层迁移、API/IPC 契约等，路径见 §7.1），并执行 §7.2 记录的生成命令（codegen）。
 7. 如果涉及接口方面的设计，需要同步更新`.context/architecture/api_strategy.md`,添加对应的请求响应示例
 
 ### 2.2 必须输出交付物清单（Deliverables）
@@ -224,7 +224,7 @@ node design/context-dev/tools/specflow/specflow.mjs templates
 - [ ] `openspec/changes/<change-id>/specs/<capability>/spec.md`（至少 1 个 capability delta；多 capability 则多文件）
 - [ ] `openspec/changes/<change-id>/design.md`（仅当 `node design/context-dev/tools/specflow/specflow.mjs instructions design --change <change-id>` 要求/建议且确有设计决策需要记录；否则明确写“未创建 design.md 的原因”）
 - [ ] 如涉及接口：`.context/architecture/api_strategy.md`（已补充请求/响应示例；否则写明“不涉及接口设计”）
-- [ ] SSoT 相关（按需）：`SSoT/schema/migrations/`、`SSoT/api/main.tsp`、以及 codegen 产物（或写明 “SSoT 未更改”）
+- [ ] SSoT 相关（按需）：criterion.md §7.1 中各层的契约文件、§7.2 中的 codegen 产物（或写明 “SSoT 未更改”）
 - [ ] Roadmap 对齐证明：输出 `Roadmap 提案快照`，并给出 proposal/tasks/specs 的字段映射说明
 
 ### 2.3 逐项自检（Self-check）+ 不通过则 STOP
@@ -324,17 +324,18 @@ node design/context-dev/tools/specflow/specflow.mjs templates
 
 > ⚠️ **仅当项目使用 SSoT 架构时执行**
 
-读取 `.context/architecture/tech_stack.md` 判断项目 SSoT 类型：
+读取 `.context/criterion.md` §2、§7.1、§7.2 获取已启用的 SSoT 层、契约路径和生成命令（工具由 `/context-init` 按架构文档选定，不在此处假设具体工具）：
 
-| Tech Stack | SSoT 文件 | 检查项 |
-|------------|----------|--------|
-| SQL/Relational DB（e.g. PostgreSQL） | `SSoT/schema/migrations/` | 数据库相关变更 |
-| REST API | `SSoT/api/main.tsp` | API 相关变更 |
-| 无 REST API | N/A | 无 SSoT 约束 |
+| criterion.md 中的层 | 检查项 |
+|--------------------|--------|
+| 数据层（已配置） | 数据库相关变更 |
+| API 层（已配置） | API 相关变更 |
+| IPC 层（已配置） | IPC 命令/事件/类型相关变更 |
+| 未配置任何层 | 无 SSoT 约束 |
 
 **若存在 SSoT 约束**，`tasks.md` 必须遵循顺序：
 1. 修改 SSoT 文件（schema/api）
-2. 运行 Codegen
+2. 运行 criterion.md §7.2 记录的生成命令（Codegen）
 3. 实现业务代码
 4. 编写测试
 

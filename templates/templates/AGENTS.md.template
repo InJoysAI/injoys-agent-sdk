@@ -8,8 +8,7 @@
 
 ## 快速规则提醒
 
-- **Schema 变更** → 创建 Goose 迁移文件到 `{{schema_path}}`，然后运行 `goose up`
-- **API 变更** → 先改 `{{api_path}}`，然后运行 `tsp compile`
+- **Schema / API / IPC 变更** → 先改 `.context/criterion.md` §7.1 中对应层的契约（如 `{{schema_path}}`、`{{api_path}}`），再运行 §7.2 记录的生成/校验命令
 - **功能变更** → 先用 `{{proposal_command}}` 创建提案
 
 ## 核心命令

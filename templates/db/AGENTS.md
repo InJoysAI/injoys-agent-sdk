@@ -1,6 +1,7 @@
 # DB 总结生成入口
 
 > **用途**: 从数据库设计文档生成结构化的数据库设计总结。  
+> **迁移工具**: 以 `.context/criterion.md` §7 记录的为准；`migrations_and_ssot.md` 模板中的 Goose 内容是默认示例，实际工具不同时按所选工具改写。  
 > **触发**: `.agent/workflows/context-openspec.md db`，或由 `.agent/workflows/context-openspec.md`（无参数一键模式）按顺序调用。`/context-init` 只归档源文档，不会生成本模块的总结。
 
 ---

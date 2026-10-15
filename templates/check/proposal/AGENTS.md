@@ -174,17 +174,17 @@ node design/context-dev/tools/specflow/specflow.mjs validate <change-id> --stric
 
 ## Phase 6: SSoT 先行任务检查
 
-**动态读取**：从 `.context/criterion.md` Section 2（三维约束体系）获取已启用的 SSoT 层和工具，从 Section 7（SSoT 文件路径）获取各层的实际文件路径：
+**动态读取**：从 `.context/criterion.md` Section 2（三维约束体系）获取已启用的 SSoT 层和工具，从 Section 7（SSoT 文件路径与工具链）获取各层的实际文件路径和生成命令：
 
 1. 读取 `.context/criterion.md` Section 2 确定已启用的 SSoT 层（数据层/API 层/IPC 层/共享层）
-2. 读取 `.context/criterion.md` Section 7 获取各层的实际文件路径
+2. 读取 `.context/criterion.md` §7.1 获取各层实际文件路径，§7.2 获取各层的生成命令
 3. 验证任务顺序：SSoT 变更任务必须排在业务代码任务之前
 
 | criterion.md 中的 SSoT 层 | `tasks.md` 必须包含 |
 |---------------------------|-------------------|
 | 数据层（已配置路径） | 该路径下的迁移/Schema 变更任务 |
-| API 层（已配置路径） | 该路径下的契约修改 + Codegen 执行任务 |
-| IPC 层（已配置路径） | 该路径下的 IPC SSoT 修改 + Codegen 执行任务 |
+| API 层（已配置路径） | 该路径下的契约修改 + §7.2 记录的生成命令执行任务 |
+| IPC 层（已配置路径） | 该路径下的 IPC SSoT 修改 + §7.2 记录的生成命令执行任务 |
 | 所有项目 | 测试 + 归档任务（`specflow validate --strict` + `specflow archive --yes`） |
 
 > ⚠️ 若 criterion.md 未配置任何 SSoT 层，则仅检查测试和归档任务。

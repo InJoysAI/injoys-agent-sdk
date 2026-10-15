@@ -81,7 +81,7 @@ openspec/changes/<id>/  →  /context-start <id> 实施并归档
 | `{{project_name}}` | 项目名称 |
 | `{{project_root}}` | 项目根目录绝对路径 |
 | `{{schema_path}}` | Schema 迁移目录 (默认 `SSoT/schema/migrations/`) |
-| `{{api_path}}` | API 定义路径 (默认 `SSoT/api/main.tsp`) |
+| `{{api_path}}` | API 契约路径 (默认 `SSoT/api/main.tsp`，以 criterion.md §7.1 为准) |
 | `{{generated_at}}` | 生成时间戳 |
 
 详见 `design/context-dev/templates/README.md`。
@@ -186,10 +186,19 @@ PRD：@docs/product-overview.md
 
 ---
 
-## SSoT 路径约定
+## SSoT 路径与工具
 
-| 层 | 文件路径 | 用途 |
-|----|---------|------|
+SSoT 的**工具不绑定具体语言**：`/context-init` 会根据架构文档为每一层选型（数据迁移、API 契约、IPC 契约、共享模型，以及各自的校验命令与 Codegen），并把结果写入 `.context/criterion.md` §7（路径见 §7.1，工具链与生成命令见 §7.2）。架构文档未指定时才使用默认：Goose（数据层）、TypeSpec → OpenAPI3（API 层）。
+
+| 层 | 默认路径（可被选型覆盖） | 默认工具 |
+|----|------------------------|---------|
+| 需求层 | `openspec/config.yaml`、`openspec/proposal-roadmap.md`、`openspec/changes/`、`openspec/specs/` | specflow |
+| 数据层 | `SSoT/schema/migrations/` | Goose |
+| 共享层（可选） | `SSoT/shared/` | TypeSpec |
+| API 层 | `SSoT/api/` | TypeSpec → OpenAPI3 |
+| IPC 层（可选） | `SSoT/ipc/` | TypeSpec → JSON Schema |
+
+----|---------|------|
 | 需求层 | `openspec/config.yaml` | 从 `.context/` 生成的 OpenSpec 上下文快照（禁止手工维护） |
 | 需求层 | `openspec/proposal-roadmap.md` | 提案路线图 |
 | 需求层 | `openspec/changes/` | 变更提案目录 |
