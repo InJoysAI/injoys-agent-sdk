@@ -174,7 +174,7 @@ node design/context-dev/tools/specflow/specflow.mjs validate <change-id> --stric
 
 ## Phase 6: SSoT 先行任务检查
 
-**动态读取**：从 `.context/criterion.md` Section 2（三维约束体系）获取已启用的 SSoT 层和工具，从 Section 7（SSoT 文件路径）获取各层的实际文件路径：
+**动态读取**：从 `.context/criterion.md` Section 2（三维约束体系）获取已启用的 SSoT 层和工具，从 Section 7（SSoT 文件路径与工具链）获取各层的实际文件路径和生成命令：
 
 1. 读取 `.context/criterion.md` Section 2 确定已启用的 SSoT 层（数据层/API 层/IPC 层/共享层）
 2. 读取 `.context/criterion.md` §7.1 获取各层实际文件路径，§7.2 获取各层的生成命令
