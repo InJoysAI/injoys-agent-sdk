@@ -100,6 +100,7 @@ node design/context-dev/tools/specflow/specflow.mjs validate <提案ID> --strict
 | IPC 层（已配置路径） | 修改 IPC SSoT → Codegen |
 
 > ⚠️ 若 criterion.md 未配置任何 SSoT 层，则跳过 SSoT-first 步骤，直接进入业务代码。
+> “启用（手写契约）”的层视为已配置：先改其契约文件再改实现；§7.2 中生成命令为“无”时只跳过 Codegen 一步。
 
 **输出识别结果**（必须向用户报告）：
 

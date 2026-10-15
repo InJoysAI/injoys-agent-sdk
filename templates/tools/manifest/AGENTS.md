@@ -167,6 +167,25 @@
 计算方式任选其一：`sha256sum <file>`、`shasum -a 256 <file>`、`bash design/context-dev/scripts/context-gen.sh <file>`（输出中的 `SHA256`）。
 该字段可选（旧版 Manifest 没有），但存在时必须是合法的 SHA-256，`check-context-manifest.sh` 会校验格式。
 
+#### pending_generation 节点（init 之后、尚待 `/context-openspec` 生成的资产）：
+
+固定写法，避免每次初始化各写各的：
+
+```json
+"pending_generation": {
+  "architecture": [".context/architecture/system_design.md", ".context/architecture/tech_stack.md"],
+  "domain": [".context/domain/business_rules.md"],
+  "db": [".context/db/schema_design.md", ".context/db/performance_tuning.md", ".context/db/migrations_and_ssot.md"],
+  "ui": [".context/ui/design_system.md"],
+  "openspec": ["openspec/config.yaml", "openspec/proposal-roadmap.md"]
+}
+```
+
+- 键为类别，值为**该类别下“必须生成”的基础文件**（architecture：`system_design.md`、`tech_stack.md`；domain：`business_rules.md`；db：`schema_design.md`、`performance_tuning.md`、`migrations_and_ssot.md`；ui：`design_system.md`）。路径中带 `.context/` 前缀的相对项目根，`openspec` 下的两项是项目根目录的 `openspec/` 文件。
+- **不登记按需生成的文件**（如 `security_policy.md`、`user_journeys.md`、`testing_strategy.md`）：是否生成由各生成模块的 Phase 0 动态决定。
+- **只写已创建的类别**：没有 DB / UI 文档就没有 `db` / `ui` 键；`openspec` 键始终存在（提案流程据此判断项目级集成是否已生成）。
+- 某个文件被生成并登记进 `generated_files` 后，必须从 `pending_generation` 中移除；整个类别清空后删除该键，`openspec` 两项都生成后可置为 `{}` 或移除该键。
+
 #### generated_files 节点：
 
 ```json
