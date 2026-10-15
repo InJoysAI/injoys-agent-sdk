@@ -188,6 +188,7 @@ node design/context-dev/tools/specflow/specflow.mjs validate <change-id> --stric
 | 所有项目 | 测试 + 归档任务（`specflow validate --strict` + `specflow archive --yes`） |
 
 > ⚠️ 若 criterion.md 未配置任何 SSoT 层，则仅检查测试和归档任务。
+> “启用（手写契约）”的层视为已配置：tasks 必须包含先修改其契约文件的任务；§7.2 中生成命令为“无”时不要求 Codegen 任务。
 
 **检查方法**：
 1. 根据 criterion.md 中实际配置的 SSoT 工具和路径确定需要检查的任务

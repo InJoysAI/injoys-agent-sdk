@@ -16,7 +16,7 @@
 
 | 条件 | 操作 |
 |------|------|
-| 不存在 | 从 `@design/context-dev/templates/openspec/integration.md.template` 复制到 `.context/openspec/integration.md` |
+| 不存在 | 先创建 `.context/openspec/` 目录（若不存在），再从 `@design/context-dev/templates/openspec/integration.md.template` 复制到 `.context/openspec/integration.md` |
 | 已存在 | 跳过复制，进入 Phase 2 |
 
 ---

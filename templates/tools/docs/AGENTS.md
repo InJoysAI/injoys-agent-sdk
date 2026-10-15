@@ -51,6 +51,8 @@
 
 ### Phase 2: 创建目录结构
 
+> ⛔ **不要创建 `.context/openspec/`**：该目录只放 `integration.md`，由 `/context-openspec` 的 integration 模块在需要时创建；init 不为它建目录、不写占位 README、不在 Manifest 的 `generated_files.openspec` 中登记。
+>
 > ⛔ **只为用户实际提供了文档的类别创建目录**。没有 DB / UI / 遗留文档时，**不要**创建对应的 `.context/db/`、`.context/ui/`、`.context/legacy/`（含 `source/`），不要为它们写“未提供”的占位 README，也不要在 Manifest 的 `generated_files` / `pending_generation` 中登记。需要时（补充文档后）由 `context-update` 创建。
 
 创建以下目录（若不存在）：
@@ -63,7 +65,6 @@
 - `.context/db/source/`
 - `.context/ui/` （若有 UI 文档）
 - `.context/ui/source/`
-- `.context/openspec/`
 - `.context/legacy/` （若有遗留文档）
 - `.context/legacy/source/`
 
@@ -143,6 +144,7 @@
 **`{{must_not_summary}}`（关键禁止项摘要）生成规则**：
 - **只从 `.context/criterion.md` 提取**：各章节中的 `MUST NOT` 条目，以及“安全约束”等章节里写明“禁止 / 严禁 / 铁律”的条款；不得加入 criterion.md 中不存在的规则，也不得改变其含义
 - 精炼为最多 10 条，每条一句，句末标注来源章节，如 `（criterion §4）`；优先放安全、不可逆、会造成数据/资金损失的条款
+- **尽量使用 criterion.md 的原文措辞**，不要自行加引号或改写原意；含义重复的条款合并为一条（保留较完整的那条），不要把不同条款糅在一起
 - criterion.md 没有任何此类条款时，写：`（criterion.md 暂未定义禁止项）`
 - 这是 criterion.md 的**派生内容**：criterion.md 变更后必须同步刷新（见下），冲突时以 criterion.md 为准
 
