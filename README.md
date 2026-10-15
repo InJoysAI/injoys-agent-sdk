@@ -44,7 +44,7 @@ Run the following command in your project root to install InJoys Agent SDK tools
 curl -fsSL https://raw.githubusercontent.com/injoysai/injoys-agent-sdk/main/scripts/install.sh | bash
 ```
 
-The installer bootstraps `/context-init` and `/context-check` into the project's `.agent/workflows/` only; it creates no other tool directories and writes nothing outside the project. After `/context-init`, the full command set is synchronized to `.agent/workflows/`, and a root `AGENTS.md` is generated to point the AI at `.context/`, `.agent/` and `openspec/`. For other tools, run `design/context-dev/scripts/install-ai-commands.sh --tools <tool-list>`; for Codex, run `design/context-dev/scripts/install-codex-prompts.sh`.
+The installer bootstraps `/context-init` and `/context-check` into the project's `.agent/workflows/` only; it creates no other tool directories and writes nothing outside the project. After `/context-init`, the full command set is synchronized to `.agent/workflows/`, and a root `AGENTS.md` (with a summary of the key MUST NOT rules) plus a one-line `CLAUDE.md` that imports it are generated to point the AI at `.context/`, `.agent/` and `openspec/`. For other tools, run `design/context-dev/scripts/install-ai-commands.sh --tools <tool-list>`; for Codex, run `design/context-dev/scripts/install-codex-prompts.sh`.
 
 ### Method 3: Manual Installation (For Development)
 

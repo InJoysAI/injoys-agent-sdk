@@ -167,7 +167,7 @@ Mode: review
 2. 先更新目标 `.context/**`
 3. 再更新相关 `source/**`
 4. 将本次审计事件作为单行 JSON 追加到 `.context/history/context-sync.jsonl`
-5. 最后更新 `context-manifest.json`，让 `last_context_sync` 只保存最新同步状态
+5. 最后更新 `context-manifest.json`，让 `last_context_sync` 只保存最新同步状态；若本次改动了 `.context/criterion.md`，同时按 `tools/docs/AGENTS.md` 的规则刷新项目根目录 `AGENTS.md` 标记块中的“关键禁止项”摘要
 6. 执行 `bash design/context-dev/scripts/check-context-manifest.sh`
 7. 输出变更摘要：
    - 修改了哪些文件

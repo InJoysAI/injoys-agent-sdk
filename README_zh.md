@@ -44,7 +44,7 @@ npx @injoysai/agent-sdk init
 curl -fsSL https://raw.githubusercontent.com/injoysai/injoys-agent-sdk/main/scripts/install.sh | bash
 ```
 
-安装脚本只会把 `/context-init` 和 `/context-check` bootstrap 到项目的 `.agent/workflows/`，不创建其他工具目录，也不写入项目之外的位置。运行 `/context-init` 后，完整命令集同步到 `.agent/workflows/`，并在项目根目录生成 `AGENTS.md`，指引 AI 阅读 `.context/`、`.agent/` 和 `openspec/`。其他工具可用 `design/context-dev/scripts/install-ai-commands.sh --tools <工具列表>` 手动安装；Codex 可运行 `design/context-dev/scripts/install-codex-prompts.sh`。
+安装脚本只会把 `/context-init` 和 `/context-check` bootstrap 到项目的 `.agent/workflows/`，不创建其他工具目录，也不写入项目之外的位置。运行 `/context-init` 后，完整命令集同步到 `.agent/workflows/`，并在项目根目录生成 `AGENTS.md`（含关键禁止项摘要）和只有一行导入的 `CLAUDE.md`，指引 AI 阅读 `.context/`、`.agent/` 和 `openspec/`。其他工具可用 `design/context-dev/scripts/install-ai-commands.sh --tools <工具列表>` 手动安装；Codex 可运行 `design/context-dev/scripts/install-codex-prompts.sh`。
 
 ### 方式 3: 手动安装（用于开发）
 

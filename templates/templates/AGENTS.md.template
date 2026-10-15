@@ -13,6 +13,12 @@
 - `.context/*/source/` — 原始 PRD / 架构等源文档（细节以此为准，只读）
 - `.context/architecture/`、`.context/domain/`、`.context/db/`、`.context/ui/` 下的总结文件（是否已生成见 manifest 的 `generated_files`）
 
+### 关键禁止项（摘自 `.context/criterion.md`，仅为提醒，**以 criterion.md 为准**）
+
+{{must_not_summary}}
+
+> 本节由工具根据 `criterion.md` 自动生成/刷新，不要手工修改；完整约束见 `.context/criterion.md`。
+
 ### OpenSpec 目录（由 `/context-openspec` 生成，未生成时可能不存在）
 
 - `openspec/config.yaml` — 从 `.context/` 派生的项目上下文快照（不要手工修改）

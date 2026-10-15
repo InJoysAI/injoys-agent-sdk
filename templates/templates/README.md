@@ -8,7 +8,7 @@
 |---------|---------|---------| 
 | `context-agents.md.template` | `.context/AGENTS.md` | 所有工具 |
 | `AGENTS.md.template` | 项目根目录 `AGENTS.md`（init 自动生成/更新标记块） | 所有支持 AGENTS.md 的工具 |
-| `CLAUDE.md.template` | `CLAUDE.md` | Claude Code |
+| `CLAUDE.md.template` | 项目根目录 `CLAUDE.md`（init 自动生成；只含 `@AGENTS.md` 一行） | Claude Code（只读 CLAUDE.md） |
 | `cursorrules.template` | `.cursorrules` | Cursor |
 
 ## 参考模板（不由工作流自动使用）
@@ -31,7 +31,8 @@
 | `{{api_path}}` | criterion.md | API 定义路径 (默认 `SSoT/api/main.tsp`) |
 | `{{proposal_command}}` | criterion.md | 提案命令 (默认 `.agent/workflows/context-openspec.md proposal <change-id> [roadmap-doc]`) |
 | `{{tech_stack_constraints}}` | tech_stack.md | 技术栈约束 (MUST/SHOULD) |
-| `{{must_not_rules}}` | criterion.md | 禁止规则 |
+| `{{must_not_rules}}` | criterion.md | 禁止规则（`cursorrules.template` 使用） |
+| `{{must_not_summary}}` | criterion.md | 根 `AGENTS.md` 的关键禁止项摘要（≤10 条，标注来源章节） |
 | `{{constraints}}` | criterion.md | 通用约束 |
 | `{{generated_at}}` | 自动填充 | 生成时间戳 (YYYY-MM-DD HH:mm) |
 | `{{prd_path}}` | 用户输入 | PRD 文档路径 |
@@ -39,9 +40,12 @@
 
 ## 使用方式
 
-`context-init` 只在**项目根目录**生成/更新一份 `AGENTS.md`（来自 `AGENTS.md.template`），用标记块 `<!-- CONTEXT-DEV:START/END -->` 指引 AI 阅读 `.context/`、`.agent/workflows/` 和 `openspec/`；已有 `AGENTS.md` 时只更新标记块、保留人工内容。
+`context-init` 在**项目根目录**生成/更新两个文件：
 
-其余模板（`CLAUDE.md.template`、`cursorrules.template`）是**可选**的其他工具入口，init 不会生成，需要时由项目维护者按需复制并替换占位符。
+- `AGENTS.md`（来自 `AGENTS.md.template`）：用标记块 `<!-- CONTEXT-DEV:START/END -->` 指引 AI 阅读 `.context/`、`.agent/workflows/` 和 `openspec/`，并附从 `criterion.md` 提炼的“关键禁止项”摘要（派生内容，`criterion.md` 变更后刷新，冲突以 `criterion.md` 为准）。已有 `AGENTS.md` 时只更新标记块、保留人工内容。
+- `CLAUDE.md`（来自 `CLAUDE.md.template`）：只有一行 `@AGENTS.md`。Claude Code 只读 `CLAUDE.md` 而不读 `AGENTS.md`，靠这行导入读到同一份入口。已有 `CLAUDE.md` 时：已导入则不动，未导入则仅在开头插入标记块。
+
+`cursorrules.template` 是**可选**的其他工具入口，init 不会生成，需要时由项目维护者按需复制。
 
 ## 准则引用与幂等更新
 
