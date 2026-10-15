@@ -32,7 +32,7 @@
 | `{{proposal_command}}` | criterion.md | 提案命令 (默认 `.agent/workflows/context-openspec.md proposal <change-id> [roadmap-doc]`) |
 | `{{tech_stack_constraints}}` | tech_stack.md | 技术栈约束 (MUST/SHOULD) |
 | `{{must_not_rules}}` | criterion.md | 禁止规则（`cursorrules.template` 使用） |
-| `{{must_not_summary}}` | criterion.md | 根 `AGENTS.md` 的关键禁止项摘要（≤10 条，标注来源章节） |
+| `{{must_not_summary}}` | criterion.md | 根 `AGENTS.md` 的关键禁止项摘要（≤15 条，逐条对应 criterion 原文、标注来源章节；被截断时注明未列出的条数） |
 | `{{constraints}}` | criterion.md | 通用约束 |
 | `{{generated_at}}` | 自动填充 | 生成时间戳 (YYYY-MM-DD HH:mm) |
 | `{{prd_path}}` | 用户输入 | PRD 文档路径 |
