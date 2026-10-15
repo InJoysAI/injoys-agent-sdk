@@ -29,8 +29,8 @@
 | 维度 | 工具 | 约束规则 |
 |------|------|---------|
 | **需求层** | OpenSpec | 功能变更必须先创建并评审提案；具体命令和文件格式由 OpenSpec 工作流定义 |
-| **数据层** | {{数据层工具，如 Goose/Alembic/Flyway}} | {{数据层变更规则；路径如 `SSoT/schema/migrations/`}} |
-| **API 层** | {{API 工具，如 TypeSpec/OpenAPI/Protobuf}} | {{API 变更规则；路径如 `SSoT/api/main.tsp`}} |
+| **数据层** | {{数据层工具，如 Goose/Alembic/Flyway/Prisma（以架构文档为准）}} | {{数据层变更规则；路径如 `SSoT/schema/migrations/`}} |
+| **API 层** | {{API 工具，如 OpenAPI(TypeSpec)/Protobuf/GraphQL（以架构文档为准）}} | {{API 变更规则；路径如 `SSoT/api/main.tsp`}} |
 | **IPC 层（可选）** | {{IPC 工具，如 JSON Schema/TypeSpec}} | {{IPC 变更规则；路径如 `SSoT/schema/ipc.schema.json` 或 `SSoT/ipc/main.tsp`}} |
 | **共享层（可选）** | {{共享模型工具，如 TypeSpec import}} | {{共享模型路径如 `SSoT/shared/`；被 API 层和 IPC 层引用}} |
 
@@ -146,6 +146,8 @@ MUST NOT:
 
 ### 5.2 统一成功响应（建议）
 
+> 若启用 API 层，统一响应/错误结构必须在 API 契约（见 §7）中定义，本节只写约定，不作为第二份定义。
+
 ```json
 {
   "code": "000001",
@@ -174,7 +176,7 @@ MUST NOT:
 
 ### 5.5 错误码规范（可选）
 - 遵循 `{{错误码规范路径}}`（如 `docs/errcode_guidelines.md`）
-- 6 位错误码格式: `MMTXXX`
+- 错误码格式: `{{错误码格式，如 6 位 MMTXXX}}`
 - 错误响应建议包含：`code`, `message`, `err`(可选), `requestId`
 
 ---
@@ -197,16 +199,32 @@ Codegen
 
 ---
 
-## 7. SSoT 文件路径
+## 7. SSoT 文件路径与工具链
 
-| 层 | 文件 | 用途 |
-|----|------|------|
-| 数据层 | `SSoT/schema/migrations/` | {{数据层迁移工具}} SQL 迁移文件目录 |
-| 共享层（可选） | `SSoT/shared/models.tsp` | API + IPC 共用模型 |
-| API 层 | `SSoT/api/tspconfig.yaml` | TypeSpec 编译配置（OpenAPI3 + JSON Schema） |
-| API 层 | `SSoT/api/main.tsp` | API 契约入口 |
-| IPC 层（可选） | `SSoT/ipc/tspconfig.yaml` | TypeSpec 编译配置（JSON Schema + bundleId） |
-| IPC 层（可选） | `SSoT/ipc/main.tsp` | IPC 契约入口 |
+> 由 `/context-init` 的 SSoT 选型写入（见 `design/context-dev/tools/SSoT/AGENTS.md`）。**工具以架构文档为准**，文档未指定时才使用默认。提案、实施、检查一律以本节为准。
+
+### 7.1 文件路径
+
+| 层 | 契约文件/目录 | 用途 |
+|----|-------------|------|
+| 数据层 | {{schema 契约路径，如 `SSoT/schema/migrations/`}} | {{数据层工具}} 迁移/Schema |
+| 共享层（可选） | {{共享层路径，如 `SSoT/shared/`}} | API + IPC 共用模型 |
+| API 层 | {{API 契约入口，如 `SSoT/api/main.tsp`}} | API 契约 |
+| IPC 层（可选） | {{IPC 契约入口，如 `SSoT/ipc/main.tsp`}} | IPC 契约（含命令与事件） |
+
+### 7.2 工具链与 Codegen
+
+| 层 | 契约工具 | 校验命令 | 生成命令 | 生成产物（路径 → 消费方） | 产物是否提交 | 选型依据 |
+|----|---------|---------|---------|--------------------------|:-----------:|---------|
+| 数据层 | {{工具}} | {{命令}} | {{命令 或 “无（原因）”}} | {{路径 → 谁使用}} | {{是/否}} | {{架构文档 §x / 推断 / 默认}} |
+| API 层 | {{工具}} | {{命令}} | {{命令，如后端与前端各一条}} | {{路径 → 后端 / 前端}} | {{是/否}} | {{…}} |
+| IPC 层（可选） | {{工具}} | {{命令}} | {{命令，如核心侧与前端侧各一条}} | {{路径 → 核心 / 前端}} | {{是/否}} | {{…}} |
+| 共享层（可选） | {{工具}} | {{命令}} | {{命令}} | {{路径}} | {{是/否}} | {{…}} |
+
+规则：
+- 契约变更后必须执行该层“生成命令”，并使用生成产物；业务代码**禁止**手写与契约等价的类型/DTO（有明确注释说明的“非契约扩展字段”除外）。
+- “生成命令”为“无”时，必须在表中写明原因及手工同步/校验方式，不得留空。
+- 本表所列工具缺失时，`check-env` 应报告缺失，不得声称校验通过。
 
 ---
 

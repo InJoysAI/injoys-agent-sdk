@@ -8,8 +8,7 @@ This project follows a project criterion. See: @.context/criterion.md
 
 ## Quick Rules
 
-- **Schema changes** → Create Goose migration file in `{{schema_path}}`, then run `goose up`
-- **API changes** → Modify `{{api_path}}` first, then `tsp compile`
+- **Schema / API / IPC changes** → Modify the contract for that layer first (see `.context/criterion.md` §7.1, e.g. `{{schema_path}}`, `{{api_path}}`), then run the generate/validate commands recorded in §7.2
 - **Feature changes** → Create proposal first with `{{proposal_command}}`
 
 ## Core Commands
