@@ -68,6 +68,11 @@
 
 ### Phase 1: 读取或创建 Manifest
 
+> **登记规则**：
+> - 只为用户实际提供了源文档的类别在 `generated_files` / `pending_generation` 中建立条目；没有 DB / UI / 遗留文档的类别不登记。
+> - `project.path` 记录相对路径 `.`，**不要写本机绝对路径**（Manifest 会被提交，绝对路径对其他人和 CI 无意义且暴露本机用户名）。
+> - SSoT 的选型/跳过决策不记录在 Manifest，见 `.context/criterion.md` §7.3。
+
 若不存在则创建初始结构：
 
 ```json
@@ -82,7 +87,7 @@
   },
   "project": {
     "name": "{{PROJECT_NAME}}",
-    "path": "{{PROJECT_PATH}}"
+    "path": "."
   },
   "sources": {},
   "generated_files": {

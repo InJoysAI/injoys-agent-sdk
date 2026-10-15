@@ -7,7 +7,7 @@
 | 模板文件 | 生成文件 | 目标工具 |
 |---------|---------|---------| 
 | `context-agents.md.template` | `.context/AGENTS.md` | 所有工具 |
-| `AGENTS.md.template` | `AGENTS.md` | Antigravity |
+| `AGENTS.md.template` | 项目根目录 `AGENTS.md`（init 自动生成/更新标记块） | 所有支持 AGENTS.md 的工具 |
 | `CLAUDE.md.template` | `CLAUDE.md` | Claude Code |
 | `cursorrules.template` | `.cursorrules` | Cursor |
 
@@ -39,7 +39,9 @@
 
 ## 使用方式
 
-这些是可选的 AI 工具入口配置模板。当前 `context-init` 工作流不会自动生成这些文件；需要时由项目维护者按需复制并替换占位符。
+`context-init` 只在**项目根目录**生成/更新一份 `AGENTS.md`（来自 `AGENTS.md.template`），用标记块 `<!-- CONTEXT-DEV:START/END -->` 指引 AI 阅读 `.context/`、`.agent/workflows/` 和 `openspec/`；已有 `AGENTS.md` 时只更新标记块、保留人工内容。
+
+其余模板（`CLAUDE.md.template`、`cursorrules.template`）是**可选**的其他工具入口，init 不会生成，需要时由项目维护者按需复制并替换占位符。
 
 ## 准则引用与幂等更新
 

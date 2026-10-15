@@ -39,8 +39,8 @@
 
 1. **执行**: `@design/context-dev/domain/AGENTS.md`
 2. **执行**: `@design/context-dev/architecture/AGENTS.md`
-3. **执行**: `@design/context-dev/db/AGENTS.md` （若 `.context/db/` 存在）
-4. **执行**: `@design/context-dev/ui/AGENTS.md` （若 `.context/ui/` 存在）
+3. **执行**: `@design/context-dev/db/AGENTS.md` （仅当 `.context/db/source/` 下有源文档；没有则跳过）
+4. **执行**: `@design/context-dev/ui/AGENTS.md` （仅当 `.context/ui/source/` 下有源文档；没有则跳过。只有 PRD 时如需降级生成，请显式运行 `ui` 子命令）
 5. **执行**: `@design/context-dev/openspec/project/AGENTS.md`
 6. **执行**: `@design/context-dev/openspec/plan/AGENTS.md`
 7. **输出验收报告**（见下文）

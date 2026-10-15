@@ -61,7 +61,7 @@
 | 命令 | 用途 |
 |------|------|
 | `.agent/workflows/context-init.md` | 初始化 .context/ 目录 |
-| `.agent/workflows/context-check.md` | 检查工具链与 MCP |
+| `.agent/workflows/context-check.md` | 检查环境 / Manifest / 任务 / 提案 / 路线图 / 项目配置 / 一致性评审 |
 | `.agent/workflows/context-openspec.md` | 生成 context 总结 + OpenSpec 集成 |
 | `.agent/workflows/context-openspec.md proposal <change-id> [roadmap-doc]` | 生成变更提案（可显式指定提案大纲/路线图文件） |
 | `.agent/workflows/context-start.md` | 基于提案开始开发 |
