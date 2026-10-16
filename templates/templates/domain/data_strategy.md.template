@@ -9,25 +9,19 @@
 
 ## 1. 埋点事件列表
 
-| 事件 ID | 事件名称 | 触发时机 | 关键属性 | 业务价值 |
-|---------|---------|---------|---------|---------|
-| `{{EVENT_ID}}` | {{EVENT_NAME}} | {{TRIGGER}} | {{ATTRIBUTES}} | {{BUSINESS_VALUE}} |
+| 事件名称 | 触发时机（用户做了什么） | 需要记录的信息 | 业务价值 |
+|---------|----------------------|--------------|---------|
+| {{EVENT_NAME}} | {{TRIGGER}} | {{ATTRIBUTES}} | {{BUSINESS_VALUE}} |
 
 ---
 
-## 2. 公共属性 (Super Properties)
+## 2. 所有事件都要记录的公共信息
 
-所有事件自动携带以下属性：
+> 只写业务上需要知道什么（如：哪台设备、什么网络、什么版本、什么时间），字段名、类型和格式属于架构。
 
-```json
-{
-  "device_id": "唯一设备标识",
-  "network": "Wifi/4G/5G",
-  "app_version": "{{APP_VERSION}}",
-  "os_version": "{{OS_VERSION}}",
-  "timestamp": "ISO 8601 格式"
-}
-```
+- {{COMMON_INFO_1，如：用户使用的设备类型}}
+- {{COMMON_INFO_2，如：应用版本}}
+- {{COMMON_INFO_3，如：事件发生时间}}
 
 ---
 
@@ -51,24 +45,12 @@
 
 ---
 
-## 5. 埋点实施规范
+## 5. 数据质量要求（业务口径）
 
-### 5.1 前端埋点
+> 埋点 SDK、上报方式、校验工具等实施规范属于 `.context/architecture/`，不写在这里。仅记录 PRD 对数据质量的**业务要求**。
 
-- 使用 {{ANALYTICS_SDK}} SDK
-- 注册时设置 `identify(user_id)`
-- Super Properties 在 SDK 初始化时设置
-
-### 5.2 后端埋点
-
-- 关键业务事件在后端触发，确保数据完整性
-- 使用 Server-Side SDK 或 HTTP API
-
-### 5.3 埋点校验
-
-- 开发环境使用 Debug Mode
-- 上线前使用 Event Validator 检查事件完整性
-- 定期审计埋点覆盖率
+- {{DATA_QUALITY_1，如：关键业务事件不得丢失}}
+- {{DATA_QUALITY_2，如：上线前需验证各事件均能被记录}}
 
 ---
 
