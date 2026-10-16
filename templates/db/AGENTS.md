@@ -41,7 +41,7 @@
 > **⚠️ 全局规则**:  
 > 1. 所有生成的文件都必须在顶部包含 Metadata 区块（Source, Generated At, Generator）。
 > 2. 生成结果必须登记到目标项目 `.context/context-manifest.json` 的 `generated_files`（路径相对于 `.context/` 根目录）。
-> 3. **输出边界**: 本命令只能写入 `.context/db/**`（不含 `source/`）。
+> 3. **输出边界**: 本命令生成的**总结资产**只能写入 `.context/db/**`（不含 `source/`）。除 §0 Pre-step 的集成资产（`.context/openspec/integration.md`）与本模块的 Manifest 登记（`.context/context-manifest.json`）之外，**不得写入其他目录**，也不得生成其他模块的总结。
 > 4. **源文档只读**: 谨慎修改 `source/` 目录中的文件。
 
 ---

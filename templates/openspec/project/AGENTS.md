@@ -120,7 +120,7 @@ rules:
 
 ## ✅ 完成后
 
-> 本模块只生成 `openspec/config.yaml`；报告后**停止**，不得自行继续执行 `plan` 等其他模块。
+> ⛔ 本模块只生成 `openspec/config.yaml`。完成后向调用方（`@design/context-dev/openspec/AGENTS.md` 路由层）报告并**停止**，不得自行继续执行 `plan` 等其他模块。子命令模式下路由层直接结束；一键模式下由路由层决定下一步。（`.context/AGENTS.md` 是索引文档，不是调用方。）
 
 报告结果：
 

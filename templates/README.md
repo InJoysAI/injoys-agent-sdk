@@ -65,7 +65,7 @@ openspec/changes/<id>/  →  /context-start <id> 实施并归档
 | `commands/context-openspec.md` | 集成/设计 | 生成 Context/OpenSpec 项目资产，或创建提案 |
 | `commands/context-interview.md` | 设计 | 访谈并完善技术规格或用户指定文档 |
 | `commands/context-start.md` | 实施 | 校验提案、按 SSoT-first 流程实施并归档 |
-| `commands/context-check.md` | 检查 | 子命令: `env` / `manifest` / `tasks` / `proposal` / `plan` / `project` / `review` |
+| `commands/context-check.md` | 检查 | 子命令: `env` / `manifest` / `commands` / `tasks` / `proposal` / `plan` / `project` / `review` |
 | `commands/context-update.md` | 维护 | `sync roadmap|proposal` 有工作流；`add` / `modify` / `delete` / `fix` 为接口草案 |
 
 安装脚本首次只 bootstrap `context-init` 和 `context-check` 到项目级工具目录，并尝试安装 Codex 全局 prompts。初始化流程随后只将完整命令同步到 `.agent/workflows/`。若要为其他工具安装完整命令，运行 `design/context-dev/scripts/install-ai-commands.sh --tools antigravity,claude,cursor,devin,qoder,grok`；Codex 使用独立的 `install-codex-prompts.sh`。

@@ -501,6 +501,7 @@ AI 在输出 Prompt 前必须完成以下自检，确认**全部通过**再输�
 
 > ⛔ **只有 `node design/context-dev/tools/specflow/specflow.mjs validate <change-id> --strict` 通过后才能报告完成**
 > ⚠️ 下方模板中的 `<...>` 均为待填充字段，**输出时必须替换为实际值**。
+> ⛔ 本模块只创建提案工件。完成后向调用方（`@design/context-dev/openspec/AGENTS.md` 路由层）报告并**停止**，不得自行继续执行其他模块。子命令模式下路由层直接结束；一键模式下由路由层决定下一步。（`.context/AGENTS.md` 是索引文档，不是调用方。）
 
 报告结果：
 

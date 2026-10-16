@@ -29,7 +29,7 @@
 
 > **⚠️ 全局规则**:  
 > 1. 所有生成的文件都必须在顶部包含 Metadata 区块（Source, Generated At, Generator）。
-> 2. **输出边界**: 本命令只能写入 `.context/legacy/**`（不含 `source/`）。
+> 2. **输出边界**: 本命令生成的**分析资产**只能写入 `.context/legacy/**`（不含 `source/`）。除 §0 Pre-step 的集成资产（`.context/openspec/integration.md`）与本模块的 Manifest 登记（`.context/context-manifest.json`）之外，**不得写入其他目录**，也不得生成其他模块的总结。
 > 3. **源文档只读**: 谨慎修改 `source/` 目录中的文件。
 
 ---
