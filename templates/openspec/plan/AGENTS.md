@@ -132,6 +132,8 @@ feat-legacy-deprecate     # 废弃旧代码
 
 ## ✅ 完成后
 
+> 本模块只生成 `proposal-roadmap.md`（及其分 Phase 细化文件）；报告后**停止**，不得自行继续执行其他模块。
+
 报告结果：
 
 ```

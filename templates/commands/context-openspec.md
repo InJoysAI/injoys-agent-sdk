@@ -51,6 +51,8 @@ mkdir -p openspec/changes openspec/specs openspec/changes/archive
 
 > 传递 `$ARGUMENTS`：无参数 = 一键模式；有参数 = 子命令模式
 
+> ⛔ **子命令模式只运行命中的那一个模块，完成后立即结束**，不得继续执行一键模式的其他步骤。可识别的子命令以权威流程 `@design/context-dev/openspec/AGENTS.md` §1 为准；**无法识别的参数：STOP 并向用户确认，不得回退为一键模式。**
+
 当执行 `proposal <change-id> [roadmap-doc]` 时，提案通过严格校验后必须基于实际 Roadmap、提案工件和 Context 资产动态生成三层评审 Prompt。Prompt 首行调用 `.agent/workflows/context-check.md review proposal <change-id>`，且明确 `check-report.md` 落盘门禁；不得只输出固定短命令。
 
 $ARGUMENTS
