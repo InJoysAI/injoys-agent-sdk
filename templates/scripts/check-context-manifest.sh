@@ -38,6 +38,14 @@ if ! jq -e '[(.sources // {}) | to_entries[] | .value | objects | .content_hash?
   exit 1
 fi
 
+# last_openspec_project.{context_sha256,config_sha256} are optional, but when present
+# they must be lowercase hex SHA-256 so the project-snapshot guard can rely on them.
+if ! jq -e '[(.last_openspec_project // {}) | objects | (.context_sha256?, .config_sha256?) | select(. != null)
+             | select((type == "string" and test("^[0-9a-f]{64}$")) | not)] | length == 0' "$manifest_path" >/dev/null; then
+  echo "ERROR: last_openspec_project.context_sha256/config_sha256 must be 64-character lowercase hex SHA-256" >&2
+  exit 1
+fi
+
 history_rel=$(jq -r '.context_sync_history.path // empty' "$manifest_path")
 if [[ -z "$history_rel" ]]; then
   echo "ERROR: context_sync_history.path is required" >&2
