@@ -10,6 +10,12 @@
 > - **基于文档**: {{SOURCE_DOCS}}
 > - **任务状态**:（proposed/in-progress/done）
 
+> **规划口径说明（按需；`criterion.md` / 架构约束中有阶段边界、或有重要规划取舍时才写，否则整块删除）**
+> - **阶段边界**: {{STAGE_BOUNDARY}}（依据：{{STAGE_BOUNDARY_SOURCE}}）
+> - **已移出本路线图的能力**: {{DEFERRED_CAPABILITIES}}（每项写明所属后续阶段与依据）
+> - **其他规划取舍**: {{OTHER_PLANNING_DECISIONS}}（如“修复优先于新增”“同一模块的缺陷合并为一个提案”）
+> - **工作量说明**: 来源资产未提供人日时，写明“人日为规划估算，非来源事实，创建提案时应复核”
+
 > ⚠️ **生成规则（生成后删除本块）**
 > - 先拟定 Phase 与提案清单，数完提案再按 `openspec/plan/AGENTS.md` 的「规模判定」选择规划形态；两种形态**只保留一种**，不要同时写。
 > - **单文件**：本文件即全部计划，「各 Phase 详情」直接写提案块；**不生成** `proposal-roadmap-Phase-*.md`。
