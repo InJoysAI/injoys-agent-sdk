@@ -64,5 +64,6 @@
 | `.agent/workflows/context-check.md` | 检查环境 / Manifest / 任务 / 提案 / 路线图 / 项目配置 / 一致性评审 |
 | `.agent/workflows/context-openspec.md` | 生成 context 总结 + OpenSpec 集成 |
 | `.agent/workflows/context-openspec.md proposal <change-id> [roadmap-doc]` | 生成变更提案（可显式指定提案大纲/路线图文件） |
+| `.agent/workflows/context-interview.md` | 访谈并完善技术规格或指定文档 |
 | `.agent/workflows/context-start.md` | 基于提案开始开发 |
 | `.agent/workflows/context-update.md` | 增量更新 context |
