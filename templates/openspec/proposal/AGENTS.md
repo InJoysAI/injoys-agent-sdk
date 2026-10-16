@@ -28,7 +28,7 @@
 |--------|---------|---------|
 | config.yaml | `openspec/config.yaml` 存在 | ⛔ STOP，先运行 `.agent/workflows/context-openspec.md project` |
 | proposal-roadmap.md | `openspec/proposal-roadmap.md` 存在 | ⛔ STOP，先运行 `.agent/workflows/context-openspec.md plan` |
-| proposal-roadmap-Phase*.md（可选） | `openspec/proposal-roadmap-Phase*.md` 或 `openspec/proposal-roadmap-Phase-*.md` 存在 | 若存在，则作为补充规划文档一并读取 |
+| 分 Phase 文件 | 总纲 Metadata 的 `规划形态` 为 `总纲+分Phase` 时，总览中列出的 `openspec/proposal-roadmap-Phase-<N>.md`（兼容旧名 `Phase<N>`）必须存在；单文件形态下不要求 | ⛔ STOP（复杂形态下缺 Phase 文件），先运行 `.agent/workflows/context-openspec.md plan` 或让用户确认 |
 | roadmap 条目匹配结果 | 能在 `openspec/proposal-roadmap.md` 中精确定位到目标 `<change-id>` 条目（或经用户确认按“新建提案”处理） | ⛔ STOP，先确认是“新建提案”还是“使用既有 roadmap 条目” |
 
 **命令参数**：
@@ -50,16 +50,19 @@
 **额外读取**（proposal 专用）：
 - `.context/openspec/integration.md` — Context 读取规范
 - `openspec/config.yaml` — 从 Context 生成的项目上下文快照（供提案创建使用的项目上下文）
-- `openspec/proposal-roadmap.md` — 规划文档（索引/总览，且必须提取 `<change-id>` 对应条目正文）
-- `openspec/proposal-roadmap-Phase*.md` / `openspec/proposal-roadmap-Phase-*.md` — 分 Phase 规划（若存在，视为更细粒度计划）
+- `openspec/proposal-roadmap.md` — 总规划，且必须提取 `<change-id>` 对应条目
+  - 单文件形态：条目正文就在本文件
+  - 总纲+分Phase 形态：本文件只有「提案索引」行，**条目正文在索引「详情」链接指向的 `proposal-roadmap-Phase-<N>.md` 中**，必须一并读取
+- `openspec/proposal-roadmap-Phase-<N>.md`（兼容旧名 `proposal-roadmap-Phase<N>.md`）— 分 Phase 提案详情（复杂形态下是提案正文的**唯一来源**）
 
 ### 1.2 匹配提案（强制）
 
 根据命令参数 `<change-id>` 执行“先精确后模糊”匹配：
 - 匹配范围：
-  - 第一步（必做）：在 `openspec/proposal-roadmap.md` 中按 `<change-id>` 精确匹配目标条目
+  - 第一步（必做）：在 `openspec/proposal-roadmap.md` 中按 `<change-id>` 精确匹配目标条目（单文件形态为提案块，总纲+分Phase 形态为索引行）
+  - 第一步-补（总纲+分Phase 形态必做）：按索引行「详情」链接打开对应 Phase 文件，取其中同 Change ID 的提案块作为条目正文；索引行与提案块的优先级/前置依赖/状态不一致时，停下来向用户确认
   - 第二步（可选补充）：若用户提供了 `roadmap-doc`，再在该文件中匹配同 `<change-id>` 或同主题条目用于补充
-  - 第三步（可选补充）：若存在 `openspec/proposal-roadmap-Phase*.md`/`openspec/proposal-roadmap-Phase-*.md`，补充匹配
+  - 第三步（可选补充）：单文件形态下若仍存在旧的 `openspec/proposal-roadmap-Phase*.md`，补充匹配
 - 匹配规则：
   - 主规则（必须）：`Change ID` 精确匹配 `<change-id>`
   - 补救规则（仅在精确匹配失败时）：名称关键词模糊匹配，并向用户确认是否接受该映射
@@ -74,7 +77,7 @@
 
 **核心必提取字段（必须）**：
 - `roadmap_source_primary`（固定为 `openspec/proposal-roadmap.md`）
-- `roadmap_source_supplement`（若无补充文件则 `N/A`）
+- `roadmap_source_supplement`（总纲+分Phase 形态填提案正文所在的 Phase 文件路径；其余补充文件同理；无则 `N/A`）
 - `phase`（如 Phase 0 / 1 / 2）
 - `change_id`
 - `title`

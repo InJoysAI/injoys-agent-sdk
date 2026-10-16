@@ -6,7 +6,7 @@
 
 ## 🎯 执行指令
 
-> ⛔ **本命令只生成 `proposal-roadmap.md`，不能触发 `config.yaml` 生成**
+> ⛔ **本命令只生成路线图文件（`proposal-roadmap.md`，复杂项目另含 `proposal-roadmap-Phase-<N>.md`），不能触发 `config.yaml` 生成**
 
 依次执行以下步骤：
 
@@ -42,9 +42,31 @@
 
 ---
 
-## Phase 2: 生成 proposal-roadmap.md
+## Phase 2: 生成路线图
 
-**模板**: `design/context-dev/templates/proposal-roadmap.md.template`
+**模板**：
+- `design/context-dev/templates/proposal-roadmap.md.template` — 总规划（两种形态都用）
+- `design/context-dev/templates/proposal-roadmap-phase.md.template` — 提案块结构；「总纲+分Phase」形态下同时是 Phase 文件模板
+
+### 2.0 规模判定：单文件 还是 总纲+分Phase（必须先做）
+
+> 目标：简单需求只要一份 `openspec/proposal-roadmap.md`；复杂业务则 `proposal-roadmap.md` 是总规划，`proposal-roadmap-Phase-<N>.md` 是各阶段具体的实现提案计划。
+
+**步骤**：
+1. 基于 Phase 1 读取的资产，先拟定**规划草案**：Phase 列表 + 每个 Phase 的提案 ID 清单（只列 ID 和一句话，不展开）
+2. 数出：提案总数 `M`、Phase 数 `P`、单个 Phase 最多的提案数 `K`
+3. 按下表判定
+
+| 形态 | 判定条件 | 产出 |
+|------|---------|------|
+| **单文件** | `M ≤ 10` 且 `P ≤ 3` 且 `K ≤ 6` | 仅 `openspec/proposal-roadmap.md`，含全部提案详情 |
+| **总纲+分Phase** | 满足任一：`M > 10`、`P ≥ 4`、`K > 6` | `openspec/proposal-roadmap.md`（总规划：阶段总览、全局依赖图、提案索引）+ **每个 Phase 一个** `openspec/proposal-roadmap-Phase-<N>.md`（提案详情） |
+
+4. 用户明确指定形态时以用户为准，并在 Metadata 的「判定依据」写明“用户指定”
+5. 判定结果写入总纲 Metadata：`规划形态` 与 `判定依据`（含 `M` / `P` / `K` 实际数值）
+
+> 阈值是默认值，用于避免单文件过长或为简单需求制造多余文件；接近阈值时偏向**简单**，除非总览已明显难以阅读。
+> 两种形态**二选一**：复杂形态下**每个 Phase 都要有文件**，不要只给部分 Phase 拆文件。
 
 ### 2.1 通用填充规则
 
@@ -82,13 +104,25 @@
    - 若 `.context/ui/` 存在 → 包含 UI 相关 Phase
    - 若 `.context/legacy/` 存在 → 包含遗留系统改造 Phase（Phase 0）
 
-### 2.1.1 可选：分 Phase 细化文件
+### 2.1.1 两种形态的写法
 
-默认只生成 `openspec/proposal-roadmap.md`（索引/总览）。仅当用户明确要求，或某个 Phase 的提案过多（>8 个）、总览已难以阅读时，才为该 Phase 额外生成 `openspec/proposal-roadmap-Phase<N>.md`：
+**单文件**
+- 用 `proposal-roadmap.md.template`，保留「【单文件形态】」，删除「提案索引」和「【总纲+分Phase 形态】」
+- 各 Phase 详情直接写提案块（结构见 `proposal-roadmap-phase.md.template` 的「提案详情」）
+- 不生成 `proposal-roadmap-Phase-*.md`
 
-- 模板：`design/context-dev/templates/proposal-roadmap-phase.md.template`
-- 总览中该 Phase 保留标题、目标和提案 ID 索引，并链接到 Phase 文件；提案条目以 Phase 文件为细化来源
-- 提案 ID、依赖关系须与总览一致，不得两处各写一套
+**总纲+分Phase**
+- 总纲：保留阶段总览（含提案数与链接）、全局依赖图、**提案索引**、「【总纲+分Phase 形态】」；**删除**「【单文件形态】」，**总纲里不写提案块**
+- Phase 文件：用 `proposal-roadmap-phase.md.template`，文件名 `openspec/proposal-roadmap-Phase-<N>.md`，`<N>` 与总纲阶段编号一致（Phase 0 → `Phase-0`）
+- **唯一来源**：提案详情只写在 Phase 文件；总纲索引只放 Change ID、Phase、标题、优先级、前置依赖、状态、链接，且必须与 Phase 文件一致，不得两处各写一套
+- 全局依赖图只在总纲维护；Phase 文件只写本 Phase 内的执行顺序与跨阶段前置/产出
+
+**提案块的必填与按需**
+- 必填：Change ID、优先级、预计时间、状态、业务目标、范围边界、关联 Context 资产、关键任务、验证标准、依赖
+- 按需：里程碑、风险、迁移与回滚、运维、KPI、验收场景、跨提案场景、跟踪清单；**没有来源依据就删除整块**，不得为填满模板而编造
+- 单文件形态下的简单提案尤其如此，只写必填项即可
+
+**命名**：生成时统一使用 `proposal-roadmap-Phase-<N>.md`。读取方同时兼容旧的 `proposal-roadmap-Phase<N>.md`。
 
 ### 2.2 棕地项目特殊规则
 
@@ -121,18 +155,28 @@ feat-legacy-deprecate     # 废弃旧代码
 
 ## Phase 3: 输出验证
 
-**输出**: `openspec/proposal-roadmap.md`
+**输出**:
+- 单文件：`openspec/proposal-roadmap.md`
+- 总纲+分Phase：`openspec/proposal-roadmap.md` + `openspec/proposal-roadmap-Phase-<N>.md`（每个 Phase 一个）
 
 **规则**：
-- 不得残留任何 `{{...}}` 占位符
+- 不得残留任何 `{{...}}` 占位符，也不得残留模板里的“生成规则/使用说明”块和未选中形态的章节
 - 路线图应与 criterion.md 约束保持一致
+- Metadata 已写明 `规划形态` 与 `判定依据`
+- **总纲+分Phase 形态额外校验**：
+  - 总览中每个 Phase 都有对应文件，链接可达，编号与文件名一致
+  - 总纲索引的 Change ID 集合 = 各 Phase 文件中提案块的 Change ID 集合（无遗漏、无重复）
+  - 索引中的优先级、前置依赖、状态与 Phase 文件逐条一致
+  - 总纲中不含提案块
+- **单文件形态额外校验**：没有残留的「提案索引」章节
+- **形态切换（重新运行 `plan` 时）**：若发现与本次形态不符的旧文件（如本次为单文件，但已有 `proposal-roadmap-Phase-*.md`），⛔ **不得自行删除**，在报告中列出并询问用户处理
 - **❌ 禁止同时生成 config.yaml**
 
 ---
 
 ## ✅ 完成后
 
-> ⛔ 本模块只生成 `proposal-roadmap.md`（及其分 Phase 细化文件）。完成后向调用方（`@design/context-dev/openspec/AGENTS.md` 路由层）报告并**停止**，不得自行继续执行其他模块。子命令模式下路由层直接结束；一键模式下由路由层决定下一步。（`.context/AGENTS.md` 是索引文档，不是调用方。）
+> ⛔ 本模块只生成 `proposal-roadmap.md`（复杂项目另含各 `proposal-roadmap-Phase-<N>.md`）。完成后向调用方（`@design/context-dev/openspec/AGENTS.md` 路由层）报告并**停止**，不得自行继续执行其他模块。子命令模式下路由层直接结束；一键模式下由路由层决定下一步。（`.context/AGENTS.md` 是索引文档，不是调用方。）
 
 报告结果：
 
@@ -140,6 +184,10 @@ feat-legacy-deprecate     # 废弃旧代码
 === OpenSpec Plan ===
 项目类型: [绿地项目 / 棕地项目]
 ✅ openspec/proposal-roadmap.md (生成/更新)
+✅ openspec/proposal-roadmap-Phase-<N>.md × {{P}}（仅「总纲+分Phase」形态）
+
+规划形态: [单文件 / 总纲+分Phase]（依据：M={{M}}、P={{P}}、K={{K}} 或 用户指定）
+遗留的旧形态文件（若有，等待用户确认处理）: {{STALE_FILES_OR_NONE}}
 
 路线图概览:
 - Phase 数量: {{N}}

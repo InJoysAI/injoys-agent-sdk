@@ -17,8 +17,11 @@
 
 | 文件 | 必需 | 说明 |
 |------|:----:|------|
-| `openspec/proposal-roadmap.md` | ✅ | Roadmap 文件 |
+| `openspec/proposal-roadmap.md` | ✅ | Roadmap 总规划 |
+| `openspec/proposal-roadmap-Phase-<N>.md`（兼容旧名 `Phase<N>`） | 条件必需 | 总纲 Metadata `规划形态` 为 `总纲+分Phase` 时，阶段总览中的每个 Phase 都必须有对应文件 |
 | `.context/context-manifest.json` | ✅ | 用于读取 Context 资产 |
+
+先读取总纲 Metadata 的 `规划形态` 与 `判定依据`，决定后续按哪种形态校验；缺少 `规划形态` 时按 `单文件` 处理并给出警告。
 
 **结果**：
 - ❌ 缺失必需文件 → 失败，提示先运行 `.agent/workflows/context-openspec.md plan`
@@ -46,6 +49,14 @@
 - `优先级`（P0/P1/P2）
 - `状态`（proposed/in-progress/done）
 - `范围` 描述
+
+**按形态**：
+- `单文件`：以上字段在 `proposal-roadmap.md` 的提案块中；不应存在「提案索引」章节
+- `总纲+分Phase`：提案块在各 Phase 文件中（结构见 `proposal-roadmap-phase.md.template`）；总纲**不应**含提案块，须有「提案索引」，并检查：
+  - 总览中每个 Phase 都有文件，链接可达，编号与文件名一致
+  - 索引 Change ID 集合 = Phase 文件提案块 Change ID 集合（无遗漏、无重复）
+  - 索引中的优先级、前置依赖、状态与 Phase 文件逐条一致
+- `规划形态` 与 `判定依据` 的数值（提案总数、Phase 数、单 Phase 最多提案数）与实际一致；形态与 `openspec/plan/AGENTS.md` §2.0 的阈值明显不符时给出提示（不判错：用户可指定）
 
 **结果**：
 - ❌ 缺失必需节 → 警告
@@ -153,8 +164,9 @@
 
 ✅/⚠️/❌ 格式正确性
    ├── 项目信息 [状态]
+   ├── 规划形态 [状态]（单文件 / 总纲+分Phase）
    ├── 阶段总览 [状态]（N 个 Phase）
-   ├── 各 Phase 详情 [状态]（N 个提案）
+   ├── 各 Phase 详情 [状态]（N 个提案；分Phase 形态含 Phase 文件与索引一致性）
    └── 依赖关系图 [状态]
 
 ✅/⚠️/❌ Context 内容一致性

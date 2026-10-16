@@ -48,6 +48,8 @@ node design/context-dev/tools/specflow/specflow.mjs status <change-id>
 
 从 `openspec/proposal-roadmap.md` 中按 `Change ID: <change-id>` 精确定位条目并提取。
 
+> 总纲+分Phase 形态下，总纲只有「提案索引」行；提案正文在索引「详情」链接指向的 `openspec/proposal-roadmap-Phase-<N>.md` 中，下列字段从该提案块提取，并核对索引行与提案块的优先级/前置依赖/状态一致。
+
 **核心必提取字段（必须）**：
 - `business_goal`
 - `in_scope` / `out_of_scope`

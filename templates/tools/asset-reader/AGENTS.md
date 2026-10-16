@@ -129,7 +129,7 @@ for scope in ["architecture", "domain", "db", "ui", "legacy"]:
 | `.context/openspec/integration.md` | `--integration` | Context 读取规范 |
 | `openspec/config.yaml` | `--project` | 从 Context 生成的项目上下文快照 |
 | `openspec/proposal-roadmap.md` | `--roadmap` | 规划文档（索引/总览） |
-| `openspec/proposal-roadmap-Phase*.md` / `openspec/proposal-roadmap-Phase-*.md` | `--roadmap <path>` | 提案大纲/分 Phase 规划（显式指定要读的 roadmap 文件） |
+| `openspec/proposal-roadmap-Phase-*.md`（兼容旧名 `Phase*.md`） | `--roadmap <path>` | 复杂项目的分 Phase 提案详情（显式指定要读的文件；总纲只含索引） |
 | `.context/<scope>/source/*` | `--source <scope>` | 回溯源文档 |
 
 ---

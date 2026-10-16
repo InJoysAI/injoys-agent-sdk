@@ -134,14 +134,14 @@ PRD：@docs/product-overview.md
 .agent/workflows/context-openspec.md proposal feat-user-login
 ```
 
-- 读取 `openspec/proposal-roadmap.md` 定位条目
+- 读取 `openspec/proposal-roadmap.md` 定位条目（复杂项目的总纲只含索引，提案正文自动读取索引链接指向的 `proposal-roadmap-Phase-<N>.md`）
 - 创建 `openspec/changes/<提案ID>/`（proposal.md, design.md, tasks.md）
 - 严格校验通过后根据实际 Roadmap、提案工件和 Context 资产动态生成三层评审 Prompt，并由专用画像生成、复核 `check-report.md`
 
 也可以显式指定“提案大纲文档”（例如某个 Phase 文件）：
 
 ```
-.agent/workflows/context-openspec.md proposal feat-user-login openspec/proposal-roadmap-Phase3.md
+.agent/workflows/context-openspec.md proposal feat-user-login openspec/proposal-roadmap-Phase-3.md
 ```
 
 ### 5. 开始实施
