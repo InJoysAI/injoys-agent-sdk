@@ -29,7 +29,11 @@
 
 生成/更新 `openspec/config.yaml`，用于向提案创建注入项目规划上下文。该文件是 `.context/` 权威资产的**只读派生快照**，不得引入来源资产中不存在的新约束，也不得手工维护。
 
-生成前，对本次实际读取的 `.context` 文件计算 **Context-SHA256** 组合指纹；将来源列表与指纹写入 YAML 顶部注释。来源内容或指纹未变化时，不重写文件。
+生成前，对本次实际读取的 `.context` 文件计算 **Context-SHA256** 组合指纹；将来源列表与指纹写入 YAML 顶部注释。**幂等守卫**：满足以下**全部**条件才可跳过重写——
+1. 来源指纹与现有 `config.yaml` 头部 `Context-SHA256` 一致；
+2. Manifest `last_openspec_project.config_sha256` 存在时，`config.yaml` 当前内容摘要与之相符（不存在则只看条件 1）。
+
+**强制重生成**（跳过守卫，指纹不变也要重写）：用户明确要求重生成，或 `.agent/workflows/context-check.md project` 报告了内容缺陷 / `[DESYNC]` 时。指纹只能证明“来源没变”，不能证明“快照内容正确”，所以内容有误时必须能绕过守卫。
 
 #### Context-SHA256 算法（规范性 · 生成与 `.agent/workflows/context-check.md project` 必须一致）
 
@@ -46,7 +50,8 @@
    joined = file_digest_1 || 0x0A || file_digest_2 || ... || file_digest_n
    Context-SHA256 = hex(sha256(utf8(joined)))
    ```
-5. 写入 `openspec/config.yaml` 顶部 `# Context-SHA256: <64-hex>`，并建议同步写入 Manifest `last_openspec_project.context_sha256`。
+5. 写入 `openspec/config.yaml` 顶部 `# Context-SHA256: <64-hex>`。
+6. 文件写完后，更新 Manifest `last_openspec_project`（字段见 `tools/manifest/AGENTS.md`）：`context_sha256`（即上面的组合指纹）与 `config_sha256`（= `hex(sha256(config.yaml 的磁盘原始字节))`，在文件最终写入后计算）。
 
 > 参考实现（Python 3）：
 > ```python
@@ -102,7 +107,7 @@ rules:
 | UI Guidelines | ui/design_system.md | ⚠️ 若存在 |
 | Database Design | db/schema_design.md | ⚠️ 若存在 |
 
-**缺失来源处理**：标记“必须”的章节若所列来源资产均未提供对应内容，写 `N/A – 来源资产未提供`；标记“若存在”的章节来源不存在时整节省略。**不得**为填满章节而编造来源资产中没有的内容或约定。
+**缺失来源处理**：标记“必须”的章节若所列来源资产均未提供对应内容，写 `N/A – 来源资产未提供`；标记“若存在”的章节（Testing Strategy、Git Workflow、UI Guidelines、Database Design）来源不存在时**整节省略**，检查方（`check/project`）同样按“若存在”处理，不会因缺这些章节告警。**不得**为填满章节而编造来源资产中没有的内容或约定。
 
 `rules` 建议最少包含：
 - `tasks`: 任务拆分粒度、SSoT-first、验证/归档要求
@@ -112,6 +117,12 @@ rules:
 - 项目强制约束以 `.context/criterion.md` 为准
 - 架构和领域事实以对应 `.context/architecture/`、`.context/domain/` 资产为准
 - `config.yaml` 只做精炼和格式转换，不复制长段原文
+
+**体积预算**（`config.yaml` 会被注入每次提案创建，过大会拉低信息密度、增加 token 成本）：
+- 目标 ≤ **20 KiB**；**软上限 32 KiB**（超过只告警，不失败）
+- 接近或超过目标时按以下优先级裁剪：① `MUST` / `MUST NOT` 约束（**不得删减**，最多合并重复表述）→ ② 业务规则与核心流程 → ③ 架构与技术栈 → ④ UI / DB → ⑤ 背景叙述
+- 优先做法：合并重复、去掉修饰、对长段落改为“摘要 + 来源路径（如 `见 .context/domain/business_rules.md BR-0xx`）”，而不是复制原文
+- 任何裁剪都不得引入来源中不存在的内容
 - 发现来源冲突时停止生成并报告，不在 `config.yaml` 内自行裁决
 
 **输出**: `openspec/config.yaml`

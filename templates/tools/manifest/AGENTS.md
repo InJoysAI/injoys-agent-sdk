@@ -232,6 +232,20 @@
 - Manifest 中禁止出现 `previous_sync`，禁止保存递归历史链，禁止把详细差异报告或领域决策堆入 `last_context_sync`。
 - 完整事件以单行 JSON 追加到 `.context/history/context-sync.jsonl`；每条记录必须是独立对象，并至少包含 `event_type` 与 ISO 8601 `synced_at`。
 - 历史日志按 `synced_at` 升序排列。领域决策的权威正文仍写入对应 Context 资产，日志只承担审计追溯。
+
+#### last_openspec_project（可选，首次 `context-openspec project` 之后才出现）
+
+记录最近一次生成 `openspec/config.yaml` 的状态，供幂等守卫与 `context-check project` 使用。只保存当前状态，不保存历史：
+
+| 字段 | 说明 |
+|------|------|
+| `path` | 固定 `openspec/config.yaml` |
+| `context_sha256` | 生成时的来源组合指纹（算法见 `openspec/project/AGENTS.md`「Context-SHA256 算法」），与 `config.yaml` 头部一致 |
+| `config_sha256` | 生成完成后 `config.yaml` 磁盘原始字节的 sha256（64 位小写 hex）；用于发现“生成之后被改动”。**可选**，旧 Manifest 没有时按未记录处理 |
+| `generated_at` | ISO 8601 |
+| `workflow` | 固定 `.agent/workflows/context-openspec.md project` |
+
+只有生成流程可以写这些字段；其他流程不得自造同级字段。
 - 历史日志不登记到 `generated_files`，避免资产读取器把审计历史作为项目上下文全文加载；Manifest 仅通过 `context_sync_history.path` 指向它。
 - 写入后必须执行 `bash design/context-dev/scripts/check-context-manifest.sh`。Manifest 超过 32 KiB、JSON/JSONL 非法或出现 `previous_sync` 时视为失败。
 

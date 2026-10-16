@@ -87,3 +87,13 @@ test('sources[].content_hash must be a 64-char lowercase hex SHA-256 when presen
   assert.notEqual(bad.status, 0);
   assert.match(bad.stderr, /content_hash/);
 });
+
+test('last_openspec_project hashes must be 64-char lowercase hex when present', opts, () => {
+  const lop = (extra) => ({ last_openspec_project: { path: 'openspec/config.yaml', context_sha256: SHA, generated_at: '2026-10-16T00:00:00Z', ...extra } });
+  assert.equal(check(project(lop({ config_sha256: SHA }))).status, 0);
+  assert.equal(check(project(lop({}))).status, 0, 'config_sha256 is optional');
+  assert.equal(check(project({})).status, 0, 'the whole node is optional');
+  const bad = check(project(lop({ config_sha256: 'XYZ' })));
+  assert.notEqual(bad.status, 0);
+  assert.match(bad.stderr, /config_sha256/);
+});
