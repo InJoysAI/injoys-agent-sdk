@@ -34,7 +34,7 @@
 | `ui` | `@design/context-dev/ui/AGENTS.md` | 生成 ui 总结 |
 | `legacy` | `@design/context-dev/legacy/AGENTS.md` | 生成 legacy 分析 |
 | `project` | `@design/context-dev/openspec/project/AGENTS.md` | 生成 config.yaml |
-| `plan` | `@design/context-dev/openspec/plan/AGENTS.md` | 生成 proposal-roadmap.md（索引/总览；可选存在 proposal-roadmap-Phase*.md 作为分 Phase 细化） |
+| `plan` | `@design/context-dev/openspec/plan/AGENTS.md` | 按项目规模生成路线图：简单项目为单个 proposal-roadmap.md；复杂项目为 proposal-roadmap.md（总规划）+ proposal-roadmap-Phase-<N>.md（各阶段提案详情） |
 | `proposal <change-id> [roadmap-doc]` | `@design/context-dev/openspec/proposal/AGENTS.md` | 创建并严格校验提案，基于实际证据动态生成三层评审 Prompt（主 roadmap 条目必需，`roadmap-doc` 仅补充） |
 
 ---

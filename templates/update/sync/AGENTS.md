@@ -17,7 +17,7 @@
 ```bash
 .agent/workflows/context-update.md sync roadmap
 .agent/workflows/context-update.md sync roadmap phase3
-.agent/workflows/context-update.md sync roadmap openspec/proposal-roadmap-Phase3.md
+.agent/workflows/context-update.md sync roadmap openspec/proposal-roadmap-Phase-3.md
 .agent/workflows/context-update.md sync proposal <change-id>
 ```
 
@@ -31,7 +31,7 @@
 |--------|------|------|
 | source | `roadmap` 或 `proposal` | `sync proposal feat-user-login` |
 | target | 默认 `.context/**` | roadmap/proposal → context |
-| scope | 全量 / 单个 phase / 单个文件 / 单个 change | `phase3` / `proposal-roadmap-Phase3.md` |
+| scope | 全量 / 单个 phase / 单个文件 / 单个 change | `phase3` / `proposal-roadmap-Phase-3.md` |
 | mode | `review` / `apply` | `--mode apply` |
 
 默认规则：
@@ -64,7 +64,7 @@
 
 必须读取：
 - `openspec/proposal-roadmap.md`
-- 所有相关的 `openspec/proposal-roadmap-Phase*.md`
+- 所有相关的 `openspec/proposal-roadmap-Phase-*.md`（兼容旧名 `Phase<N>`）；总纲+分Phase 形态下同时核对总纲「提案索引」与 Phase 文件一致
 
 若用户指定了 `phase-or-file`：
 - 仅读取对应 Phase 文件

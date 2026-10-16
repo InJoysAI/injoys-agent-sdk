@@ -1,11 +1,18 @@
 # Phase {{PHASE_NO}}: {{PHASE_NAME}}
 
 > **返回总纲**: [proposal-roadmap.md](./proposal-roadmap.md)
+> **文件名**: `proposal-roadmap-Phase-{{PHASE_NO}}.md`（`{{PHASE_NO}}` 与总纲阶段总览中的编号一致，Phase 0 → `Phase-0`）
 > **状态**: {{PHASE_STATUS}}
 > **来源**: {{SOURCE_DOCS}}
 > **预计工作量与周期**: {{PHASE_ESTIMATE_OR_PENDING}}
 
-> 本文件承载阶段完整计划；提案块按实际数量重复。里程碑、风险、迁移、运维、KPI 等按需保留，无适用内容时删除或说明。示例条数不是要求。沿用项目术语，不为填满模板增加设计。
+> ⚠️ **使用说明（生成后删除本块）**
+> - 本模板用于「总纲+分Phase」形态：一个 Phase 一个文件，承载该阶段的**完整提案详情**；总纲只保留阶段总览、全局依赖图和提案索引。
+> - 下面的「提案详情」块同时是**单文件形态**下总纲各 Phase 详情的提案块结构，两种形态共用，不另写一套。
+> - 本文件中每个提案的 Change ID、优先级、前置依赖、状态必须与总纲「提案索引」一致；有变更时两处同步。
+> - **必填**：Change ID、优先级、预计时间、状态、业务目标、范围边界、关联 Context 资产、关键任务、验证标准、依赖。
+> - **按需**（无适用内容就整块删除，不写“无”也不编造）：里程碑、风险与处理决定、迁移与回滚、运维与支持、成功指标、验收场景、跨提案场景、验收与跟踪清单。简单提案只需必填项。
+> - 示例条数不是要求；沿用项目术语，不为填满模板增加设计。
 
 ## 阶段目标与范围
 
@@ -14,6 +21,8 @@
 - 适用约束：{{PHASE_CONSTRAINTS}}
 
 ## 提案详情
+
+> 以下为**提案块**（按实际提案数重复）。
 
 ### 提案 {{PROPOSAL_NO}}: {{PROPOSAL_TITLE}}
 
@@ -57,7 +66,7 @@
 4. {{TASK_4}} ({{TASK_4_EST}})
 5. {{TASK_5}} ({{TASK_5_EST}})
 
-**里程碑**:
+**里程碑（按需）**:
 
 | 里程碑 | 预计时间 | 验收标准 |
 |--------|----------|----------|
@@ -73,17 +82,17 @@
 | {{RISK_2}} | {{RISK_2_IMPACT}} | {{RISK_2_MITIGATION}} |
 | {{RISK_3}} | {{RISK_3_IMPACT}} | {{RISK_3_MITIGATION}} |
 
-**迁移与回滚（Change Management）**:
+**迁移与回滚（Change Management，按需）**:
 - {{CHANGE_MGMT_1}}
 - {{CHANGE_MGMT_2}}
 - {{CHANGE_MGMT_3}}
 
-**运维与支持（Ops/Support）**:
+**运维与支持（Ops/Support，按需）**:
 - {{OPS_SUPPORT_1}}
 - {{OPS_SUPPORT_2}}
 - {{OPS_SUPPORT_3}}
 
-**成功指标（KPI）**:
+**成功指标（KPI，按需）**:
 - {{KPI_1}}
 - {{KPI_2}}
 - {{KPI_3}}
@@ -96,20 +105,20 @@
 | {{ACCEPTANCE_ITEM_2}} | {{ACCEPTANCE_CRITERIA_2}} | {{ACCEPTANCE_METHOD_2}} |
 | {{ACCEPTANCE_ITEM_3}} | {{ACCEPTANCE_CRITERIA_3}} | {{ACCEPTANCE_METHOD_3}} |
 
-**验收场景（可选，建议 BDD）**:
+**验收场景（按需，建议 BDD）**:
 
 ```gherkin
 {{GATE_SCENARIOS_GHERKIN}}
 ```
 
-**跨提案场景（仅有实际关联时填写）**:
+**跨提案场景（按需，仅有实际关联时填写）**:
 
 | 场景 | 对应提案 | 纳入验收的条件 |
 |------|----------|------------------|
 | {{NON_GATE_SCENARIO_1}} | `{{NON_GATE_CHANGE_1}}` | {{NON_GATE_UPGRADE_1}} |
 | {{NON_GATE_SCENARIO_2}} | `{{NON_GATE_CHANGE_2}}` | {{NON_GATE_UPGRADE_2}} |
 
-**验收与跟踪清单（可选）**:
+**验收与跟踪清单（按需）**:
 
 | 项目 | 验收/交付物 | 验收方式 | 负责人 | 截止点 |
 |------|-------------|----------|--------|--------|

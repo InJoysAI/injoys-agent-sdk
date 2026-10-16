@@ -17,7 +17,7 @@
 |---------|------|
 | `PRD.md.template` / `TAD.md.template` | 自备 PRD / 技术架构文档时的参考结构（`/context-init` 的输入，可选） |
 | `module-contract.md.template` / `module-audit.md.template` / `module-check.md.template` | 模块契约/审计/检查的提示词模板，需要时手工复制使用；示例中的 ID 仅为示意 |
-| `proposal-roadmap-phase.md.template` | `/context-openspec plan` 在需要分 Phase 细化时使用 |
+| `proposal-roadmap.md.template` / `proposal-roadmap-phase.md.template` | `/context-openspec plan` 使用：简单项目只生成 `proposal-roadmap.md`（单文件）；复杂项目 `proposal-roadmap.md` 为总规划，`proposal-roadmap-Phase-<N>.md`（用 phase 模板）为各阶段提案详情。规模判定规则见 `openspec/plan/AGENTS.md` §2.0 |
 
 提案工件模板位于 `design/context-dev/templates/openspec/`（`proposal/spec/design/tasks.md.template`），由 `specflow new` 使用。
 
