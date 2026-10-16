@@ -126,7 +126,7 @@ PRD：@docs/product-overview.md
 - 确保 `openspec/` 目录结构存在
 - 生成 `openspec/config.yaml` 与 `openspec/proposal-roadmap.md`
 
-也可单独运行子命令：`domain` / `architecture` / `db` / `ui` / `legacy` / `project` / `plan`。
+也可单独运行子命令：`domain` / `architecture` / `db` / `ui` / `legacy` / `project` / `plan`。**带参数 = 只运行命中的那一个模块，完成后立即结束**，不会继续执行其他步骤；无法识别的参数会停下来询问，不会回退为一键模式。
 
 ### 4. 创建提案
 

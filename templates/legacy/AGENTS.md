@@ -142,4 +142,4 @@ README.md 内容。
 
 ## ✅ 完成后
 
-向上级 `.context/AGENTS.md` 汇报完成状态。
+向调用方（`@design/context-dev/openspec/AGENTS.md` 路由层）汇报完成状态，**然后停止**，不得自行继续执行其他模块。
