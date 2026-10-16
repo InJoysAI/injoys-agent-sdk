@@ -35,6 +35,7 @@
 | `.agent/workflows/context-init.md` | 初始化 Context（归档源文档、生成准则、初始化 SSoT） |
 | `.agent/workflows/context-openspec.md` | 生成 Context 总结、`config.yaml`、`proposal-roadmap.md` |
 | `.agent/workflows/context-openspec.md proposal <change-id> [roadmap-doc]` | 创建并校验变更提案 |
+| `.agent/workflows/context-interview.md` | 访谈并完善技术规格或指定文档 |
 | `.agent/workflows/context-start.md` | 按提案实施并归档 |
 | `.agent/workflows/context-check.md` | 检查环境 / Manifest / 任务 / 提案 / 路线图等 |
 | `.agent/workflows/context-update.md` | 维护 Context（源文档变更后同步） |
