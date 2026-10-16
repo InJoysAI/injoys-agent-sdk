@@ -2,7 +2,7 @@
 
 > **Metadata**
 > - **项目名称**: {{PROJECT_NAME}}
-> - **项目类型**: {{PROJECT_TYPE}}（绿地/棕地）
+> - **项目类型**: {{PROJECT_TYPE}}（绿地 / 已有实现 / 棕地；已有实现与棕地需写明判定依据）
 > - **规划形态**: {{ROADMAP_MODE}}（`单文件` / `总纲+分Phase`）
 > - **判定依据**: {{MODE_REASON}}（提案总数 {{PROPOSAL_COUNT}}、Phase 数 {{PHASE_COUNT}}、单 Phase 最多提案数 {{MAX_PHASE_PROPOSALS}}）
 > - **当前阶段**: {{CURRENT_PHASE}}
@@ -14,6 +14,7 @@
 > - 先拟定 Phase 与提案清单，数完提案再按 `openspec/plan/AGENTS.md` 的「规模判定」选择规划形态；两种形态**只保留一种**，不要同时写。
 > - **单文件**：本文件即全部计划，「各 Phase 详情」直接写提案块；**不生成** `proposal-roadmap-Phase-*.md`。
 > - **总纲+分Phase**：本文件只做总规划（阶段总览、依赖图、提案索引）；每个 Phase 的提案详情写在 `openspec/proposal-roadmap-Phase-<N>.md`，**本文件不写提案块**，避免两处各写一套。
+> - **形态标记标题**（`【单文件形态】`、`【总纲+分Phase 形态】`）只是模板里的分区标记：保留所选形态下的内容，**把标记标题行本身也删掉**。
 > - 提案块的结构、必填/按需字段见 `proposal-roadmap-phase.md.template` 的「提案详情」块（两种形态共用同一结构）。
 > - Phase 数量按 `.context/` 资产动态决定；存在 `.context/legacy/` 必须有 Phase 0（遗留系统对齐）；存在 `.context/db/` / `.context/ui/` 必须有对应提案。
 
@@ -54,7 +55,7 @@
 ### 【单文件形态】
 
 > 每个 Phase 一节；提案块使用 `proposal-roadmap-phase.md.template`「提案详情」下的结构，按实际提案数重复。
-> 原子化：每个提案聚焦单一能力或单一问题，建议 0.5-3 天可交付；提案 ID 统一 `feat-*` / `fix-*`（kebab-case）。
+> 原子化：每个提案聚焦单一能力或单一问题，建议 0.5-3 人日可交付；**超过 5 人日必须拆分，或在「范围边界」下的 `[!NOTE]` 写明不拆的理由**；提案 ID 统一 `feat-*` / `fix-*`（kebab-case）。
 
 #### Phase {{PHASE_NO}}: {{PHASE_NAME}}
 
