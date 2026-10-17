@@ -1,0 +1,13 @@
+# 协作花名册
+
+> 记录各角色默认由哪个 AI 工具负责。只有用户修改。协议见 `design/context-dev/tools/collab/AGENTS.md`。
+
+| 角色 | 负责工具 | 对应命令 |
+|------|----------|----------|
+| 生成 | 未指定 | `context-init`、`context-update`、`context-interview`、`context-openspec`（domain/architecture/db/ui/legacy/project） |
+| 规划 | 未指定 | `context-openspec plan`、`context-openspec proposal` |
+| 评审 | 未指定 | `context-check` |
+| 实现 | 未指定 | `context-start` |
+| 工具侧 | 未指定 | 维护 `design/context-dev` 规范（非命令） |
+
+可填：`claude-code`、`codex`、`cursor` 等工具 id；`用户`；`未指定`。

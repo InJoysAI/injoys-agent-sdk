@@ -4,6 +4,10 @@ description: Implement an OpenSpec change (validate → SSoT → code → test �
 
 # Context Start
 
+## 协作协议（先执行）
+
+先读 `@design/context-dev/tools/collab/AGENTS.md`，然后：第一行输出身份行（本命令角色：**实现**）→ 读花名册与待确认台账，处理发给自己的 `open` 记录 → 再执行下面的主任务 → 结束报告末尾追加「待确认」。
+
 实施 OpenSpec 变更提案。
 
 **用法**：

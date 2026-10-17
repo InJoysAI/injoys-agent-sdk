@@ -4,6 +4,10 @@ description: Initialize project Context (archive sources + skeleton)
 
 # Context Initialization (delegated, archive-only)
 
+## 协作协议（先执行）
+
+先读 `@design/context-dev/tools/collab/AGENTS.md`，然后：第一行输出身份行（本命令角色：**生成**）→ 读花名册与待确认台账，处理发给自己的 `open` 记录 → 再执行下面的主任务 → 结束报告末尾追加「待确认」。
+
 ## Prerequisites
 - Target project path, PRD, and Architecture docs ready
 

@@ -4,6 +4,10 @@ description: Check OpenSpec change status (env/tasks/proposal/plan/project/revie
 
 # Context Check
 
+## 协作协议（先执行）
+
+先读 `@design/context-dev/tools/collab/AGENTS.md`，然后：第一行输出身份行（本命令角色：**评审**）→ 读花名册与待确认台账，处理发给自己的 `open` 记录 → 再执行下面的主任务 → 结束报告末尾追加「待确认」。
+
 Supported subcommands:
 - `env`: project environment checks (provider-based, optional)
 - `tasks <change-id>`: progress report for `openspec/changes/<change-id>/tasks.md`
