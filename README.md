@@ -14,7 +14,7 @@ It unifies two core capabilities:
 
 ## Features
 
-- **Seven command files**: `/context-init`, `/context-openspec` (including the proposal subcommand), `/context-interview`, `/context-start`, `/context-check`, `/context-update`, and `/context-collab` (multi-AI collaboration setup).
+- **Six command files**: `/context-init`, `/context-openspec` (including the proposal subcommand), `/context-interview`, `/context-start`, `/context-check`, and `/context-update`.
 - **Shared command source**: Commands can be installed for Antigravity, Claude Code, Cursor, Devin, Qoder, and Grok. Codex prompts use a separate installer.
 - **SSoT Integration**: Templates for integrating Single Source of Truth (SSoT) definitions for Schema (Goose SQL migrations) and API (TypeSpec).
 
