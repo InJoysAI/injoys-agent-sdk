@@ -133,7 +133,7 @@ README.md 内容。
 **执行**: `@design/context-dev/tools/manifest/AGENTS.md` (mode: update)
 
 **更新内容**：
-1. 将本次生成的所有文件添加到 `generated_files.legacy` 数组
+1. 将本次生成的所有文件添加到 `generated_files.legacy` 数组（该键不存在时先创建，不要预置空数组）
 2. 确认 `sources.LEGACY_CODEBASE` 记录正确
 
 **⚠️ Phase 3 完成后必须执行 ✅ 完成后 报告**

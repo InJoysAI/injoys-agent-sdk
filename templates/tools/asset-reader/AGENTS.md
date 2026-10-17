@@ -72,7 +72,7 @@ cat .context/context-manifest.json
 读取列表 = []
 
 for scope in ["architecture", "domain", "db", "ui", "legacy"]:
-    for file in generated_files[scope]:
+    for file in generated_files.get(scope, []):   # 键不存在视同空
         if "README.md" not in file:
             读取列表.append(file)
 
