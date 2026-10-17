@@ -10,4 +10,5 @@
 | 实现 | 未指定 | `context-start` |
 | 工具侧 | 未指定 | 维护 `design/context-dev` 规范（非命令） |
 
+一个角色可填多个，用逗号分隔，括号内为分工备注，如 `cursor（前端）, claude-code（后端）`。
 可填：`claude-code`、`codex`、`cursor` 等工具 id；`用户`；`未指定`。
