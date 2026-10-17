@@ -185,6 +185,7 @@ feat-legacy-deprecate     # 废弃旧代码
   - 索引中的优先级、前置依赖、状态与 Phase 文件逐条一致
   - 总纲中不含提案块
 - **单文件形态额外校验**：没有残留的「提案索引」章节
+- **Manifest 登记**：把本次实际生成/更新的 `openspec/proposal-roadmap.md` 以及每个 `openspec/proposal-roadmap-Phase-<N>.md` 登记进 `generated_files.openspec`（去重；不覆盖其他模块已登记的条目；口径见 `tools/manifest/AGENTS.md`），并从 `pending_generation.openspec` 移除已生成项；已登记但磁盘上已不存在的 Phase 文件条目，先在报告中说明再移除
 - **形态切换（重新运行 `plan` 时）**：若发现与本次形态不符的旧文件（如本次为单文件，但已有 `proposal-roadmap-Phase-*.md`），⛔ **不得自行删除**，在报告中列出并询问用户处理
 - **❌ 禁止同时生成 config.yaml**
 
