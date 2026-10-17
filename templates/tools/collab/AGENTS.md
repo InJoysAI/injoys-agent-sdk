@@ -19,7 +19,7 @@
 
   | 命令 | 角色 |
   |------|------|
-  | `context-init`、`context-update`、`context-interview`、`context-openspec domain/architecture/db/ui/legacy/project/integration` | 生成 |
+  | `context-init`、`context-update`、`context-interview`、`context-collab`、`context-openspec domain/architecture/db/ui/legacy/project/integration` | 生成 |
   | `context-openspec plan/proposal` | 规划 |
   | `context-check` | 评审 |
   | `context-start` | 实现 |
@@ -31,7 +31,8 @@
 
 每个项目一份，记录**哪个角色默认由哪个工具负责**。格式见 `templates/team.md.template`。
 
-- 文件不存在时，用模板创建（所有角色填 `未指定`），在报告里提示用户补充；**不要为此中断任务**。
+- 推荐用 `/context-collab setup` 交互式配置（见 §7）。
+- 文件不存在、且当前不是在跑 setup 时，用模板创建（所有角色填 `未指定`），在报告里提示用户运行 `context-collab setup`；**不要为此中断任务**。
 - 只有用户（或用户明确授权）才修改花名册，AI 不自行改派。
 - 可取值：`claude-code`、`codex`、`cursor` 等工具 id，`用户`，`未指定`。
 
@@ -91,3 +92,37 @@
 ```
 
 “建议下一步”只给出有 `open` 记录时的接力建议，不要编造。
+
+---
+
+## 7. 初始化（`context-collab setup`）
+
+根据本机实际环境交互式配置花名册。**不要猜测用户装了什么工具，先看证据，再问。**
+
+**Step 1 · 探测（只读）**：在项目根目录检查下列痕迹，得到**候选工具**清单（只是线索，不代表一定在用）：
+
+| 痕迹 | 候选工具 id |
+|------|-------------|
+| `.claude/` 或 `.claude/commands/`、根目录 `CLAUDE.md` | `claude-code` |
+| `~/.codex/`、`~/.codex/prompts/` | `codex` |
+| `.cursor/`、`.cursor/commands/` | `cursor` |
+| `.agent/workflows/` | `antigravity` |
+| `.devin/`、`.qoder/`、`.grok/` 及其 commands 目录 | `devin` / `qoder` / `grok` |
+
+同时读取现有 `.context/collab/team.md`（若有）和台账中 `open` 的条数。当前自己所在的工具（身份行里的工具）一定是候选。
+
+**Step 2 · 询问用户**（有 AskUserQuestion 工具就用它，否则用编号列表在对话中问，一次只问一件事）：
+1. **你实际在用哪些 AI 工具？** 列出候选并允许补充；未装命令的候选要注明“尚未安装 context 命令”。
+2. **各角色由谁负责？** 对 `生成` / `规划` / `评审` / `实现` / `工具侧` 逐一选择工具；同一工具可兼任多个角色。给出建议：若有两个及以上工具，`评审` 与 `实现` 尽量不是同一个（独立核查）；只有一个工具时全部填它。
+3. 工具侧不需要 AI 常驻时，可填 `用户`。
+
+**Step 3 · 写入**：
+- 以 `templates/team.md.template` 为底，把答案填入“负责工具”列；工具 id 只用小写 id（`claude-code`、`codex`、`cursor`、`antigravity`、`devin`、`qoder`、`grok`、`用户`）。
+- 已有花名册时，先展示变更对比并得到用户确认再覆盖。
+- 确保 `.context/history/open-questions.md` 存在（缺失则用模板创建）。
+- **只写这两个文件**，不改其他任何文件。
+
+**Step 4 · 报告**：
+- 输出最终花名册表。
+- 对尚未安装 context 命令的工具，给出对应的安装命令（`bash design/context-dev/scripts/install-ai-commands.sh --tools <工具>`；Codex 用 `install-codex-prompts.sh`），**只提示，不代为执行**。
+- 提醒：花名册只由用户修改，之后想改派可再次运行 `setup`。

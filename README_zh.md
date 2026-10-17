@@ -14,7 +14,7 @@
 
 ## 功能特性
 
--   **6 个命令文件**：`/context-init`、`/context-openspec`（含 proposal 子命令）、`/context-interview`、`/context-start`、`/context-check`、`/context-update`。
+-   **7 个命令文件**：`/context-init`、`/context-openspec`（含 proposal 子命令）、`/context-interview`、`/context-start`、`/context-check`、`/context-update`、`/context-collab`（多 AI 工具协作配置）。
 -   **共享命令源**：命令可安装到 Antigravity、Claude Code、Cursor、Devin、Qoder 和 Grok；Codex prompts 通过独立脚本安装。
 -   **SSoT 集成**：提供 Schema (Goose SQL 迁移) 和 API (TypeSpec) 的单一数据源（SSoT）集成模板。
 
