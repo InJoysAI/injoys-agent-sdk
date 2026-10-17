@@ -269,7 +269,7 @@
 2. 从实际文件系统获取 `*/source/*` 文件；不得把待生成 source 写成已存在。
 3. 若 `context_sync_history.path` 对应文件实际存在，将它作为审计入口加入目录树，但不得加入 `generated_files`。
 4. 生成完整、无幽灵引用的 `.context/` 目录树。
-5. 仅当目录树内容实际发生变化时，才更新 AGENTS Metadata 的 `Updated At`（语义见 `tools/docs/AGENTS.md`“时间戳语义”）；不得改写原始 `Generated At` 与真实 Generator。
+5. 不得改写 AGENTS Metadata 的原始 `Generated At` 与真实 Generator；不写、不刷新 `Updated At`（见 `tools/docs/AGENTS.md`“时间戳语义”）。
 6. 复核目录树与 Manifest/文件系统没有遗漏或多报，然后再写入 Manifest。
 
 ---

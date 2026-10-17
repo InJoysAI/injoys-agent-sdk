@@ -26,11 +26,10 @@
 
 ## 时间戳判定
 
-`Updated At` 表示该文件自身内容最后修改时间，**不要求**不早于 `last_context_sync.synced_at`。
+`.context/` 下的文件只记录 `Generated At`，不维护 `Updated At`；变更时间以 git、Manifest 和同步历史为准。
 
-- 文件**不在** `updated_context_files` 中，`Updated At` 早于同步时间：正常，不报任何标签。
-- 文件**在** `updated_context_files` 中，且 `Updated At` 早于该次同步时间：标 `[STALE]`（P2），建议刷新。
-- 无法判断文件内容是否随该次同步变化时，不要凭时间先后下结论，也不要仅为此输出 `[AMBIGUOUS]`。
+- **不要**用文档头部时间与 `last_context_sync.synced_at` 比较，也不要仅因时间先后输出 `[STALE]` / `[AMBIGUOUS]`。
+- 旧项目遗留的 `Updated At` 行：不判错，仅作 `[DEVIATION]`（P2）提示可删除；其值不作为任何一致性判断的依据。
 
 ## 严重程度
 
