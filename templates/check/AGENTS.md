@@ -24,6 +24,14 @@
 | `[OVERSIZE]` | 资产体积超出规范给出的软上限（只警告，不判失败；上限由对应生成规范定义） |
 | `[AMBIGUOUS]` | 证据不足，需要人工裁决 |
 
+## 时间戳判定
+
+`Updated At` 表示该文件自身内容最后修改时间，**不要求**不早于 `last_context_sync.synced_at`。
+
+- 文件**不在** `updated_context_files` 中，`Updated At` 早于同步时间：正常，不报任何标签。
+- 文件**在** `updated_context_files` 中，且 `Updated At` 早于该次同步时间：标 `[STALE]`（P2），建议刷新。
+- 无法判断文件内容是否随该次同步变化时，不要凭时间先后下结论，也不要仅为此输出 `[AMBIGUOUS]`。
+
 ## 严重程度
 
 | 级别 | 判断标准 |
