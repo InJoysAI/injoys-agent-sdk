@@ -184,7 +184,13 @@
 > - **Source**: `[源文件路径]`
 > - **Generated At**: `YYYY-MM-DD HH:mm`
 > - **Generator**: `Context-Dev-Agent v1.0`
+> - **Updated At**: `YYYY-MM-DD HH:mm`（可选，首次生成时不写）
 ```
+
+**时间戳语义**：
+- `Generated At`：首次生成时间，之后不得改写。
+- `Updated At`：**该文件自身内容**最后一次被实际修改的时间。只在该文件内容真的发生变更时刷新，取写入时的真实当前时间；它**不是**同步时间，不随 `last_context_sync` 或其他文件的变更而刷新。
+- 同步/检查是否发生过、涉及哪些文件，以 Manifest 的 `last_context_sync.updated_context_files` 和审计历史为准，不由文档头部时间推断。
 
 ---
 
