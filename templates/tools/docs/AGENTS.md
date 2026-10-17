@@ -129,6 +129,11 @@
 - **保留模板结构**，不删除任何 Section
 - 顶部添加 Metadata
 
+**核心文档（README.md / AGENTS.md / 根 AGENTS.md）内容边界**：
+- 只承载**结构与导航**：目录树、文件索引、命令入口、更新规则、criterion/SSoT 指针。
+- **不写带日期的裁决、版本变更、同步摘要或“最新决定”**，也不复述 criterion 的规则内容；这类信息只放在 `criterion.md`、ADR 和 `.context/history/context-sync.jsonl`，核心文档最多给出指向它们的路径。
+- 核心文档里的“当前状态”类描述（✅ 已生成 / 待生成）必须能由目录树或 Manifest 推出，不得凭印象填写。
+
 **AGENTS.md 填充规则**：
 - 将 `{{context_directory_tree}}` 替换为生成当时实际存在及本次计划生成的 `.context/` 目录树
 - 目录树必须包含根资产、已存在的分域资产、OpenSpec Context 资产及实际 `source/` 文件

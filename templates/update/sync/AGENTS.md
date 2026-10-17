@@ -163,7 +163,7 @@ Mode: review
 
 若 mode = `apply`：
 
-1. 仅做**最小且可审计**的修改
+1. 仅做**最小且可审计**的修改；同步不得向 `.context/README.md`、`.context/AGENTS.md`、根 `AGENTS.md` 写入带日期的裁决/变更摘要（目录树和索引的结构性更新除外），变更说明只进审计历史和变更摘要
 2. 先更新目标 `.context/**`
 3. 再更新相关 `source/**`
 4. 将本次审计事件作为单行 JSON 追加到 `.context/history/context-sync.jsonl`
