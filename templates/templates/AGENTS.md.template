@@ -23,10 +23,10 @@
 
 - `openspec/config.yaml` — 从 `.context/` 派生的项目上下文快照（不要手工修改）
 - `openspec/proposal-roadmap.md` — 提案路线图
-- `openspec/changes/` — 进行中的变更提案
-- `openspec/specs/` — 当前规范
+- `openspec/changes/` — 进行中的变更提案（由提案流程按需创建，可能不存在或为空）
+- `openspec/specs/` — 当前规范（由提案归档按需创建，可能不存在或为空）
 
-若这些文件不存在，说明还没有运行 `.agent/workflows/context-openspec.md`。
+`config.yaml` 与 `proposal-roadmap*.md` 缺失，说明对应的 `project` / `plan` 子命令尚未运行，可查 `.context/context-manifest.json` 的 `pending_generation`；`changes/`、`specs/` 不在 `pending_generation` 管理范围内，缺失或为空属正常。
 
 ### 工作流命令（`.agent/workflows/`）
 
