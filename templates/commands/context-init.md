@@ -27,7 +27,7 @@ description: Initialize project Context (archive sources + skeleton)
 ```
 
 4. Optional final step — multi-AI collaboration setup（可选）：
-   - 询问用户是否要配置多 AI 工具协作（花名册与待确认台账）；选“是”则按 `@design/context-dev/tools/collab/AGENTS.md` 的 **§7 初始化** 执行（与 `/context-collab setup` 是同一份流程）；选“否”则跳过，之后可随时运行 `.agent/workflows/context-collab.md setup`。
+   - 询问用户是否要配置多 AI 工具协作（花名册与待确认台账）；选“是”则按 `@design/context-dev/tools/collab/AGENTS.md` 的 **§7 初始化** 执行（与 `.agent/workflows/context-collab.md setup` 是同一份流程）；选“否”则跳过，之后可随时运行 `.agent/workflows/context-collab.md setup`。
    - 该步骤只写 `.context/collab/team.md` 与 `.context/history/open-questions.md`，不登记到 Manifest。
 
 Note: Context summarization + Specflow setup (creating `openspec/` directories + generating config/roadmap/proposals) is handled by `.agent/workflows/context-openspec.md`.
