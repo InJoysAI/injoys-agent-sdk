@@ -124,7 +124,7 @@
 
 - 引用具体文件路径及章节、字段或行号。
 - 区分“权威源缺失”和“生成资产遗漏”。
-- `assets` 必须单独说明 `generated_files.openspec` 与 `.context/openspec/integration.md` 是否同步。
+- `assets` 必须单独说明 `generated_files.openspec` 的登记情况（口径见 `tools/manifest/AGENTS.md`）：① 包含 `.context/openspec/integration.md`；② 磁盘上已存在的 `openspec/config.yaml`、`openspec/proposal-roadmap*.md` 都已登记；③ 已登记的条目都真实存在；④ `integration.md` 的 OpenSpec 索引一栏与该键一致。不一致标 `[DESYNC]`。
 - 只报告有证据的问题；通过项可以矩阵汇总，不展开重复叙述。
 - 默认不请求用户逐项确认，也不自动修复。用户明确要求修复后，修改对应资产并更新 Manifest。
 

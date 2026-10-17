@@ -56,8 +56,8 @@
      {{从 generated_files.ui 动态列出}}
    - **Legacy** ({{N}} 个文件):
      {{从 generated_files.legacy 动态列出}}
-   - **OpenSpec** ({{N}} 个文件):
-     {{从 generated_files.openspec 动态列出}}
+   - **OpenSpec** ({{N}} 个文件，派生产物，不作为 Context 输入):
+     {{从 generated_files.openspec 动态列出；路径原样写出，含项目根的 `openspec/...` 条目}}
    <!-- CONTEXT_ASSET_INDEX:END -->
    ```
 
@@ -67,13 +67,14 @@
 
 ## ⚠️ 保护规则
 
-- 每次只更新 ASSET_INDEX 区块，不改其他内容
+- 每次只更新 ASSET_INDEX 区块，不改区块外的内容
+- 区块**内**的条目随 Manifest 变化是预期行为（例如 `project` / `plan` 生成后，OpenSpec 一栏会多出根目录条目），不属于违反本规则
 
 ---
 
 ### Phase 3: 登记集成资产
 
-执行 `@design/context-dev/tools/manifest/AGENTS.md`（mode: update），确保：
+执行 `@design/context-dev/tools/manifest/AGENTS.md`（mode: update），确保 `generated_files.openspec` **包含** `.context/openspec/integration.md`：
 
 ```json
 "generated_files": {
@@ -83,7 +84,7 @@
 }
 ```
 
-该路径表示 `.context/` 内的集成说明，不得与项目根目录的 `openspec/config.yaml`、`openspec/specs/` 或 `openspec/changes/` 混淆。重复执行不得产生重复项。
+口径以 `tools/manifest/AGENTS.md`「`generated_files.openspec` 的登记口径」为准：该键同时登记其他模块的产出（项目根的 `openspec/config.yaml`、`openspec/proposal-roadmap*.md`）。本模块**只登记自己的 `integration.md`**，**不得覆盖、重排或删除其他模块已登记的条目**；`openspec/changes/**`、`openspec/specs/**` 不登记。重复执行不得产生重复项。
 
 ---
 

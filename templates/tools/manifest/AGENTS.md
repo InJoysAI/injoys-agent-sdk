@@ -186,6 +186,21 @@
 - **只写已创建的类别**：没有 DB / UI 文档就没有 `db` / `ui` 键；`openspec` 键始终存在（提案流程据此判断项目级集成是否已生成）。
 - 某个文件被生成并登记进 `generated_files` 后，必须从 `pending_generation` 中移除；整个类别清空后删除该键，`openspec` 两项都生成后可置为 `{}` 或移除该键。
 
+#### `generated_files.openspec` 的登记口径（唯一定义，其他规范以此为准）
+
+该键登记 **openspec 相关的全部生成物**，路径带各自的真实前缀，一眼可分：
+
+| 生成方 | 登记的路径 | 说明 |
+|--------|-----------|------|
+| integration 模块（`context-openspec` 的 Pre-step） | `.context/openspec/integration.md` | 位于 `.context/` 内 |
+| `project` | `openspec/config.yaml` | 位于**项目根**；是 `.context/` 的派生快照 |
+| `plan` | `openspec/proposal-roadmap.md`，以及总纲+分Phase 形态下的每个 `openspec/proposal-roadmap-Phase-<N>.md` | 位于**项目根** |
+
+- **各写各的**：每个模块只登记、更新自己的产出，**不得覆盖或删除其他模块已登记的条目**；去重，重复执行不产生重复项
+- **不登记**：`openspec/changes/**`、`openspec/specs/**`（它们由 specflow 管理，不是 Context 生成物）
+- 登记的条目必须真实存在于磁盘；条目对应文件已不存在时，先在报告中说明，再移除条目（本工具不自动删除磁盘文件）
+- 根目录的 `openspec/**` 产物是**派生产物**：登记在这里只表示“已生成”，**不代表它们是 Context 输入**（`asset-reader` 仍按路径排除，避免循环引用）
+
 #### generated_files 节点：
 
 ```json

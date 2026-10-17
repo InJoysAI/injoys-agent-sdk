@@ -51,7 +51,8 @@
    Context-SHA256 = hex(sha256(utf8(joined)))
    ```
 5. 写入 `openspec/config.yaml` 顶部 `# Context-SHA256: <64-hex>`。
-6. 文件写完后，更新 Manifest `last_openspec_project`（字段见 `tools/manifest/AGENTS.md`）：`context_sha256`（即上面的组合指纹）与 `config_sha256`（= `hex(sha256(config.yaml 的磁盘原始字节))`，在文件最终写入后计算）。
+6. 文件写完后，把 `openspec/config.yaml` 登记进 Manifest `generated_files.openspec`（去重；不覆盖其他模块已登记的条目；口径见 `tools/manifest/AGENTS.md`），并从 `pending_generation.openspec` 移除该项
+7. 更新 Manifest `last_openspec_project`（字段见 `tools/manifest/AGENTS.md`）：`context_sha256`（即上面的组合指纹）与 `config_sha256`（= `hex(sha256(config.yaml 的磁盘原始字节))`，在文件最终写入后计算）。
 
 > 参考实现（Python 3）：
 > ```python
