@@ -64,6 +64,7 @@ openspec/changes/<id>/  →  /context-start <id> 实施并归档
 | `commands/context-init.md` | 初始化 | 调用生成入口，收集源文档并安装项目内工作流 |
 | `commands/context-openspec.md` | 集成/设计 | 生成 Context/OpenSpec 项目资产，或创建提案 |
 | `commands/context-interview.md` | 设计 | 访谈并完善技术规格或用户指定文档 |
+| `commands/context-collab.md` | 设计 | 配置多 AI 工具协作（花名册、待确认台账） |
 | `commands/context-start.md` | 实施 | 校验提案、按 SSoT-first 流程实施并归档 |
 | `commands/context-check.md` | 检查 | 子命令: `env` / `manifest` / `commands` / `tasks` / `proposal` / `plan` / `project` / `review` |
 | `commands/context-update.md` | 维护 | `sync roadmap|proposal` 有工作流；`add` / `modify` / `delete` / `fix` 为接口草案 |

@@ -1,6 +1,6 @@
 # 协作花名册
 
-> 记录各角色默认由哪个 AI 工具负责。只有用户修改。协议见 `design/context-dev/tools/collab/AGENTS.md`。
+> 记录各角色默认由哪个 AI 工具负责。只有用户修改，推荐用 `context-collab setup` 配置。协议见 `design/context-dev/tools/collab/AGENTS.md`。
 
 | 角色 | 负责工具 | 对应命令 |
 |------|----------|----------|
