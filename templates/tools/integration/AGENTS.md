@@ -50,11 +50,11 @@
      {{从 generated_files.architecture 动态列出}}
    - **Domain** ({{N}} 个文件):
      {{从 generated_files.domain 动态列出}}
-   - **DB** ({{N}} 个文件):
+   - **DB** ({{N}} 个文件；键不存在或为空则整行省略):
      {{从 generated_files.db 动态列出}}
-   - **UI** ({{N}} 个文件):
+   - **UI** ({{N}} 个文件；键不存在或为空则整行省略):
      {{从 generated_files.ui 动态列出}}
-   - **Legacy** ({{N}} 个文件):
+   - **Legacy** ({{N}} 个文件；键不存在或为空则整行省略):
      {{从 generated_files.legacy 动态列出}}
    - **OpenSpec** ({{N}} 个文件，派生产物，不作为 Context 输入):
      {{从 generated_files.openspec 动态列出；路径原样写出，含项目根的 `openspec/...` 条目}}

@@ -43,7 +43,7 @@
 > - 跳过 openspec/（避免循环引用）
 > - 跳过 source/（按需回溯）
 
-**若为棕地项目**（检测到 `generated_files.legacy` 非空）：
+**若为棕地项目**（检测到 `generated_files.legacy` 存在且非空；键不存在视同空）：
 - 读取 `.context/legacy/legacy_system_analysis.md`
 - 从 `sources.LEGACY_CODEBASE.reference` 获取遗留代码库引用路径
 
