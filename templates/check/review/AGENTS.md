@@ -85,8 +85,11 @@
 
 - 目录树无幽灵引用和遗漏引用。
 - 三份核心文档对目录、更新规则和 SSoT 路径的描述一致。
+- README.md 不含资产索引表、文件数量或“已生成/待生成”状态（AGENTS.md 目录树与 Manifest 是唯一来源）；出现则标 `[DEVIATION]`（P2），建议删除、改为指向 AGENTS.md。
 - 不在 README/AGENTS 重复维护 criterion 的详细规则；核心文档中出现带日期的“最新裁决/变更摘要”段落，标 `[DEVIATION]`，建议删除并只保留 criterion/ADR/同步历史中的单一来源。
 - 外部路径标明已存在、待生成或可选，不把待生成资产误报为缺失。
+
+- `sources.*.path` 与 `archived_to` 相同属合法状态（源文档即归档副本），不报差异；仅当 `content_hash` 与文件实际内容不符时才标 `[DESYNC]`。
 
 ### 3.4 scope 源资产对照
 

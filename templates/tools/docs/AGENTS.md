@@ -119,7 +119,7 @@
 
 | 文件 | 操作 |
 |------|------|
-| `README.md` | 生成目录说明 |
+| `README.md` | 生成目录说明（只含用途、权威性声明、阅读顺序，见下“README.md 填充规则”） |
 | `criterion.md` | 读取 `@design/context-dev/criterion.md` 模板并填充占位符 |
 | `AGENTS.md` | 使用 `templates/context-agents.md.template` |
 | `{项目根目录}/AGENTS.md` | 使用 `templates/AGENTS.md.template`，见下文“项目根目录 AGENTS.md” |
@@ -134,11 +134,16 @@
 - **不写带日期的裁决、版本变更、同步摘要或“最新决定”**，也不复述 criterion 的规则内容；这类信息只放在 `criterion.md`、ADR 和 `.context/history/context-sync.jsonl`，核心文档最多给出指向它们的路径。
 - 核心文档里的“当前状态”类描述（✅ 已生成 / 待生成）必须能由目录树或 Manifest 推出，不得凭印象填写。
 
+**README.md 填充规则**（README 面向人，AGENTS.md 面向 AI，二者不重复维护资产清单）：
+- 只写：`.context/` 的用途、权威性声明（工程约束以 `criterion.md` 为准，源文档细节以 `source/` 归档副本为准）、推荐阅读顺序，以及指向 `AGENTS.md`（AI 入口、目录树、核心文件）和 `context-manifest.json`（机器清单）的链接
+- **不写资产索引表、文件数量、“已生成/待生成”状态**：这些由 `AGENTS.md` 目录树和 Manifest 唯一承载，README 再写一份必然漂移
+
 **AGENTS.md 填充规则**：
 - 将 `{{context_directory_tree}}` 替换为生成当时实际存在及本次计划生成的 `.context/` 目录树
 - 目录树必须包含根资产、已存在的分域资产、OpenSpec Context 资产及实际 `source/` 文件
 - **只列实际存在的目录和文件**：未创建的类别、空的 `source/` 目录都不要写进目录树（git 不跟踪空目录）
 - 后续 Manifest 的 `generated_files` 发生变化时，由 Manifest 更新流程同步刷新目录树
+- “核心文件”表保持模板给出的固定入口行，**不逐文件追加“已生成/待生成”状态列或文件数量**（完整清单以目录树和 Manifest 为准）
 
 **项目根目录 AGENTS.md 规则**（init 生成的 AI 入口文件只有 `AGENTS.md`，外加下面一个只做导入的 `CLAUDE.md`；不生成 `.cursorrules` 等其他工具的入口文件）：
 - 使用 `templates/AGENTS.md.template`；需要替换的占位符：`{{project_name}}`、`{{proposal_command}}`、`{{must_not_summary}}`
