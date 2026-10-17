@@ -4,6 +4,10 @@ description: Initialize and enhance OpenSpec with Context assets (generate `conf
 
 # Context OpenSpec Integration
 
+## 协作协议（先执行）
+
+先读 `@design/context-dev/tools/collab/AGENTS.md`，然后：第一行输出身份行（本命令角色：**生成（domain/architecture/db/ui/legacy/project）或 规划（plan/proposal）**）→ 读花名册与待确认台账，处理发给自己的 `open` 记录 → 再执行下面的主任务 → 结束报告末尾追加「待确认」。
+
 ---
 
 ## ⛔ 第 1 步：Pre-flight Checklist（必须首先完成）

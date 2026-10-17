@@ -45,5 +45,6 @@
 - 功能变更先创建提案（`{{proposal_command}}`），再实施。
 - 数据层 / API / IPC 变更：先改 `.context/criterion.md` §7.1 中对应层的契约，再运行 §7.2 记录的生成与校验命令。
 - 不要手工修改 `.context/*/source/`、`openspec/config.yaml` 和 `design/context-dev/`；源文档变更请走 `context-update`。
+- 多个 AI 工具协作时，每条 `/context-*` 命令先按 `design/context-dev/tools/collab/AGENTS.md` 输出身份行、查看 `.context/history/open-questions.md` 中发给自己的待确认事项。
 - 约束冲突时以 `.context/criterion.md` 为准。
 <!-- CONTEXT-DEV:END -->

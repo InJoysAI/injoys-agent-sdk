@@ -4,6 +4,10 @@ description: Update Context assets (sync/add/modify/delete/fix) and keep manifes
 
 # Context Update
 
+## 协作协议（先执行）
+
+先读 `@design/context-dev/tools/collab/AGENTS.md`，然后：第一行输出身份行（本命令角色：**生成**）→ 读花名册与待确认台账，处理发给自己的 `open` 记录 → 再执行下面的主任务 → 结束报告末尾追加「待确认」。
+
 > ⚠️ 给 AI 的说明：本命令文档同时包含「已落地能力」与「规划中的接口草案」。
 >
 > - `archive <change-id>`：✅ 已落地（通过 `design/context-dev/tools/specflow/specflow.mjs`）

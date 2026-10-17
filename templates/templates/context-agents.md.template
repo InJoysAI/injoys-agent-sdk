@@ -40,6 +40,8 @@
 | `criterion.md` | 项目准则 — AI 必须遵守的工程约束 |
 | `context-manifest.json` | 元数据清单 — 追踪源文件 hash 和生成时间 |
 | `history/context-sync.jsonl` | 扁平同步/决策审计日志；默认不作为生成资产加载 |
+| `collab/team.md` | 协作花名册 — 各角色默认由哪个 AI 工具负责（按需创建，用户维护） |
+| `history/open-questions.md` | 待确认台账 — 跨工具/跨会话的待确认事项（按需创建，不作为 Context 输入） |
 | `architecture/tech_stack.md` | 技术栈约束 (MUST/SHOULD) |
 | `domain/business_rules.md` | 业务逻辑规则 |
 
