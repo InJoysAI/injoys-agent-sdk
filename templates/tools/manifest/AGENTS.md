@@ -119,6 +119,8 @@
 
 #### sources 节点（用户提供的源文件）：
 
+> **`path` 与 `archived_to` 可以相同**：当用户的源文档本来就放在 `.context/*/source/` 下（或在 init 之后被迁入）时，归档副本即源文档本身，两者填同一路径是合法状态，不需要另造一份副本。此时 `content_hash` 仍按该路径计算，该文件被改动即视为源变更，走 `context-update`；旧版“逐字节比较 `path` 与 `archived_to`”在这种情况下恒为相等，应只依赖 `content_hash`。
+
 ```json
 "sources": {
   "PRD": {
