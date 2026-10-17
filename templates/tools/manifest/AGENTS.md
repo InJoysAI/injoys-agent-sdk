@@ -94,6 +94,9 @@
     "root": [],
     "architecture": [],
     "domain": [],
+    "db": [],
+    "ui": [],
+    "legacy": [],
     "openspec": []
   },
   "pending_generation": {},
@@ -105,8 +108,6 @@
   "last_context_sync": null
 }
 ```
-
-> `db`、`ui`、`legacy` 等 scope 仅在用户提供了对应源文档时加入；没有对应文档时省略整个键，不写空数组。上例中的 `openspec` 空数组是固定键例外，供提案流程判断项目级集成是否已生成；`architecture`、`domain` 等键也应按实际输入动态省略，不把此结构示例理解为要求保留所有键。
 
 ---
 
@@ -221,11 +222,23 @@
     ".context/domain/business_rules.md",
     ".context/domain/user_journeys.md"
   ],
+  "db": [
+    ".context/db/README.md",
+    ".context/db/schema_design.md"
+  ],
+  "ui": [
+    ".context/ui/README.md",
+    ".context/ui/design_system.md"
+  ],
+  "legacy": [
+    ".context/legacy/README.md",
+    ".context/legacy/legacy_system_analysis.md"
+  ],
   "openspec": []
 }
 ```
 
-> **注意**：每个实际存在的 scope 数组包含该 scope 下生成的所有文件路径；没有对应文档的 scope 整个键省略。此处 `db`、`ui`、`legacy` 是有资产时的示例，不要求空类别占位。
+> **注意**：每个 scope 的数组包含该 scope 下生成的所有文件路径
 
 #### 同步状态与审计历史
 
