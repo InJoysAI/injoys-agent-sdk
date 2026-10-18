@@ -101,8 +101,28 @@ function getTemplates() {
     spec: "design/context-dev/templates/openspec/spec.md.template",
     design: "design/context-dev/templates/openspec/design.md.template",
     tasks: "design/context-dev/templates/openspec/tasks.md.template",
+    tasksDocsOps: "design/context-dev/templates/openspec/tasks-docs-ops.md.template",
   };
 }
+
+// change_kind comes from the roadmap entry: code (default shape), docs-ops (no business code), mixed (code + non-code).
+const CHANGE_KINDS = ["code", "docs-ops", "mixed"];
+
+function parseKind(flags) {
+  const raw = flags.get("kind");
+  if (raw === undefined) return { kind: "code", given: false };
+  if (typeof raw !== "string" || !CHANGE_KINDS.includes(raw)) {
+    die(`Invalid --kind '${raw === true ? "" : raw}'. Expected one of: ${CHANGE_KINDS.join(", ")}.`);
+  }
+  return { kind: raw, given: true };
+}
+
+function tasksTemplateFor(kind, templates) {
+  return kind === "docs-ops" ? templates.tasksDocsOps : templates.tasks;
+}
+
+const KIND_MISSING_NOTE =
+  "NOTE: --kind not given; using the 'code' tasks template. Pass --kind <code|docs-ops|mixed> from the roadmap entry's change_kind (ask the user if the roadmap has none).";
 
 function assertChangeId(changeId) {
   if (!CHANGE_ID_RE.test(String(changeId))) {
@@ -541,8 +561,9 @@ function cmdTemplates({ flags }) {
 
 function cmdNew({ args, flags }) {
   const changeId = args[0];
-  if (!changeId) die("Usage: specflow new <change-id> [--capability <capability>] [--title <title>]");
+  if (!changeId) die("Usage: specflow new <change-id> [--capability <capability>] [--title <title>] [--kind <code|docs-ops|mixed>]");
   assertChangeId(changeId);
+  const { kind, given: kindGiven } = parseKind(flags);
 
   const capability = String(flags.get("capability") || "capability");
   if (!CHANGE_ID_RE.test(capability)) {
@@ -555,12 +576,16 @@ function cmdNew({ args, flags }) {
 
   ensureDir(p.dir);
   writeIfMissing(p.proposal, readText(path.join(REPO_ROOT, templates.proposal)).replaceAll("{{CHANGE_TITLE}}", title));
-  writeIfMissing(p.tasks, readText(path.join(REPO_ROOT, templates.tasks)).replace("{{DEVELOPMENT_NOTES}}", "TBD"));
+  const tasksBody = readText(path.join(REPO_ROOT, tasksTemplateFor(kind, templates)))
+    .replace("{{DEVELOPMENT_NOTES}}", "TBD")
+    .replaceAll("{{CHANGE_ID}}", changeId);
+  writeIfMissing(p.tasks, `<!-- change_kind: ${kind} -->\n${tasksBody}`);
   writeIfMissing(p.deltaSpec, readText(path.join(REPO_ROOT, templates.spec)));
 
   process.stdout.write("=== Specflow New Change ===\n");
   process.stdout.write(`✅ openspec/changes/${changeId}/ (created/ensured)\n`);
-  process.stdout.write(`- proposal.md\n- tasks.md\n- specs/${capability}/spec.md\n`);
+  process.stdout.write(`- proposal.md\n- tasks.md (change_kind: ${kind})\n- specs/${capability}/spec.md\n`);
+  if (!kindGiven) process.stdout.write(`${KIND_MISSING_NOTE}\n`);
 }
 
 function cmdStatus({ args, flags }) {
@@ -588,12 +613,14 @@ function cmdStatus({ args, flags }) {
 function cmdInstructions({ args, flags }) {
   const artifact = args[0];
   const changeId = flags.get("change");
-  if (!artifact || !changeId) die("Usage: specflow instructions <artifact> --change <change-id> [--json]");
+  if (!artifact || !changeId) die("Usage: specflow instructions <artifact> --change <change-id> [--kind <code|docs-ops|mixed>] [--json]");
+  const { kind, given: kindGiven } = parseKind(flags);
 
   const templates = getTemplates();
   const base = {
     changeId,
     artifact,
+    kind,
     templates,
   };
 
@@ -621,9 +648,10 @@ function cmdInstructions({ args, flags }) {
     dependencies = [path.relative(REPO_ROOT, changePaths(changeId).proposal)];
   } else if (artifact === "tasks") {
     outputPath = path.relative(REPO_ROOT, changePaths(changeId).tasks);
-    templatePath = templates.tasks;
+    templatePath = tasksTemplateFor(kind, templates);
     instruction =
-      "Create tasks.md as executable checkboxes. Include verification (specflow validate --strict) and post (specflow archive) steps.";
+      `Create tasks.md (change_kind: ${kind}) from the template as executable checkboxes. Keep sections 1 (Roadmap alignment map), 2 (SSoT) and 6 (validate + archive steps) in place; trim or extend the other sections per the template's fill rules.` +
+      (kindGiven ? "" : ` ${KIND_MISSING_NOTE}`);
     dependencies = [
       path.relative(REPO_ROOT, changePaths(changeId).proposal),
       path.relative(REPO_ROOT, changePaths(changeId, "<capability>").deltaSpec),
@@ -747,9 +775,9 @@ function main() {
         "  node design/context-dev/tools/specflow/specflow.mjs <command> [args] [--flags]",
         "",
         "Commands:",
-        "  new <change-id> [--capability <cap>] [--title <title>]",
+        "  new <change-id> [--capability <cap>] [--title <title>] [--kind <code|docs-ops|mixed>]",
         "  status <change-id> [--json]",
-        "  instructions <artifact> --change <change-id> [--json]",
+        "  instructions <artifact> --change <change-id> [--kind <code|docs-ops|mixed>] [--json]",
         "  templates [--json]",
         "  validate <change-id> [--strict] [--json]",
         "  archive <change-id> [--yes] [--skip-specs] [--no-validate]",

@@ -1,0 +1,49 @@
+# 实施任务清单
+
+<!--
+填写规则（写入文件前删除本注释块；注释内不含占位符）
+- 本模板适用于 change_kind = docs-ops：只改文档、配置、运维动作或做核对/停用/迁移，不新增或修改业务代码。若同时有代码改动，change_kind 应为 mixed，改用 tasks.md.template。
+- 章节 1、2、6 固定存在且位置不变；章节 3、4、5 按实际需要增减，不适用的子项删除，不写“无”。
+- 章节 1 只做映射：roadmap 的每条 key_task 必须在“对应任务”列写出本文件中承接它的任务编号；真正的执行步骤写在章节 3。
+- 章节 2：启用了 SSoT 层时按“改 SSoT → 运行 codegen → 写业务代码 → 写测试”排序；未启用或本变更不涉及时保留 2.1 一行并写明依据。
+- 章节 4 的验证项必须能被证据支撑：写明日志、命令输出、文件清单比对等出处。
+- 章节 5：影响宿主或线上环境的动作必须写回滚步骤；确实不可回滚时写明原因与替代的缓解措施。
+- 6.3、6.4 必须是普通 checkbox 文本行（不能只放在代码块里）。
+-->
+
+> {{DEVELOPMENT_NOTES}}
+
+## 1. Roadmap 对齐
+
+| # | roadmap 关键任务 | 对应任务 |
+|---|------------------|----------|
+| 1 | {{KEY_TASK_1}} | {{TASK_REF_1}} |
+| 2 | {{KEY_TASK_2}} | {{TASK_REF_2}} |
+
+## 2. SSoT 检查
+- [ ] 2.1 {{SSOT_CHECK}}
+  - {{SSOT_DETAIL}}
+
+## 3. {{WORK_GROUP_1_NAME}}
+- [ ] 3.1 {{TASK_1_1}}
+  - {{SUBTASK_DETAIL}}
+- [ ] 3.2 {{TASK_1_2}}
+
+## 4. 验证
+- [ ] 4.1 {{VERIFY_EFFECT}}
+  - [ ] 4.1.1 {{VERIFY_EVIDENCE_SOURCE}}
+- [ ] 4.2 确认本变更未触及范围外的文件与配置
+  - [ ] 4.2.1 {{SCOPE_BOUNDARY_CHECK}}
+
+## 5. 回滚与影响面
+- [ ] 5.1 记录影响面（哪些环境/作用域受影响、哪些不受影响）
+- [ ] 5.2 记录回滚步骤，并完成一次演练或写明无法演练的原因
+
+## 6. 验证与归档
+- [ ] 6.1 逐条核对验收标准
+  - [ ] 6.1.1 {{VERIFICATION_1}}
+- [ ] 6.2 复核证据与文档
+  - [ ] 6.2.1 {{EVIDENCE_REVIEW}}
+- [ ] 6.3 运行 node design/context-dev/tools/specflow/specflow.mjs validate {{CHANGE_ID}} --strict
+- [ ] 6.4 运行 node design/context-dev/tools/specflow/specflow.mjs archive {{CHANGE_ID}} --yes --no-validate
+  - 仅在 6.3 通过后执行
