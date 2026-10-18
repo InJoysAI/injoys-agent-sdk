@@ -8,7 +8,7 @@ const { spawnSync } = require('node:child_process');
 const ROOT = path.join(__dirname, '..');
 const CLI = path.join(ROOT, 'bin', 'cli.js');
 const pkg = require('../package.json');
-const { copyDir, AI_TOOL_DIRS } = require('../src');
+const { copyDir, AI_TOOL_DIRS, WORKFLOWS_DIR } = require('../src');
 
 function run(args, cwd = ROOT) {
   return spawnSync(process.execPath, [CLI, ...args], { cwd, encoding: 'utf8' });
@@ -38,22 +38,22 @@ test('init installs templates to design/context-dev and bootstrap commands', () 
   assert.ok(fs.existsSync(path.join(dir, 'design/context-dev/tools/specflow/specflow.mjs')));
   assert.ok(!fs.existsSync(path.join(dir, '.context')), 'init must not create .context/');
 
-  const rel = AI_TOOL_DIRS.antigravity;
-  assert.equal(rel, '.agent/workflows');
+  const rel = WORKFLOWS_DIR;
+  assert.equal(rel, path.join('.agents', 'workflows'));
+  assert.ok(!('antigravity' in AI_TOOL_DIRS), 'antigravity is no longer a supported tool');
   assert.ok(fs.existsSync(path.join(dir, rel, 'context-init.md')), `${rel}/context-init.md`);
   assert.ok(fs.existsSync(path.join(dir, rel, 'context-check.md')), `${rel}/context-check.md`);
   assert.ok(!fs.existsSync(path.join(dir, rel, 'context-start.md')), 'only bootstrap commands are installed');
 
-  // Other AI tools are opt-in: nothing is written outside .agent/workflows by default.
+  // Other AI tools are opt-in: nothing is written outside .agents/workflows by default.
   for (const [tool, other] of Object.entries(AI_TOOL_DIRS)) {
-    if (tool === 'antigravity') continue;
     assert.ok(!fs.existsSync(path.join(dir, other)), `${other} must not be created by default`);
   }
 });
 
 test('init does not overwrite existing files without --force', () => {
   const dir = tmp();
-  const file = path.join(dir, '.agent/workflows/context-init.md');
+  const file = path.join(dir, '.agents/workflows/context-init.md');
   fs.mkdirSync(path.dirname(file), { recursive: true });
   fs.writeFileSync(file, 'mine');
 
@@ -71,10 +71,10 @@ test('init --dry-run writes nothing', () => {
   assert.deepEqual(fs.readdirSync(dir), []);
 });
 
-test('init --tools adds extra AI tool directories on top of .agent/workflows', () => {
+test('init --tools adds extra AI tool directories on top of .agents/workflows', () => {
   const dir = tmp();
   assert.equal(run(['init', dir, '--tools', 'claude']).status, 0);
-  assert.ok(fs.existsSync(path.join(dir, '.agent/workflows/context-init.md')));
+  assert.ok(fs.existsSync(path.join(dir, '.agents/workflows/context-init.md')));
   assert.ok(fs.existsSync(path.join(dir, '.claude/commands/context-init.md')));
   assert.ok(!fs.existsSync(path.join(dir, '.cursor')));
 });
@@ -139,4 +139,17 @@ test('readManifest: null when missing, throws with the path when corrupt', () =>
 
   fs.writeFileSync(file, '{"version":1}');
   assert.deepEqual(readManifest(dir), { version: 1 });
+});
+
+test('init warns about a legacy .agent/workflows directory and does not delete it', () => {
+  const dir = tmp();
+  const legacy = path.join(dir, '.agent/workflows');
+  fs.mkdirSync(legacy, { recursive: true });
+  fs.writeFileSync(path.join(legacy, 'context-init.md'), 'old');
+
+  const res = run(['init', dir]);
+  assert.equal(res.status, 0, res.stderr);
+  assert.match(res.stdout + res.stderr, /Legacy directory/);
+  assert.equal(fs.readFileSync(path.join(legacy, 'context-init.md'), 'utf8'), 'old');
+  assert.ok(fs.existsSync(path.join(dir, '.agents/workflows/context-init.md')));
 });

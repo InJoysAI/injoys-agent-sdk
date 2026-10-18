@@ -1,6 +1,6 @@
 # Project 生成指令
 
-> 当 `.agent/workflows/context-openspec.md project` 被调用时执行此文件。
+> 当 `.agents/workflows/context-openspec.md project` 被调用时执行此文件。
 
 ---
 
@@ -33,9 +33,9 @@
 1. 来源指纹与现有 `config.yaml` 头部 `Context-SHA256` 一致；
 2. Manifest `last_openspec_project.config_sha256` 存在时，`config.yaml` 当前内容摘要与之相符（不存在则只看条件 1）。
 
-**强制重生成**（跳过守卫，指纹不变也要重写）：用户明确要求重生成，或 `.agent/workflows/context-check.md project` 报告了内容缺陷 / `[DESYNC]` 时。指纹只能证明“来源没变”，不能证明“快照内容正确”，所以内容有误时必须能绕过守卫。
+**强制重生成**（跳过守卫，指纹不变也要重写）：用户明确要求重生成，或 `.agents/workflows/context-check.md project` 报告了内容缺陷 / `[DESYNC]` 时。指纹只能证明“来源没变”，不能证明“快照内容正确”，所以内容有误时必须能绕过守卫。
 
-#### Context-SHA256 算法（规范性 · 生成与 `.agent/workflows/context-check.md project` 必须一致）
+#### Context-SHA256 算法（规范性 · 生成与 `.agents/workflows/context-check.md project` 必须一致）
 
 输入集合 = Phase 1 实际读取的资产路径（已跳过 `README.md` / `openspec/` / `source/`；**包含** `.context/criterion.md`）。
 
@@ -72,7 +72,7 @@
 # Generated from: .context/context-manifest.json + listed Context assets
 # Context-SHA256: <sha256>
 # Context-SHA256-Algo: path-nl-content-then-join-hex  # optional marker; algorithm defined in design/context-dev/openspec/project/AGENTS.md
-# DO NOT EDIT: regenerate with .agent/workflows/context-openspec.md project
+# DO NOT EDIT: regenerate with .agents/workflows/context-openspec.md project
 schema: spec-driven
 
 context: |

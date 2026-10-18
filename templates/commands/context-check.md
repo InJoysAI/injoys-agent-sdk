@@ -17,7 +17,7 @@ Supported subcommands:
 - `review proposal <change-id>`: 提案大纲 ↔ Proposal ↔ Context 三层联合评审，并写入提案目录
 - `review "<description>"`: 自由文本专项核对
 - `manifest`: 校验 Manifest/同步历史的格式、职责边界与体积上限
-- `commands`: 校验 `.agent/workflows/` 下的命令副本与 `design/context-dev/commands/` 命令源逐字节同步
+- `commands`: 校验 `.agents/workflows/` 下的命令副本与 `design/context-dev/commands/` 命令源逐字节同步
 
 ---
 
@@ -49,9 +49,9 @@ bash design/context-dev/scripts/check-context-manifest.sh
 
 **详细步骤**见 `commands/AGENTS.md`，包括：
 1. 运行 `bash design/context-dev/scripts/check-ai-commands.sh`
-2. 核对命令源与 `.agent/workflows/` 逐字节同步（检出缺失 / 不一致 / 残留）
+2. 核对命令源与 `.agents/workflows/` 逐字节同步（检出缺失 / 不一致 / 残留）
 3. 核对命令清单与 `design/context-dev/README.md`「命令」表一致
-4. 生成检查报告与最小修复建议（重新安装，不手工编辑 `.agent/workflows/` 副本）
+4. 生成检查报告与最小修复建议（重新安装，不手工编辑 `.agents/workflows/` 副本）
 
 ---
 
@@ -138,12 +138,12 @@ bash design/context-dev/scripts/check-context-manifest.sh
 
 **示例**:
 ```
-.agent/workflows/context-check.md review prd-tad
-.agent/workflows/context-check.md review assets
-.agent/workflows/context-check.md review core
-.agent/workflows/context-check.md review scope db
-.agent/workflows/context-check.md review proposal feat-example
-.agent/workflows/context-check.md review "检查 api_strategy.md 的错误响应格式"
+.agents/workflows/context-check.md review prd-tad
+.agents/workflows/context-check.md review assets
+.agents/workflows/context-check.md review core
+.agents/workflows/context-check.md review scope db
+.agents/workflows/context-check.md review proposal feat-example
+.agents/workflows/context-check.md review "检查 api_strategy.md 的错误响应格式"
 ```
 
 **执行流程**：

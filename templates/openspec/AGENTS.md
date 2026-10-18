@@ -1,6 +1,6 @@
 # OpenSpec Integration
 
-> `.agent/workflows/context-openspec.md` 的权威执行流程
+> `.agents/workflows/context-openspec.md` 的权威执行流程
 
 ---
 

@@ -1,6 +1,6 @@
 # Context Proposal 指令
 
-> 当 `.agent/workflows/context-openspec.md proposal` 被调用时执行此文件。
+> 当 `.agents/workflows/context-openspec.md proposal` 被调用时执行此文件。
 > 本指令增强 OpenSpec 标准提案流程，集成 Context 资产读取。
 
 ---
@@ -26,14 +26,14 @@
 
 | 检查项 | 通过条件 | 失败处理 |
 |--------|---------|---------|
-| config.yaml | `openspec/config.yaml` 存在 | ⛔ STOP，先运行 `.agent/workflows/context-openspec.md project` |
-| proposal-roadmap.md | `openspec/proposal-roadmap.md` 存在 | ⛔ STOP，先运行 `.agent/workflows/context-openspec.md plan` |
-| 分 Phase 文件 | 总纲 Metadata 的 `规划形态` 为 `总纲+分Phase` 时，总览中列出的 `openspec/proposal-roadmap-Phase-<N>.md`（兼容旧名 `Phase<N>`）必须存在；单文件形态下不要求 | ⛔ STOP（复杂形态下缺 Phase 文件），先运行 `.agent/workflows/context-openspec.md plan` 或让用户确认 |
+| config.yaml | `openspec/config.yaml` 存在 | ⛔ STOP，先运行 `.agents/workflows/context-openspec.md project` |
+| proposal-roadmap.md | `openspec/proposal-roadmap.md` 存在 | ⛔ STOP，先运行 `.agents/workflows/context-openspec.md plan` |
+| 分 Phase 文件 | 总纲 Metadata 的 `规划形态` 为 `总纲+分Phase` 时，总览中列出的 `openspec/proposal-roadmap-Phase-<N>.md`（兼容旧名 `Phase<N>`）必须存在；单文件形态下不要求 | ⛔ STOP（复杂形态下缺 Phase 文件），先运行 `.agents/workflows/context-openspec.md plan` 或让用户确认 |
 | roadmap 条目匹配结果 | 能在 `openspec/proposal-roadmap.md` 中精确定位到目标 `<change-id>` 条目（或经用户确认按“新建提案”处理） | ⛔ STOP，先确认是“新建提案”还是“使用既有 roadmap 条目” |
 
 **命令参数**：
-- `.agent/workflows/context-openspec.md proposal <change-id>`：创建提案时，必须携带 `openspec/proposal-roadmap.md` 中该 `<change-id>` 的条目内容
-- `.agent/workflows/context-openspec.md proposal <change-id> <roadmap-doc>`：在上条基础上，额外读取 `<roadmap-doc>` 作为补充信息（不能替代 `openspec/proposal-roadmap.md` 的主条目）
+- `.agents/workflows/context-openspec.md proposal <change-id>`：创建提案时，必须携带 `openspec/proposal-roadmap.md` 中该 `<change-id>` 的条目内容
+- `.agents/workflows/context-openspec.md proposal <change-id> <roadmap-doc>`：在上条基础上，额外读取 `<roadmap-doc>` 作为补充信息（不能替代 `openspec/proposal-roadmap.md` 的主条目）
   - `roadmap-doc` 期望是一个**具体文件路径**（不建议传 `*` 通配符；若用户传了通配符，需先让用户确认要读取哪些具体文件）
 
 
@@ -366,7 +366,7 @@ node design/context-dev/tools/specflow/specflow.mjs validate <change-id> --stric
 
 > ⛔ **必须在 Phase 4 验证通过后执行**。
 > ⛔ **输出的 Prompt 必须完整填入实际的 change-id 和 Phase 编号，不得保留任何 `<...>` 占位符**。
-> ⛔ **本 Phase 由 `.agent/workflows/context-openspec.md proposal <change-id>` 自动执行，不需要用户额外请求**。
+> ⛔ **本 Phase 由 `.agents/workflows/context-openspec.md proposal <change-id>` 自动执行，不需要用户额外请求**。
 > 本 Phase 只生成评审 Prompt，不重复运行 Phase 4 的 Specflow 校验。
 
 ### 5.1 执行前数据汇总
@@ -387,7 +387,7 @@ node design/context-dev/tools/specflow/specflow.mjs validate <change-id> --stric
 
 ~~~markdown
 ```
-.agent/workflows/context-check.md review proposal `<实际change-id>` 提案进行三层联合评审，评审对象包括：
+.agents/workflows/context-check.md review proposal `<实际change-id>` 提案进行三层联合评审，评审对象包括：
 - 大纲（Outline）：`<本次实际匹配的 roadmap 文件>` 中该提案的条目（补充来源：`<实际补充文件或无>`）
 - 提案内容（Proposal）：`openspec/changes/<实际change-id>/`（包含 proposal.md / tasks.md / specs/<实际capability>/spec.md，以及可能的 design.md）
 - 业务资产（Context）：`.context/` 目录下的权威文档
@@ -496,7 +496,7 @@ AI 在输出 Prompt 前必须完成以下自检，确认**全部通过**再输�
 - [ ] 权威对照源均已在 Manifest 登记且实际存在，不包含幽灵路径
 - [ ] Prompt 全文无任何 `<...>` 占位符
 
-> ⏸️ **将上方 Prompt 复制至新对话运行评审**；建议在评审结论为 PASS 或 PASS (Conditional) 后，再继续实施（`.agent/workflows/context-start.md <change-id>`）。
+> ⏸️ **将上方 Prompt 复制至新对话运行评审**；建议在评审结论为 PASS 或 PASS (Conditional) 后，再继续实施（`.agents/workflows/context-start.md <change-id>`）。
 
 ---
 
@@ -533,5 +533,5 @@ Roadmap 对齐:
 
 下一步:
 - 复制 Phase 5 Prompt 至新对话运行三阶段评审
-- 评审通过后开始实施: .agent/workflows/context-start.md <实际 change-id>
+- 评审通过后开始实施: .agents/workflows/context-start.md <实际 change-id>
 ```

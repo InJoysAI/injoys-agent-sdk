@@ -15,7 +15,7 @@
 ## 功能特性
 
 -   **6 个命令文件**：`/context-init`、`/context-openspec`（含 proposal 子命令）、`/context-interview`、`/context-start`、`/context-check`、`/context-update`。
--   **共享命令源**：命令可安装到 Antigravity、Claude Code、Cursor、Devin、Qoder 和 Grok；Codex prompts 通过独立脚本安装。
+-   **共享命令源**：命令统一安装在项目级 `.agents/workflows/`（不绑定具体工具）；也可按需额外安装到 Claude Code、Cursor、Devin、Qoder 和 Grok；Codex prompts 通过独立脚本安装。
 -   **SSoT 集成**：提供 Schema (Goose SQL 迁移) 和 API (TypeSpec) 的单一数据源（SSoT）集成模板。
 
 ## 安装指南
@@ -26,11 +26,11 @@
 npx @injoysai/agent-sdk init
 ```
 
-`init` 与方式 2 安装的布局一致（`design/context-dev/`，并在 `.agent/workflows/` 中 bootstrap `/context-init` 和 `/context-check`）。已存在的文件默认保留，传入 `--force` 才会覆盖。
+`init` 与方式 2 安装的布局一致（`design/context-dev/`，并在 `.agents/workflows/` 中 bootstrap `/context-init` 和 `/context-check`）。已存在的文件默认保留，传入 `--force` 才会覆盖。
 
 | 选项 | 说明 |
 | --- | --- |
-| `--tools <list>` | 在 `.agent/workflows` 之外，额外为指定工具 bootstrap 命令（`antigravity,claude,cursor,devin,qoder,all`；默认仅 `.agent/workflows`） |
+| `--tools <list>` | 在 `.agents/workflows` 之外，额外为指定工具 bootstrap 命令（`claude,cursor,devin,qoder,grok,all`；`.agents/workflows` 始终安装） |
 | `--force` | 覆盖已存在的文件 |
 | `--dry-run` | 只显示将要写入的内容，不做任何修改 |
 
@@ -44,7 +44,7 @@ npx @injoysai/agent-sdk init
 curl -fsSL https://raw.githubusercontent.com/injoysai/injoys-agent-sdk/main/scripts/install.sh | bash
 ```
 
-安装脚本只会把 `/context-init` 和 `/context-check` bootstrap 到项目的 `.agent/workflows/`，不创建其他工具目录，也不写入项目之外的位置。运行 `/context-init` 后，完整命令集同步到 `.agent/workflows/`，并在项目根目录生成 `AGENTS.md`（含关键禁止项摘要）和只有一行导入的 `CLAUDE.md`，指引 AI 阅读 `.context/`、`.agent/` 和 `openspec/`。其他工具可用 `design/context-dev/scripts/install-ai-commands.sh --tools <工具列表>` 手动安装；Codex 可运行 `design/context-dev/scripts/install-codex-prompts.sh`。
+安装脚本只会把 `/context-init` 和 `/context-check` bootstrap 到项目的 `.agents/workflows/`，不创建其他工具目录，也不写入项目之外的位置。运行 `/context-init` 后，完整命令集同步到 `.agents/workflows/`，并在项目根目录生成 `AGENTS.md`（含关键禁止项摘要）和只有一行导入的 `CLAUDE.md`，指引 AI 阅读 `.context/`、`.agents/` 和 `openspec/`。其他工具可用 `design/context-dev/scripts/install-ai-commands.sh --tools <工具列表>` 手动安装；Codex 可运行 `design/context-dev/scripts/install-codex-prompts.sh`。
 
 ### 方式 3: 手动安装（用于开发）
 

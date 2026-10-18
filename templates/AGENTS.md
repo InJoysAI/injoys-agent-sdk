@@ -1,7 +1,7 @@
 # Context 生成入口
 
 > **用途**: 读取此文件后，在**目标项目目录**生成 `.context/` 资产  
-> **触发**: `@design/context-dev/AGENTS.md` 或 `.agent/workflows/context-init.md`
+> **触发**: `@design/context-dev/AGENTS.md` 或 `.agents/workflows/context-init.md`
 
 ---
 
@@ -13,7 +13,7 @@
 
 ### Step 1: 确认目标项目
 
-**检查用户是否已提供参数**（如 `.agent/workflows/context-init.md PRD: xx; 架构: xx; 项目路径: xx`）：
+**检查用户是否已提供参数**（如 `.agents/workflows/context-init.md PRD: xx; 架构: xx; 项目路径: xx`）：
 
 | 参数 | 必需 | 缺失时询问 |
 |------|:----:|-----------|
@@ -56,7 +56,7 @@
 > - 收集用户提供的源文档，并**询问用户：归档时“移动(mv)”还是“复制(copy)”**（推荐移动，避免同时维护多份 PRD / TAD / UI / DB 文档）
 > - 创建 `.context/` 目录结构
 > - 生成 `.context/` 根文件（README.md, criterion.md, AGENTS.md）
-> - 在**项目根目录**生成/更新 `AGENTS.md`（AI 入口：指引阅读 `.context/`、`.agent/`、`openspec/`，并附 criterion 的关键禁止项摘要）和一个只含 `@AGENTS.md` 的 `CLAUDE.md`（供 Claude Code 读取）；不生成其他 AI 工具的入口文件
+> - 在**项目根目录**生成/更新 `AGENTS.md`（AI 入口：指引阅读 `.context/`、`.agents/`、`openspec/`，并附 criterion 的关键禁止项摘要）和一个只含 `@AGENTS.md` 的 `CLAUDE.md`（供 Claude Code 读取）；不生成其他 AI 工具的入口文件
 > - 更新 Manifest
 
 **⚠️ Step 3 完成后必须继续 Step 4**
@@ -71,7 +71,7 @@
 
 > 该模块会：
 > - 不询问 AI 工具类型
-> - 只将 `design/context-dev/commands/*.md` 同步到目标项目的 `.agent/workflows/`
+> - 只将 `design/context-dev/commands/*.md` 同步到目标项目的 `.agents/workflows/`
 > - 不安装其他 AI 工具命令
 
 **⚠️ Step 4 完成后必须继续 Step 5**
@@ -120,11 +120,11 @@
 🔁 Manifest: [已更新 / 未变更]
 
 🤖 Context 工作流命令:
-- .agent/workflows/: [已同步 / 失败]
+- .agents/workflows/: [已同步 / 失败]
 
 🏗️ SSoT 状态: [已初始化 / 跳过 (原因)]
 
-➡️ 下一步: 运行 `.agent/workflows/context-openspec.md`（一键）生成 domain / architecture / db / ui 总结、`openspec/config.yaml` 和 `openspec/proposal-roadmap.md`
+➡️ 下一步: 运行 `.agents/workflows/context-openspec.md`（一键）生成 domain / architecture / db / ui 总结、`openspec/config.yaml` 和 `openspec/proposal-roadmap.md`
 ```
 
 ---
@@ -136,5 +136,5 @@
 | 环境检查 (Provider) | 项目自定义 `Makefile check-env` 或 `scripts/check-env.sh` | 项目级环境检查（可选） |
 | 文档收集与生成 | `@design/context-dev/tools/docs/AGENTS.md` | 收集源文件并生成 .context/ |
 | Manifest | `@design/context-dev/tools/manifest/AGENTS.md` | 记录文件变化 |
-| 命令安装 | `@design/context-dev/tools/ai-config/AGENTS.md` | 只同步 `.agent/workflows/` |
+| 命令安装 | `@design/context-dev/tools/ai-config/AGENTS.md` | 只同步 `.agents/workflows/` |
 | SSoT | `@design/context-dev/tools/SSoT/AGENTS.md` | 初始化 SSoT |

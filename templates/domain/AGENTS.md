@@ -1,7 +1,7 @@
 # Domain 总结生成入口
 
 > **用途**: 从 PRD 产品需求文档生成结构化的业务领域总结。  
-> **触发**: `.agent/workflows/context-openspec.md domain`，或由 `.agent/workflows/context-openspec.md`（无参数一键模式）按顺序调用。`/context-init` 只归档源文档，不会生成本模块的总结。
+> **触发**: `.agents/workflows/context-openspec.md domain`，或由 `.agents/workflows/context-openspec.md`（无参数一键模式）按顺序调用。`/context-init` 只归档源文档，不会生成本模块的总结。
 
 ---
 
@@ -103,7 +103,7 @@
 | 8. 项目管理 | 依赖、风险评估 | `risks_and_debt.md` |
 
 > **⚠️ NFR 处理说明**:  
-> PRD 的「非功能性需求」作为 domain 的**补充摘要**写入 `business_rules.md`（供 project/plan 汇总与提案约束使用），**不作为架构权威输出**。架构层的 NFR 由 `.agent/workflows/context-openspec.md architecture` 单独处理。
+> PRD 的「非功能性需求」作为 domain 的**补充摘要**写入 `business_rules.md`（供 project/plan 汇总与提案约束使用），**不作为架构权威输出**。架构层的 NFR 由 `.agents/workflows/context-openspec.md architecture` 单独处理。
 >
 > 只摘取**用户可感知、且 PRD 写了明确数值或口径**的条目；并发模型、加密算法、存储方式、分层约束等实现类要求**不摘取**（见上文「业务 / 技术判定」）。
 

@@ -23,4 +23,4 @@ description: Initialize project Context (move/copy sources + skeleton)
 ./design/context-dev/scripts/context-gen.sh -i
 ```
 
-Note: Context summarization + Specflow setup (creating `openspec/` directories + generating config/roadmap/proposals) is handled by `.agent/workflows/context-openspec.md`.
+Note: Context summarization + Specflow setup (creating `openspec/` directories + generating config/roadmap/proposals) is handled by `.agents/workflows/context-openspec.md`.

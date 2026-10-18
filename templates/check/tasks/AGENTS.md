@@ -1,6 +1,6 @@
 # Tasks Check 指令
 
-> 当 `.agent/workflows/context-check.md tasks <change-id>` 被调用时执行此文件。
+> 当 `.agents/workflows/context-check.md tasks <change-id>` 被调用时执行此文件。
 
 ---
 

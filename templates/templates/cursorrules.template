@@ -21,9 +21,9 @@ This project follows a project criterion. See: @.context/criterion.md
 - Requirements: openspec/config.yaml
 
 ## Commands
-- .agent/workflows/context-init.md — Initialize Context
-- .agent/workflows/context-openspec.md — Initialize OpenSpec
-- .agent/workflows/context-openspec.md proposal <change-id> [roadmap-doc] — Create proposal (optionally specify roadmap/outline doc)
-- .agent/workflows/context-start.md — Implement change
-- .agent/workflows/context-check.md — Check status
-- .agent/workflows/context-update.md — Maintain Context
+- .agents/workflows/context-init.md — Initialize Context
+- .agents/workflows/context-openspec.md — Initialize OpenSpec
+- .agents/workflows/context-openspec.md proposal <change-id> [roadmap-doc] — Create proposal (optionally specify roadmap/outline doc)
+- .agents/workflows/context-start.md — Implement change
+- .agents/workflows/context-check.md — Check status
+- .agents/workflows/context-update.md — Maintain Context

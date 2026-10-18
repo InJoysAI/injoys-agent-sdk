@@ -1,6 +1,6 @@
 # Context Start 指令
 
-> 当 `.agent/workflows/context-start.md <提案ID>` 被调用时执行此文件。
+> 当 `.agents/workflows/context-start.md <提案ID>` 被调用时执行此文件。
 
 ---
 

@@ -1,6 +1,6 @@
 # Context Review 核对指令
 
-> 当 `.agent/workflows/context-check.md review <profile> [arguments]` 被调用时执行。遵循 `@design/context-dev/check/AGENTS.md` 通用审查协议。
+> 当 `.agents/workflows/context-check.md review <profile> [arguments]` 被调用时执行。遵循 `@design/context-dev/check/AGENTS.md` 通用审查协议。
 
 ## 输入
 

@@ -1,6 +1,6 @@
 # Commands Check 指令
 
-> 当 `.agent/workflows/context-check.md commands` 被调用时执行此文件。
+> 当 `.agents/workflows/context-check.md commands` 被调用时执行此文件。
 > 遵循 `@design/context-dev/check/AGENTS.md` 通用审查协议。
 
 ---
@@ -19,13 +19,13 @@
 bash design/context-dev/scripts/check-ai-commands.sh
 ```
 
-该脚本把 `design/context-dev/commands/*.md` 与 `.agent/workflows/` 下的同名文件**逐字节比较**，并分别检出三种漂移：
+该脚本把 `design/context-dev/commands/*.md` 与 `.agents/workflows/` 下的同名文件**逐字节比较**，并分别检出三种漂移：
 
 | 漂移 | 含义 |
 |------|------|
-| 缺失 | 命令源有，`.agent/workflows/` 没有 |
+| 缺失 | 命令源有，`.agents/workflows/` 没有 |
 | 不一致 | 两处内容不同（命令源已改但未重新安装） |
-| 残留 | `.agent/workflows/` 有，但命令源已删除或改名 |
+| 残留 | `.agents/workflows/` 有，但命令源已删除或改名 |
 
 **结果**：
 - ❌ 退出码非 0 → 判定 `FAIL`，直接进入 Phase 3 报告
@@ -57,7 +57,7 @@ bash design/context-dev/scripts/check-ai-commands.sh
 ```
 🔍 AI 命令同步检查报告
 命令源：design/context-dev/commands/
-目标：  .agent/workflows/
+目标：  .agents/workflows/
 状态：[🟢 通过 | 🔴 失败]
 
 ✅/❌ 逐字节同步（N 个命令文件）
@@ -71,8 +71,8 @@ bash design/context-dev/scripts/check-ai-commands.sh
    └── README 子命令清单 → [状态]
 
 📋 修复建议：
-1. 重新安装命令（不要手工编辑 .agent/workflows/ 下的副本）：
-   bash design/context-dev/scripts/install-ai-commands.sh --tools antigravity
+1. 重新安装命令（不要手工编辑 .agents/workflows/ 下的副本）：
+   bash design/context-dev/scripts/install-ai-commands.sh
 ```
 
-**修复约定**：命令漂移只通过重新安装修复。`.agent/workflows/` 下的文件是 `commands/` 的同步产物，手工编辑会在下一次安装时被覆盖，且掩盖真实漂移。
+**修复约定**：命令漂移只通过重新安装修复。`.agents/workflows/` 下的文件是 `commands/` 的同步产物，手工编辑会在下一次安装时被覆盖，且掩盖真实漂移。

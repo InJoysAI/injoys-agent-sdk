@@ -8,7 +8,7 @@
 
 - Node.js 18+
 - Git
-- AI 编程工具（Antigravity / Claude Code / Cursor / Devin / Codex / Qoder）
+- AI 编程工具（Claude Code / Cursor / Devin / Codex / Qoder）
 
 ---
 
@@ -27,7 +27,7 @@ npx @injoysai/agent-sdk init
 curl -fsSL https://raw.githubusercontent.com/injoysai/injoys-agent-sdk/main/scripts/install.sh | bash
 ```
 
-安装脚本会将 `/context-init` 和 `/context-check` bootstrap 到 Antigravity、Claude Code、Cursor、Devin、Qoder 项目命令目录，并尝试安装到 Codex 全局 prompts。运行 `/context-init` 后，完整命令集只同步到项目 `.agent/workflows/`。其他工具可通过 `design/context-dev/scripts/install-ai-commands.sh --tools <工具列表>` 安装完整命令；Codex 可运行 `design/context-dev/scripts/install-codex-prompts.sh`。
+安装脚本会将 `/context-init` 和 `/context-check` bootstrap 到项目级 `.agents/workflows/`（不绑定具体工具），并尝试安装到 Codex 全局 prompts。运行 `/context-init` 后，完整命令集只同步到项目 `.agents/workflows/`。其他工具可通过 `design/context-dev/scripts/install-ai-commands.sh --tools <工具列表>` 安装完整命令；Codex 可运行 `design/context-dev/scripts/install-codex-prompts.sh`。
 
 安装完成后，你会看到：
 - `design/context-dev/` — 上下文生成框架
@@ -55,7 +55,7 @@ PRD：@docs/product-overview.md
 - ✅ 归档源文档
 - ✅ 生成 `context-manifest.json`
 - ✅ 生成工程约束权威来源 `.context/criterion.md`
-- ✅ 将完整 `/context-*` 命令集同步到 `.agent/workflows/`
+- ✅ 将完整 `/context-*` 命令集同步到 `.agents/workflows/`
 
 ---
 
