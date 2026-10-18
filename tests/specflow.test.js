@@ -319,3 +319,110 @@ test('a freshly generated tasks.md of every kind fails strict validation until p
     assert.ok(!issues.some((i) => /validate step|archive step/.test(i.message)), `${kind}: step lines are recognised`);
   }
 });
+
+// ---- tasks.md structure checks (files carrying the change_kind marker) ----
+
+const ROADMAP = (id, kind, tasks) =>
+  `# roadmap\n\n### 提案 1: x\n\n**Change ID:** \`${id}\`  \n**优先级:** P0  \n**变更类型（change_kind）:** ${kind}（判定依据：test）\n\n**关键任务**:\n${tasks
+    .map((t, i) => `${i + 1}. ${t} (0.3 人日)`)
+    .join('\n')}\n\n**里程碑（按需）**:\n- m\n`;
+
+const GOOD_TASKS = (id, kind = 'docs-ops', refs = ['3.1', '3.2', '3.3']) =>
+  `<!-- change_kind: ${kind} -->
+# 实施任务清单
+
+> notes
+
+## 1. Roadmap 对齐
+
+| # | roadmap 关键任务 | 对应任务 |
+|---|------------------|----------|
+${refs.map((r, i) => `| ${i + 1} | 任务${i + 1} | ${r} |`).join('\n')}
+
+## 2. SSoT 检查
+- [ ] 2.1 确认 SSoT 未更改
+
+## 3. 实施
+- [ ] 3.1 a
+- [ ] 3.2 b
+- [ ] 3.3 c
+
+## 6. 验证与归档
+- [ ] 6.3 运行 node design/context-dev/tools/specflow/specflow.mjs validate ${id} --strict
+- [ ] 6.4 运行 node design/context-dev/tools/specflow/specflow.mjs archive ${id} --yes --no-validate
+`;
+
+function structureCheck(dir, id, { tasks, roadmap, strict = true }) {
+  assert.equal(specflow(dir, ['new', id, '--kind', 'docs-ops']).status, 0);
+  fs.writeFileSync(path.join(dir, 'openspec/changes', id, 'tasks.md'), tasks);
+  const rm = path.join(dir, 'openspec/proposal-roadmap.md');
+  if (roadmap) fs.writeFileSync(rm, roadmap);
+  else fs.rmSync(rm, { force: true });
+  const res = specflow(dir, ['validate', id, ...(strict ? ['--strict'] : []), '--json']);
+  return JSON.parse(res.stdout).issues.filter((i) => i.file === 'tasks.md');
+}
+
+test('a complete marked tasks.md that matches its roadmap entry passes the structure checks', () => {
+  const dir = project();
+  const issues = structureCheck(dir, 'ok-change', {
+    tasks: GOOD_TASKS('ok-change'),
+    roadmap: ROADMAP('ok-change', 'docs-ops', ['一', '二', '三']),
+  });
+  assert.deepEqual(issues, []);
+});
+
+test('missing fixed sections and validate/archive only inside a code block are errors in strict mode', () => {
+  const dir = project();
+  const tasks = GOOD_TASKS('bad-sections')
+    .replace(/## 6\. 验证与归档[\s\S]*$/, '## 6. 收尾\n- [ ] 6.1 done\n\n```\nnode design/context-dev/tools/specflow/specflow.mjs validate bad-sections --strict\nnode design/context-dev/tools/specflow/specflow.mjs archive bad-sections --yes\n```\n')
+    .replace(/## 1\. Roadmap 对齐[\s\S]*?## 2\./, '## 2.');
+  const issues = structureCheck(dir, 'bad-sections', { tasks });
+  const msgs = issues.map((i) => i.message).join('\n');
+  assert.ok(issues.every((i) => i.level === 'error'));
+  assert.match(msgs, /Roadmap 对齐/);
+  assert.match(msgs, /验证与归档/);
+  assert.match(msgs, /no checkbox line that runs 'specflow validate'/);
+  assert.match(msgs, /no checkbox line that runs 'specflow archive'/);
+});
+
+test('mapping rows must reference existing task numbers', () => {
+  const dir = project();
+  const issues = structureCheck(dir, 'bad-refs', { tasks: GOOD_TASKS('bad-refs', 'docs-ops', ['3.1', '9.9', '到时候再说']) });
+  const msgs = issues.map((i) => i.message);
+  assert.ok(msgs.some((m) => /references task 9\.9/.test(m)));
+  assert.ok(msgs.some((m) => /does not reference any task number/.test(m)));
+});
+
+test('the number of mapped key_tasks is checked against the roadmap entry, and so is change_kind', () => {
+  const dir = project();
+  const few = structureCheck(dir, 'few-rows', {
+    tasks: GOOD_TASKS('few-rows', 'docs-ops', ['3.1', '3.2']),
+    roadmap: ROADMAP('few-rows', 'docs-ops', ['一', '二', '三']),
+  });
+  assert.ok(few.some((i) => /lists 3 key_tasks .* maps only 2/.test(i.message)));
+
+  const mismatch = structureCheck(dir, 'kind-mismatch', {
+    tasks: GOOD_TASKS('kind-mismatch'),
+    roadmap: ROADMAP('kind-mismatch', 'code', ['一', '二', '三']),
+  });
+  assert.ok(mismatch.some((i) => /differs from the roadmap entry's change_kind 'code'/.test(i.message)));
+});
+
+test('structure problems are warnings (not errors) in loose mode', () => {
+  const dir = project();
+  const issues = structureCheck(dir, 'loose-mode', {
+    tasks: GOOD_TASKS('loose-mode', 'docs-ops', ['9.9']),
+    strict: false,
+  });
+  assert.ok(issues.length > 0);
+  assert.ok(issues.every((i) => i.level === 'warning'));
+});
+
+test('tasks.md without the change_kind marker (legacy / hand-written) skips the structure checks', () => {
+  const dir = project();
+  assert.equal(specflow(dir, ['new', 'legacy-tasks']).status, 0);
+  fs.writeFileSync(path.join(dir, 'openspec/changes/legacy-tasks/tasks.md'), '- [ ] do it\n- [ ] run specflow validate legacy-tasks\n');
+  const issues = JSON.parse(specflow(dir, ['validate', 'legacy-tasks', '--strict', '--json']).stdout).issues;
+  assert.ok(!issues.some((i) => i.file === 'tasks.md'));
+  assert.ok(issues.some((i) => /archive step/.test(i.message)), 'the old hint still applies');
+});
