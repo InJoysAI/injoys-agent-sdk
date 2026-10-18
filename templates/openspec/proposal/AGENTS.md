@@ -81,6 +81,7 @@
 - `phase`（如 Phase 0 / 1 / 2）
 - `change_id`
 - `title`
+- `change_kind`（`code` / `docs-ops` / `mixed`；条目缺失时**不要猜**，先问用户并建议补回 roadmap）
 - `business_goal`
 - `in_scope` / `out_of_scope`
 - `dependencies`
@@ -109,6 +110,7 @@
 | phase | ... |
 | change_id | ... |
 | title | ... |
+| change_kind | ... |
 | business_goal | ... |
 | in_scope | ... |
 | out_of_scope | ... |
@@ -156,8 +158,8 @@ ls openspec/specs/         # 已有的 specs（capabilities）
 > 目标：避免漏文件/漏顺序，骨架直接来自 `design/context-dev/templates/openspec/` 模板。
 
 **优先流程**：
-1. 运行 `node design/context-dev/tools/specflow/specflow.mjs new <change-id> [--capability <capability>] [--title <title>]`，创建 `openspec/changes/<change-id>/` 及 proposal/tasks/spec 骨架
-2. 按 `node design/context-dev/tools/specflow/specflow.mjs instructions <artifact> --change <change-id>` 的要求逐个填充工件（proposal/tasks/specs/design）
+1. 运行 `node design/context-dev/tools/specflow/specflow.mjs new <change-id> --kind <change_kind> [--capability <capability>] [--title <title>]`（`--kind` 取 roadmap 条目的 `change_kind`），创建 `openspec/changes/<change-id>/` 及 proposal/tasks/spec 骨架
+2. 按 `node design/context-dev/tools/specflow/specflow.mjs instructions <artifact> --change <change-id> --kind <change_kind>` 的要求逐个填充工件（proposal/tasks/specs/design）
 3. 回到本指令继续执行下面的 **2.1 强约束** 与后续自检/验证
 
 **fallback**（`specflow new` 不可用时）：按下方步骤手工创建目录结构与交付物。
@@ -263,7 +265,8 @@ node design/context-dev/tools/specflow/specflow.mjs templates
 > - `design/context-dev/templates/openspec/proposal.md.template`
 > - `design/context-dev/templates/openspec/spec.md.template`
 > - `design/context-dev/templates/openspec/design.md.template`
-> - `design/context-dev/templates/openspec/tasks.md.template`
+> - `design/context-dev/templates/openspec/tasks.md.template`（`code` / `mixed`）
+> - `design/context-dev/templates/openspec/tasks-docs-ops.md.template`（`docs-ops`）
 
 #### Template: `openspec/changes/<change-id>/proposal.md`
 **SSoT 模板**：`design/context-dev/templates/openspec/proposal.md.template`  
@@ -276,14 +279,20 @@ node design/context-dev/tools/specflow/specflow.mjs templates
 - 禁止残留任何 `{{...}}` 占位符（写入文件前必须全部替换为实际内容）
 
 #### Template: `openspec/changes/<change-id>/tasks.md`
-**SSoT 模板**：`design/context-dev/templates/openspec/tasks.md.template`  
+**SSoT 模板**（按 roadmap 条目的 `change_kind` 选择）：
+- `code` / `mixed`：`design/context-dev/templates/openspec/tasks.md.template`
+- `docs-ops`：`design/context-dev/templates/openspec/tasks-docs-ops.md.template`
+
+`specflow new --kind <change_kind>` 已按此选好并在文件首行写入 `<!-- change_kind: ... -->`；不得在写 tasks 时自行改换类型，类型有疑问先问用户。
 **输出路径**：`openspec/changes/<change-id>/tasks.md`
+
+**固定章节**（两套模板一致，章节名与位置不得改动）：`1. Roadmap 对齐`（只做 key_tasks → 任务编号映射）、`2. SSoT 先行/检查`、末章 `验证与归档`（含 validate 与 archive 两条 checkbox）。其余章节按模板内的填写规则增减。
 
 **硬约束**：
 - 必须是可执行的 Markdown checkbox 列表（`- [ ] ...`）
-- 必须包含验证步骤：`- [ ] 运行 node design/context-dev/tools/specflow/specflow.mjs validate <change-id> --strict`（普通 checkbox 文本行，不可仅放在代码块）
+- 必须包含验证步骤：`- [ ] 运行 node design/context-dev/tools/specflow/specflow.mjs validate <change-id> --strict`（普通 checkbox 文本行，不可仅放在代码块；模板已带，不需要再加“等价写法”）
 - 必须包含归档步骤：`- [ ] 运行 node design/context-dev/tools/specflow/specflow.mjs archive <change-id> --yes --no-validate`（紧随最终校验；普通 checkbox 文本行，不可仅放在代码块）
-- 必须包含 `Roadmap 对齐任务`（对应 roadmap 的 `key_tasks`；可以拆分为更细粒度子任务）
+- 必须包含 `Roadmap 对齐` 章节：roadmap 的每条 `key_tasks` 都要映射到承接它的任务编号（可拆分为更细粒度子任务）
 - 禁止残留任何 `{{...}}` 占位符（写入文件前必须全部替换为实际内容）
 
 #### Template: `openspec/changes/<change-id>/specs/<capability>/spec.md`（delta）

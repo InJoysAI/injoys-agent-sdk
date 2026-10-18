@@ -260,3 +260,62 @@ test('validate recognises the documented `node .../specflow.mjs validate|archive
   fs.writeFileSync(tasks, '- [ ] run specflow validate step-lines --strict\n- [ ] run openspec archive step-lines\n');
   assert.deepEqual(stepWarnings(), [], 'the short forms keep working');
 });
+
+test('new --kind selects the tasks template, stamps change_kind and fills the change id', () => {
+  const dir = project();
+  const tasksOf = (id) => fs.readFileSync(path.join(dir, 'openspec/changes', id, 'tasks.md'), 'utf8');
+
+  const ops = specflow(dir, ['new', 'ops-change', '--kind', 'docs-ops']);
+  assert.equal(ops.status, 0, ops.stderr);
+  assert.doesNotMatch(ops.stdout, /--kind not given/);
+  const opsTasks = tasksOf('ops-change');
+  assert.ok(opsTasks.startsWith('<!-- change_kind: docs-ops -->\n'));
+  assert.match(opsTasks, /## 5\. 回滚与影响面/);
+  assert.doesNotMatch(opsTasks, /单元测试/);
+  assert.match(opsTasks, /specflow\.mjs validate ops-change --strict/);
+  assert.match(opsTasks, /specflow\.mjs archive ops-change --yes --no-validate/);
+
+  for (const kind of ['code', 'mixed']) {
+    const id = `${kind}-change`;
+    assert.equal(specflow(dir, ['new', id, '--kind', kind]).status, 0);
+    const body = tasksOf(id);
+    assert.ok(body.startsWith(`<!-- change_kind: ${kind} -->\n`));
+    assert.match(body, /单元测试/);
+    assert.match(body, new RegExp(`specflow\\.mjs validate ${id} --strict`));
+  }
+});
+
+test('new without --kind keeps the code template and says so; an invalid --kind is rejected', () => {
+  const dir = project();
+  const res = specflow(dir, ['new', 'no-kind']);
+  assert.equal(res.status, 0, res.stderr);
+  assert.match(res.stdout, /--kind not given/);
+  assert.ok(fs.readFileSync(path.join(dir, 'openspec/changes/no-kind/tasks.md'), 'utf8').startsWith('<!-- change_kind: code -->'));
+
+  const bad = specflow(dir, ['new', 'bad-kind', '--kind', 'refactor']);
+  assert.equal(bad.status, 1);
+  assert.match(bad.stderr, /Invalid --kind/);
+  assert.ok(!fs.existsSync(path.join(dir, 'openspec/changes/bad-kind')));
+});
+
+test('instructions tasks points to the template for the given kind', () => {
+  const dir = project();
+  const get = (args) => JSON.parse(specflow(dir, ['instructions', 'tasks', '--change', 'x-change', '--json', ...args]).stdout);
+  assert.match(get([]).templatePath, /tasks\.md\.template$/);
+  assert.match(get(['--kind', 'mixed']).templatePath, /tasks\.md\.template$/);
+  const ops = get(['--kind', 'docs-ops']);
+  assert.match(ops.templatePath, /tasks-docs-ops\.md\.template$/);
+  assert.equal(ops.kind, 'docs-ops');
+});
+
+test('a freshly generated tasks.md of every kind fails strict validation until placeholders are filled, with no stray step warnings', () => {
+  const dir = project();
+  for (const kind of ['code', 'docs-ops', 'mixed']) {
+    const id = `fresh-${kind}`;
+    assert.equal(specflow(dir, ['new', id, '--kind', kind]).status, 0);
+    const res = specflow(dir, ['validate', id, '--strict', '--json']);
+    const issues = JSON.parse(res.stdout).issues;
+    assert.ok(issues.some((i) => /placeholders/.test(i.message)), `${kind}: placeholders are still reported`);
+    assert.ok(!issues.some((i) => /validate step|archive step/.test(i.message)), `${kind}: step lines are recognised`);
+  }
+});
