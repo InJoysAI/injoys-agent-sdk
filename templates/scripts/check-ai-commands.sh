@@ -30,8 +30,8 @@ fi
 status=0
 checked=0
 
-if [[ -d "$project_root/.agent/workflows" ]]; then
-  echo "DRIFT: 发现遗留目录 .agent/workflows/；命令已迁至 .agents/workflows/，请迁移或删除旧目录以避免两份副本" >&2
+if [[ -d "$project_root/.agents/workflows" ]]; then
+  echo "DRIFT: 发现遗留目录 .agents/workflows/；命令已迁至 .agents/workflows/，请迁移或删除旧目录以避免两份副本" >&2
   status=1
 fi
 
