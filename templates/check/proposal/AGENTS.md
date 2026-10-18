@@ -1,6 +1,6 @@
 # Proposal Check 指令
 
-> 当 `.agent/workflows/context-check.md proposal <change-id>` 被调用时执行此文件。
+> 当 `.agents/workflows/context-check.md proposal <change-id>` 被调用时执行此文件。
 > 遵循 `@design/context-dev/check/AGENTS.md` 通用审查协议。
 
 ---

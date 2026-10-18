@@ -1,18 +1,20 @@
 #!/bin/bash
 set -euo pipefail
 
-# Install the full `/context-*` command set to selected AI tool directories.
+# Install the full `/context-*` command set into `.agents/workflows/` (always),
+# plus optional AI-tool-specific directories selected via --tools.
 #
 # This script uses the tool-agnostic command sources under:
 #   design/context-dev/commands/*.md
 #
 # Usage:
-#   bash design/context-dev/scripts/install-ai-commands.sh --tools antigravity,cursor,claude,devin,qoder,grok
+#   bash design/context-dev/scripts/install-ai-commands.sh                      # .agents/workflows only
+#   bash design/context-dev/scripts/install-ai-commands.sh --tools cursor,claude,devin,qoder,grok
 #
 # Notes:
 # - Codex prompts are global (~/.codex/prompts). Use install-codex-prompts.sh.
 # - Grok loads flat *.md from .grok/commands/ and .claude/commands/ (compat).
-#   It does NOT read .agent/workflows/ — use --tools grok (or claude) for slash commands.
+#   It does NOT read .agents/workflows/ — use --tools grok (or claude) for slash commands.
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/../../.." && pwd)"
@@ -27,25 +29,21 @@ while [[ $# -gt 0 ]]; do
       shift 2
       ;;
     -h|--help)
-      echo "Usage: $0 --tools antigravity,claude,cursor,devin,qoder,grok"
+      echo "Usage: $0 [--tools claude,cursor,devin,qoder,grok]"
       exit 0
       ;;
     *)
       echo "Unknown arg: $1"
-      echo "Usage: $0 --tools antigravity,claude,cursor,devin,qoder,grok"
+      echo "Usage: $0 [--tools claude,cursor,devin,qoder,grok]"
       exit 1
       ;;
   esac
 done
 
-if [[ -z "$TOOLS" ]]; then
-  echo "❌ Missing --tools"
-  exit 1
-fi
 
 # Expand "all" to full list
 if [[ "$TOOLS" == "all" ]]; then
-  TOOLS="antigravity,claude,cursor,devin,qoder,grok"
+  TOOLS="claude,cursor,devin,qoder,grok"
 fi
 
 IFS=',' read -r -a tool_list <<< "$TOOLS"
@@ -67,10 +65,18 @@ copy_dir() {
   echo "✅ Installed $((${#files[@]})) files -> $dest_dir"
 }
 
+# Tool-agnostic project workflows: always installed.
+copy_dir "$COMMANDS_DIR" "$ROOT_DIR/.agents/workflows"
+
+if [[ -d "$ROOT_DIR/.agent/workflows" ]]; then
+  echo "⚠️  Legacy .agent/workflows/ exists. Commands now live in .agents/workflows/."
+  echo "    Move or remove the old directory yourself to avoid two copies (nothing was deleted)."
+fi
+
 for tool in "${tool_list[@]}"; do
   case "$tool" in
     antigravity)
-      copy_dir "$COMMANDS_DIR" "$ROOT_DIR/.agent/workflows"
+      echo "ℹ️  'antigravity' is no longer a tool option: .agents/workflows is always installed."
       ;;
     claude)
       copy_dir "$COMMANDS_DIR" "$ROOT_DIR/.claude/commands"

@@ -11,9 +11,14 @@ const crypto = require('crypto');
 /** Where templates are installed inside a target project (shared with scripts/install.sh). */
 const INSTALL_DIR = path.join('design', 'context-dev');
 
-/** Command directories of the supported AI tools (relative to the project root). */
+/** Project-level workflow directory: always installed, not tied to any AI tool. */
+const WORKFLOWS_DIR = path.join('.agents', 'workflows');
+
+/** Legacy workflow directory (before the rename to `.agents/workflows`). */
+const LEGACY_WORKFLOWS_DIR = path.join('.agent', 'workflows');
+
+/** Optional extra command directories of specific AI tools (relative to the project root). */
 const AI_TOOL_DIRS = {
-    antigravity: path.join('.agent', 'workflows'),
     claude: path.join('.claude', 'commands'),
     cursor: path.join('.cursor', 'commands'),
     devin: path.join('.devin', 'workflows'),
@@ -122,6 +127,8 @@ function readManifest(projectRoot) {
 
 module.exports = {
     INSTALL_DIR,
+    WORKFLOWS_DIR,
+    LEGACY_WORKFLOWS_DIR,
     AI_TOOL_DIRS,
     BOOTSTRAP_COMMANDS,
     calculateHash,

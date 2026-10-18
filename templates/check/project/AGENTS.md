@@ -1,6 +1,6 @@
 # Project Check 指令
 
-> 当 `.agent/workflows/context-check.md project` 被调用时执行此文件。
+> 当 `.agents/workflows/context-check.md project` 被调用时执行此文件。
 > 遵循 `@design/context-dev/check/AGENTS.md` 通用审查协议。
 
 ---
@@ -21,7 +21,7 @@
 | `.context/context-manifest.json` | ✅ | 用于读取 Context 资产 |
 
 **结果**：
-- ❌ 缺失必需文件 → 失败，提示先运行 `.agent/workflows/context-openspec.md project`
+- ❌ 缺失必需文件 → 失败，提示先运行 `.agents/workflows/context-openspec.md project`
 - ✅ 所有必需文件存在 → 继续
 
 ---
@@ -59,10 +59,10 @@
   - `file_digest = hex(sha256(utf8(path) || 0x0A || file_bytes))`
   - 按路径排序后 `Context-SHA256 = hex(sha256(join_hex_with_newline))`（末条无尾随 `\n`）
   - 与 YAML 头部 `Context-SHA256`（及 Manifest `last_openspec_project.context_sha256` 若存在）比对
-  - **不一致** → 标记 `[STALE] P1`（来源已变或快照过期；要求 `.agent/workflows/context-openspec.md project` 重生成）
+  - **不一致** → 标记 `[STALE] P1`（来源已变或快照过期；要求 `.agents/workflows/context-openspec.md project` 重生成）
   - **无法解析算法文档** → 标记 `[AMBIGUOUS] P2`（流程缺陷，非内容错误）
 - **内容基线**：Manifest `last_openspec_project.config_sha256` 存在时，计算 `config.yaml` 当前原始字节的 sha256 与之比对：
-  - 来源指纹一致、但内容摘要 ≠ 基线 → 标记 `[DESYNC] P2`（快照在生成后被修改过，可能与来源不一致；要求复核并用 `.agent/workflows/context-openspec.md project` 重生成）
+  - 来源指纹一致、但内容摘要 ≠ 基线 → 标记 `[DESYNC] P2`（快照在生成后被修改过，可能与来源不一致；要求复核并用 `.agents/workflows/context-openspec.md project` 重生成）
   - 字段不存在 → 跳过本项（旧 Manifest 兼容），不报错
   - 注意：该基线只能发现“生成之后被改动”，**发现不了“生成时就不完整”**；后者由 Phase 3 / Phase 4 的内容一致性与完整性校验负责
 - **体积**：`config.yaml` 超过 **32 KiB** → 标记 `[OVERSIZE] P2`（仅警告；裁剪优先级见生成规范「体积预算」）；超过 20 KiB 目标但未到 32 KiB 仅在报告中提示

@@ -8,7 +8,7 @@
 
 - Node.js 18+
 - Git
-- AI coding tool (Antigravity / Claude Code / Cursor / Devin / Codex / Qoder)
+- AI coding tool (Claude Code / Cursor / Devin / Codex / Qoder)
 
 ---
 
@@ -27,7 +27,7 @@ npx @injoysai/agent-sdk init
 curl -fsSL https://raw.githubusercontent.com/injoysai/injoys-agent-sdk/main/scripts/install.sh | bash
 ```
 
-The installer bootstraps `/context-init` and `/context-check` into the Antigravity, Claude Code, Cursor, Devin, and Qoder project command directories, and attempts to install them into Codex's global prompts. After `/context-init`, the full command set is synchronized only to the project's `.agent/workflows/`. Install the full set for other tools with `design/context-dev/scripts/install-ai-commands.sh --tools <tool-list>`; Codex prompts use `design/context-dev/scripts/install-codex-prompts.sh`.
+The installer bootstraps `/context-init` and `/context-check` into the tool-agnostic project directory `.agents/workflows/`, and attempts to install them into Codex's global prompts. After `/context-init`, the full command set is synchronized only to the project's `.agents/workflows/`. Install the full set for other tools with `design/context-dev/scripts/install-ai-commands.sh --tools <tool-list>`; Codex prompts use `design/context-dev/scripts/install-codex-prompts.sh`.
 
 After installation, you'll see:
 - `design/context-dev/` — Context generation framework
@@ -55,7 +55,7 @@ Architecture: @docs/system-architecture.md
 - ✅ Archives source documents
 - ✅ Generates `context-manifest.json`
 - ✅ Generates `.context/criterion.md` as the engineering-constraint source of truth
-- ✅ Synchronizes the full `/context-*` command set to `.agent/workflows/`
+- ✅ Synchronizes the full `/context-*` command set to `.agents/workflows/`
 
 ---
 

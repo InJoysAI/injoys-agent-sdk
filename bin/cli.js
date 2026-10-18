@@ -6,6 +6,8 @@ const { spawnSync } = require('child_process');
 const {
   INSTALL_DIR,
   AI_TOOL_DIRS,
+  WORKFLOWS_DIR,
+  LEGACY_WORKFLOWS_DIR,
   BOOTSTRAP_COMMANDS,
   copyDir,
   copyFiles
@@ -51,8 +53,8 @@ Commands:
 
 Options for init:
   --tools <list>    Also bootstrap commands for these AI tools, in addition to
-                    .agent/workflows (${Object.keys(AI_TOOL_DIRS).join(', ')}, all).
-                    Default: .agent/workflows only
+                    .agents/workflows (${Object.keys(AI_TOOL_DIRS).join(', ')}, all).
+                    Default: .agents/workflows only (always installed)
   --force           Overwrite files that already exist
   --dry-run         Show what would be written without changing anything
 
@@ -95,9 +97,9 @@ function parseArgs(argv, valueFlags = []) {
   return { positional, flags };
 }
 
-// `.agent/workflows` (antigravity) is always installed: it is where /context-init
-// syncs the full command set. Other tools are opt-in via --tools.
-const DEFAULT_TOOLS = ['antigravity'];
+// `.agents/workflows` is always installed (tool-agnostic): it is where /context-init
+// syncs the full command set. Other tools' command directories are opt-in via --tools.
+const DEFAULT_TOOLS = [];
 
 function resolveTools(value) {
   const all = Object.keys(AI_TOOL_DIRS);
@@ -145,12 +147,19 @@ function initCommand(args) {
 
   // 2. Bootstrap commands for each selected AI tool
   log.step('Installing bootstrap commands (/context-init, /context-check) ...');
-  for (const tool of tools) {
-    const dest = path.join(target, AI_TOOL_DIRS[tool]);
+  const targets = [['workflows', WORKFLOWS_DIR], ...tools.map((t) => [t, AI_TOOL_DIRS[t]])];
+  for (const [name, relDir] of targets) {
+    const dest = path.join(target, relDir);
     const res = copyFiles(commandsDir, dest, BOOTSTRAP_COMMANDS, options);
     copied.push(...res.copied);
     skipped.push(...res.skipped);
-    log.info(`${tool}: ${AI_TOOL_DIRS[tool].split(path.sep).join('/')}`);
+    log.info(`${name}: ${relDir.split(path.sep).join('/')}`);
+  }
+
+  const legacy = path.join(target, LEGACY_WORKFLOWS_DIR);
+  if (fs.existsSync(legacy)) {
+    log.warn(`Legacy directory found: ${LEGACY_WORKFLOWS_DIR.split(path.sep).join('/')} — commands now live in ${WORKFLOWS_DIR.split(path.sep).join('/')}.`);
+    log.warn('Move or remove the old directory yourself to avoid keeping two copies; nothing was deleted.');
   }
 
   // 3. Make helper scripts executable

@@ -1,6 +1,6 @@
 # Plan Check 指令
 
-> 当 `.agent/workflows/context-check.md plan` 被调用时执行此文件。
+> 当 `.agents/workflows/context-check.md plan` 被调用时执行此文件。
 > 遵循 `@design/context-dev/check/AGENTS.md` 通用审查协议。
 
 ---
@@ -24,7 +24,7 @@
 先读取总纲 Metadata 的 `规划形态` 与 `判定依据`，决定后续按哪种形态校验；缺少 `规划形态` 时按 `单文件` 处理并给出警告。
 
 **结果**：
-- ❌ 缺失必需文件 → 失败，提示先运行 `.agent/workflows/context-openspec.md plan`
+- ❌ 缺失必需文件 → 失败，提示先运行 `.agents/workflows/context-openspec.md plan`
 - ✅ 所有必需文件存在 → 继续
 
 ---

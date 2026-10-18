@@ -1,6 +1,6 @@
 # Context Sync 指令
 
-> 当 `.agent/workflows/context-update.md sync ...` 被调用时执行此文件。
+> 当 `.agents/workflows/context-update.md sync ...` 被调用时执行此文件。
 
 ---
 
@@ -15,10 +15,10 @@
 支持形式：
 
 ```bash
-.agent/workflows/context-update.md sync roadmap
-.agent/workflows/context-update.md sync roadmap phase3
-.agent/workflows/context-update.md sync roadmap openspec/proposal-roadmap-Phase-3.md
-.agent/workflows/context-update.md sync proposal <change-id>
+.agents/workflows/context-update.md sync roadmap
+.agents/workflows/context-update.md sync roadmap phase3
+.agents/workflows/context-update.md sync roadmap openspec/proposal-roadmap-Phase-3.md
+.agents/workflows/context-update.md sync proposal <change-id>
 ```
 
 ---

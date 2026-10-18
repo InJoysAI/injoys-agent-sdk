@@ -28,17 +28,17 @@
 
 `config.yaml` 与 `proposal-roadmap*.md` 缺失，说明对应的 `project` / `plan` 子命令尚未运行，可查 `.context/context-manifest.json` 的 `pending_generation`；`changes/`、`specs/` 不在 `pending_generation` 管理范围内，缺失或为空属正常。
 
-### 工作流命令（`.agent/workflows/`）
+### 工作流命令（`.agents/workflows/`）
 
 | 命令 | 用途 |
 |------|------|
-| `.agent/workflows/context-init.md` | 初始化 Context（归档源文档、生成准则、初始化 SSoT） |
-| `.agent/workflows/context-openspec.md` | 生成 Context 总结、`config.yaml`、`proposal-roadmap.md` |
-| `.agent/workflows/context-openspec.md proposal <change-id> [roadmap-doc]` | 创建并校验变更提案 |
-| `.agent/workflows/context-interview.md` | 访谈并完善技术规格或指定文档 |
-| `.agent/workflows/context-start.md` | 按提案实施并归档 |
-| `.agent/workflows/context-check.md` | 检查环境 / Manifest / 任务 / 提案 / 路线图等 |
-| `.agent/workflows/context-update.md` | 维护 Context（源文档变更后同步） |
+| `.agents/workflows/context-init.md` | 初始化 Context（归档源文档、生成准则、初始化 SSoT） |
+| `.agents/workflows/context-openspec.md` | 生成 Context 总结、`config.yaml`、`proposal-roadmap.md` |
+| `.agents/workflows/context-openspec.md proposal <change-id> [roadmap-doc]` | 创建并校验变更提案 |
+| `.agents/workflows/context-interview.md` | 访谈并完善技术规格或指定文档 |
+| `.agents/workflows/context-start.md` | 按提案实施并归档 |
+| `.agents/workflows/context-check.md` | 检查环境 / Manifest / 任务 / 提案 / 路线图等 |
+| `.agents/workflows/context-update.md` | 维护 Context（源文档变更后同步） |
 
 ### 规则
 

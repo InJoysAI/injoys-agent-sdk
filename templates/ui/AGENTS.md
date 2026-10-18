@@ -1,7 +1,7 @@
 # UI 总结生成入口
 
 > **用途**: 从 UI 设计规范文档生成结构化的 UI 设计资产（供实现期引用）。  
-> **触发**: `.agent/workflows/context-openspec.md ui`，或由 `.agent/workflows/context-openspec.md`（无参数一键模式）按顺序调用。`/context-init` 只归档源文档，不会生成本模块的总结。
+> **触发**: `.agents/workflows/context-openspec.md ui`，或由 `.agents/workflows/context-openspec.md`（无参数一键模式）按顺序调用。`/context-init` 只归档源文档，不会生成本模块的总结。
 
 ---
 
@@ -48,10 +48,10 @@
 
 ## ✅ 基于什么生成（输入来源与优先级）
 
-`.agent/workflows/context-openspec.md ui` 的产物**基于 UI 规范类源文档**生成，而不是凭空“设计 UI”。按优先级选择输入：
+`.agents/workflows/context-openspec.md ui` 的产物**基于 UI 规范类源文档**生成，而不是凭空“设计 UI”。按优先级选择输入：
 
 1. **UI 设计规范文档（首选）**：如 `ui-spec.md` / `design-system.md` / `ui-guidelines.md`  
-   - 放置位置：`.context/ui/<file>`（由 `.agent/workflows/context-init.md` 归档）
+   - 放置位置：`.context/ui/<file>`（由 `.agents/workflows/context-init.md` 归档）
 2. **设计系统资产（可选）**：tokens/组件清单/交互状态/无障碍清单（来自设计稿或设计系统文档）
 3. **设计稿/原型（可选）**：Figma 链接 + 导出的说明（如有）
 4. **仅有 PRD 时（降级）**：允许从 PRD 推导“最小可实施 UI 约束”，但必须：

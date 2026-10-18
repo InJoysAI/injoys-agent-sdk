@@ -29,7 +29,7 @@ templates/
 ├── commands/              # 工具无关的唯一 /context-* 命令源
 ├── scripts/
 │   ├── context-gen.sh             # Hash/引导脚本
-│   ├── install-ai-commands.sh     # 安装 /context-* 命令（初始化仅选 antigravity）
+│   ├── install-ai-commands.sh     # 安装 /context-* 命令到 .agents/workflows（可选附加其他工具目录）
 │   ├── install-codex-prompts.sh   # 可选手动安装 Codex prompts
 │   └── check-context-manifest.sh  # Manifest 校验（需要 jq）
 └── templates/             # 各类文档/入口文件模板（PRD、TAD、roadmap、AI 工具入口等）
@@ -68,7 +68,7 @@ openspec/changes/<id>/  →  /context-start <id> 实施并归档
 | `commands/context-check.md` | 检查 | 子命令: `env` / `manifest` / `commands` / `tasks` / `proposal` / `plan` / `project` / `review` |
 | `commands/context-update.md` | 维护 | `sync roadmap|proposal` 有工作流；`add` / `modify` / `delete` / `fix` 为接口草案 |
 
-安装脚本首次只 bootstrap `context-init` 和 `context-check` 到项目级工具目录，并尝试安装 Codex 全局 prompts。初始化流程随后只将完整命令同步到 `.agent/workflows/`。若要为其他工具安装完整命令，运行 `design/context-dev/scripts/install-ai-commands.sh --tools antigravity,claude,cursor,devin,qoder,grok`；Codex 使用独立的 `install-codex-prompts.sh`。
+安装脚本首次只 bootstrap `context-init` 和 `context-check` 到项目级工具目录，并尝试安装 Codex 全局 prompts。初始化流程随后只将完整命令同步到 `.agents/workflows/`。若要为其他工具安装完整命令，运行 `design/context-dev/scripts/install-ai-commands.sh --tools claude,cursor,devin,qoder,grok`；Codex 使用独立的 `install-codex-prompts.sh`。
 
 ---
 
@@ -105,7 +105,7 @@ curl -fsSL https://raw.githubusercontent.com/injoysai/injoys-agent-sdk/main/scri
 先自备 PRD 与架构设计文档（`design/context-dev/templates/PRD.md.template`、`TAD.md.template` 可作参考，非必需；总结生成按章节语义解析，不依赖固定编号）。
 
 ```
-.agent/workflows/context-init.md
+.agents/workflows/context-init.md
 目标项目：/path/to/your-project
 PRD：@docs/product-overview.md
 架构：@docs/system-architecture.md
@@ -113,12 +113,12 @@ PRD：@docs/product-overview.md
 
 产出：`.context/{domain,architecture,...}/source/` 源文档归档、`criterion.md`、`README.md`、`AGENTS.md`、Manifest，并按架构文档判断是否初始化 `SSoT/`。此步**不生成** domain / architecture 等总结。
 
-安装脚本会先 bootstrap 命令到若干工具目录；初始化流程自身不会询问 AI 工具类型，只会将完整命令同步到目标项目的 `.agent/workflows/`。需要其他工具的完整命令时，按上文单独运行安装脚本。
+安装脚本会先 bootstrap 命令到若干工具目录；初始化流程自身不会询问 AI 工具类型，只会将完整命令同步到目标项目的 `.agents/workflows/`。需要其他工具的完整命令时，按上文单独运行安装脚本。
 
 ### 3. 生成 Context 总结与 OpenSpec 资产（幂等）
 
 ```
-.agent/workflows/context-openspec.md
+.agents/workflows/context-openspec.md
 ```
 
 一键模式按顺序执行：
@@ -131,7 +131,7 @@ PRD：@docs/product-overview.md
 ### 4. 创建提案
 
 ```
-.agent/workflows/context-openspec.md proposal feat-user-login
+.agents/workflows/context-openspec.md proposal feat-user-login
 ```
 
 - 读取 `openspec/proposal-roadmap.md` 定位条目（复杂项目的总纲只含索引，提案正文自动读取索引链接指向的 `proposal-roadmap-Phase-<N>.md`）
@@ -141,13 +141,13 @@ PRD：@docs/product-overview.md
 也可以显式指定“提案大纲文档”（例如某个 Phase 文件）：
 
 ```
-.agent/workflows/context-openspec.md proposal feat-user-login openspec/proposal-roadmap-Phase-3.md
+.agents/workflows/context-openspec.md proposal feat-user-login openspec/proposal-roadmap-Phase-3.md
 ```
 
 ### 5. 开始实施
 
 ```
-.agent/workflows/context-start.md <提案ID>
+.agents/workflows/context-start.md <提案ID>
 ```
 
 执行流程：
@@ -161,25 +161,25 @@ PRD：@docs/product-overview.md
 
 ```bash
 # 检查任务进度
-.agent/workflows/context-check.md tasks <提案ID>
+.agents/workflows/context-check.md tasks <提案ID>
 
 # 检查提案完整性
-.agent/workflows/context-check.md proposal <提案ID>
+.agents/workflows/context-check.md proposal <提案ID>
 
 # 检查环境
-.agent/workflows/context-check.md env
+.agents/workflows/context-check.md env
 
 # PRD 与架构双向追溯（路径可由 Manifest 自动解析）
-.agent/workflows/context-check.md review prd-tad
+.agents/workflows/context-check.md review prd-tad
 
 # 全量生成资产、Manifest、README、Integration Index 四方同步
-.agent/workflows/context-check.md review assets
+.agents/workflows/context-check.md review assets
 
 # 单模块生成资产与源文档核对
-.agent/workflows/context-check.md review scope domain
+.agents/workflows/context-check.md review scope domain
 
 # Manifest 当前状态与扁平审计历史校验
-.agent/workflows/context-check.md manifest
+.agents/workflows/context-check.md manifest
 ```
 
 `context-manifest.json` 只保存当前源文件、生成资产和最近同步状态。完整同步/决策历史使用 `.context/history/context-sync.jsonl`，禁止通过 `previous_sync` 递归嵌套进 Manifest。
