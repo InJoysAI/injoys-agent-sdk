@@ -70,19 +70,48 @@
 
 ---
 
-### Phase 3: 复制源文档
+### Phase 3: 归档源文档（先问：移动还是复制）
 
-将用户提供的源文档**原样复制**到对应的 `source/` 子目录（保留原文件名）：
+> ⛔ **必须询问，不得默认直接复制**。init 之后 `.context/*/source/` 是唯一权威来源；若原位置还留着一份，团队就要同时维护两份 PRD / TAD / UI / DB 文档，两份会逐渐不一致。
 
-| 源文档类型 | 归档目录 | 操作 |
-|------------|---------|------|
-| PRD | `.context/domain/source/` | 复制 |
-| 架构设计 | `.context/architecture/source/` | 复制 |
-| DB Schema | `.context/db/source/` | 复制 |
-| UI 规范 | `.context/ui/source/` | 复制 |
-| 遗留**文档** | `.context/legacy/source/` | 复制 |
-| 遗留**代码库** | - | ⚠️ **不复制**，见下文 |
-| 补充文档 | 按内容归档到对应 `source/` | 复制 |
+**Step 3.1 询问处置方式**（一次问完所有源文档，用户可对个别文件单独指定）：
+
+> "源文档归档到 `.context/*/source/` 后，原位置的文件如何处理？
+>
+> 1. **移动（mv，推荐）**：原位置不再保留，只维护 `source/` 下这一份，避免多份文档
+> 2. **复制（copy）**：原位置保留，`source/` 下为归档副本（之后改哪份要自己约定，需同步时走 `context-update`）
+>
+> 默认 1。需要例外的文件请单独说明（如 `docs/PRD.md 复制`）。"
+
+用户已在命令参数里给出（如 `mode: move` / `mode: copy`）时可跳过询问，但**未给出时必须问**。
+
+**Step 3.2 按选择执行**（保留原文件名）：
+
+| 源文档类型 | 归档目录 |
+|------------|---------|
+| PRD | `.context/domain/source/` |
+| 架构设计 | `.context/architecture/source/` |
+| DB Schema | `.context/db/source/` |
+| UI 规范 | `.context/ui/source/` |
+| 遗留**文档** | `.context/legacy/source/` |
+| 遗留**代码库** | ⚠️ **不移动也不复制**，见下文 |
+| 补充文档 | 按内容归档到对应 `source/` |
+
+**选择“移动”时**：
+- 目标项目是 git 仓库且该文件已被跟踪 → 用 `git mv`，保留历史；否则用 `mv`。
+- 先计算并记录 SHA-256，再移动，移动后校验目标哈希与记录一致。
+- 原文件在目标项目**之外**（如 `~/Downloads/`）时，再次提醒“将从原目录移走”，得到用户确认再执行。
+- 在目标项目内搜索对原路径的引用（`README.md`、根 `AGENTS.md`、`docs/`、`openspec/` 等），**列出清单**并询问是否改为新路径；不得静默改写。
+- Manifest：`path` 与 `archived_to` 填**同一个** `.context/*/source/…` 路径（合法，见 manifest 规范）。
+
+**选择“复制”时**：
+- 原样复制，原文件不动；Manifest 中 `path` 为原路径，`archived_to` 为归档副本。
+- 报告里必须提示：“原位置仍有一份，后续修改请以哪份为准需自行约定；若改了原文件，运行 `context-update` 同步。”
+
+**两种情况都适用**：
+- 源文档本来就位于 `.context/*/source/` 下 → 无需处理方式，直接登记。
+- 目标文件已存在且内容不同 → 停下询问覆盖或改名，不得静默覆盖。
+- 同一份文档不要同时存在于“原位置 + source/ + 其他目录”三处。
 
 ### 遗留代码库特殊处理
 
@@ -107,9 +136,9 @@
 
 3. **执行分析** — 执行 `@design/context-dev/legacy/AGENTS.md` 直接读取原始路径生成 `legacy_system_analysis.md`
 
-复制每个源文档时同时计算其 SHA-256，由 Manifest 更新流程写入 `sources.<KEY>.content_hash`（见 `@design/context-dev/tools/manifest/AGENTS.md`），用于之后判断源文件是否变更。
+归档每个源文档时同时计算其 SHA-256，由 Manifest 更新流程写入 `sources.<KEY>.content_hash`（见 `@design/context-dev/tools/manifest/AGENTS.md`），用于之后判断源文件是否变更。
 
-> ⚠️ **源文档只读**: `source/` 目录中的文件为权威来源，谨慎修改。
+> ⚠️ **`source/` 为权威来源**：选择“移动”后，需求变更应直接改 `source/` 下的文件（改后运行 `context-update`），不要再另建副本。
 
 每个**已创建**的子目录生成 `README.md` 说明（作为快速索引）；未创建的类别不生成。
 
@@ -213,9 +242,10 @@
 报告结果（示例，要依据真实情况）：
 
 ```
-=== 源文档归档 ===
-✅ PRD.md → .context/domain/source/PRD.md (复制)
-✅ TDS.md → .context/architecture/source/TDS.md (复制)
+=== 源文档归档（处置方式：移动 / 复制）===
+✅ docs/PRD.md → .context/domain/source/PRD.md (移动，原位置已不存在)
+✅ docs/TDS.md → .context/architecture/source/TDS.md (复制，原位置仍保留，需自行约定以哪份为准)
+ℹ️ 发现 2 处引用原路径: README.md:12, docs/index.md:5（已询问是否更新）
 ⏩ DB: 跳过（未提供）
 
 === 根目录文件 ===

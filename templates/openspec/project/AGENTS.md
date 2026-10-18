@@ -147,7 +147,7 @@ rules:
 - ...（列出实际读取的文件）
 
 跳过的文件:
-- .context/domain/source/PRD.md (copied)
-- .context/architecture/source/TDS.md (copied)
+- .context/domain/source/PRD.md (moved/copied)
+- .context/architecture/source/TDS.md (moved/copied)
 - .context/README.md (template)
 ```

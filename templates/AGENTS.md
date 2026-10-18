@@ -19,9 +19,10 @@
 |------|:----:|-----------|
 | 项目路径 | ✅ | "请提供目标项目的根目录路径（绝对路径）" |
 | PRD | ✅ | 在 Step 3 由 docs 模块询问 |
+| 处置方式（`mode: move\|copy`） | ✅ | 未提供时在 Step 3 必须询问，不得默认复制 |
 | 架构文档 | ✅ | 在 Step 3 由 docs 模块询问 |
 
-> 若用户已提供全部参数，**跳过询问直接执行**。
+> 若用户已提供全部参数，**跳过询问直接执行**（唯一例外：未给出 `mode` 时，Step 3 仍必须询问移动还是复制）。
 
 **⚠️ Step 1 完成后必须继续 Step 2**
 
@@ -52,7 +53,7 @@
 **执行**: `@design/context-dev/tools/docs/AGENTS.md`
 
 > 该模块会：
-> - 收集用户提供的源文档
+> - 收集用户提供的源文档，并**询问用户：归档时“移动(mv)”还是“复制(copy)”**（推荐移动，避免同时维护多份 PRD / TAD / UI / DB 文档）
 > - 创建 `.context/` 目录结构
 > - 生成 `.context/` 根文件（README.md, criterion.md, AGENTS.md）
 > - 在**项目根目录**生成/更新 `AGENTS.md`（AI 入口：指引阅读 `.context/`、`.agent/`、`openspec/`，并附 criterion 的关键禁止项摘要）和一个只含 `@AGENTS.md` 的 `CLAUDE.md`（供 Claude Code 读取）；不生成其他 AI 工具的入口文件
@@ -108,13 +109,14 @@
 - .context/criterion.md
 - .context/AGENTS.md
 - AGENTS.md、CLAUDE.md（项目根目录，新建 / 仅更新标记块；CLAUDE.md 只含 `@AGENTS.md`）
-- .context/domain/source/[PRD文件]
-- .context/architecture/source/[架构文件]
+- .context/domain/source/[PRD文件]（移动 / 复制）
+- .context/architecture/source/[架构文件]（移动 / 复制）
 - ...
 
 ⏩ 跳过的模块:
 - [模块名] (原因: ...)
 
+📄 源文档处置: [移动 / 复制]；复制时提示“原位置仍有一份”；移动时列出仍引用原路径的位置
 🔁 Manifest: [已更新 / 未变更]
 
 🤖 Context 工作流命令:

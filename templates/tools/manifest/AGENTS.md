@@ -159,7 +159,7 @@
 
 | status | 说明 |
 |--------|------|
-| `archived` | 源文件已复制到 `source/` 目录，并记录 `content_hash` |
+| `archived` | 源文件已移动或复制到 `source/` 目录（移动时 `path == archived_to`），并记录 `content_hash` |
 | `referenced` | 仅记录引用（遗留代码库不复制），没有 `content_hash` |
 
 **`content_hash`**：被归档源文件原始字节的 SHA-256（64 位小写 hex），在复制归档时写入，源文件被重新归档（`UPDATE`）时刷新。
