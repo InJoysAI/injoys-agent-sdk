@@ -337,10 +337,6 @@ function validateTasks(tasksText, { strict, changeId }) {
   return issues;
 }
 
-function escapeRegExp(s) {
-  return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-}
-
 function validateChange(changeId, { strict }) {
   const base = changeDir(changeId);
   if (!fileExists(base)) {
