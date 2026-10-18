@@ -320,12 +320,12 @@ function validateTasks(tasksText, { strict, changeId }) {
   }
 
   // Soft expectation: tasks include validate and archive steps. Accept both openspec and specflow to ease migration.
-  const expectsValidate =
-    new RegExp(`\\b(openspec\\s+validate|specflow\\s+validate)\\s+${escapeRegExp(changeId)}\\b`).test(tasksText) ||
-    /\b(openspec\s+validate|specflow\s+validate)\b/.test(tasksText);
-  const expectsArchive =
-    new RegExp(`\\b(openspec\\s+archive|specflow\\s+archive)\\s+${escapeRegExp(changeId)}\\b`).test(tasksText) ||
-    /\b(openspec\s+archive|specflow\s+archive)\b/.test(tasksText);
+  // The documented command is `node design/context-dev/tools/specflow/specflow.mjs validate <id>`, so the
+  // verb may follow `specflow` or `specflow.mjs`.
+  const stepRe = (verb) =>
+    new RegExp(`\\b(?:openspec|specflow(?:\\.mjs)?)\\s+${verb}\\b`);
+  const expectsValidate = stepRe("validate").test(tasksText);
+  const expectsArchive = stepRe("archive").test(tasksText);
 
   if (!expectsValidate) {
     issues.push({ level: strict ? "warning" : "info", message: "tasks.md does not mention a validate step (openspec/specflow). Consider adding one." });

@@ -235,3 +235,28 @@ test('uppercase [X] checkboxes are accepted by validate and counted by status', 
   const status = JSON.parse(specflow(dir, ['status', 'upper-x', '--json']).stdout);
   assert.deepEqual(status.taskStats, { total: 1, checked: 1, unchecked: 0 });
 });
+
+test('validate recognises the documented `node .../specflow.mjs validate|archive <id>` task lines', () => {
+  const dir = project();
+  assert.equal(specflow(dir, ['new', 'step-lines']).status, 0);
+  const tasks = path.join(dir, 'openspec/changes/step-lines/tasks.md');
+
+  const stepWarnings = () => {
+    const res = specflow(dir, ['validate', 'step-lines', '--strict', '--json']);
+    const report = JSON.parse(res.stdout);
+    return report.issues.filter((i) => /validate step|archive step/.test(i.message)).map((i) => i.message);
+  };
+
+  fs.writeFileSync(tasks, '- [ ] 实现功能\n');
+  assert.equal(stepWarnings().length, 2, 'missing steps are still reported');
+
+  fs.writeFileSync(
+    tasks,
+    '- [ ] 运行 node design/context-dev/tools/specflow/specflow.mjs validate step-lines --strict\n' +
+      '- [ ] 运行 node design/context-dev/tools/specflow/specflow.mjs archive step-lines --yes --no-validate\n'
+  );
+  assert.deepEqual(stepWarnings(), []);
+
+  fs.writeFileSync(tasks, '- [ ] run specflow validate step-lines --strict\n- [ ] run openspec archive step-lines\n');
+  assert.deepEqual(stepWarnings(), [], 'the short forms keep working');
+});
