@@ -334,6 +334,12 @@ function escapeRegExp(s) {
   return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
+// Matches a roadmap line that declares exactly this Change ID (e.g. "**Change ID:** `feat-a`").
+// The id must not continue with more id characters, so `feat-a` does not match `feat-a-extra`.
+function changeIdLineRe(changeId) {
+  return new RegExp(`Change ID\\W{0,8}${escapeRegExp(changeId)}(?![A-Za-z0-9-])`);
+}
+
 const KIND_MARKER_RE = /^<!--\s*change_kind:\s*([A-Za-z-]+)\s*-->/;
 const TASK_NUMBER_RE = /\d+(?:\.\d+)+/g;
 
@@ -349,7 +355,7 @@ function roadmapFiles() {
 // Best-effort lookup of a change's entry in the roadmap: its change_kind and the number of key_tasks.
 // Returns null when no entry with a matching Change ID is found (e.g. legacy or hand-written roadmaps).
 function findRoadmapEntry(changeId) {
-  const idRe = new RegExp(`Change ID\\W{0,8}${escapeRegExp(changeId)}(?:\\W|$)`);
+  const idRe = changeIdLineRe(changeId);
   for (const file of roadmapFiles()) {
     const lines = readText(file).split(/\r?\n/);
     const start = lines.findIndex((l) => idRe.test(l));
@@ -698,7 +704,7 @@ function splitCells(line) {
 
 // All places in the roadmap files that carry the status of `changeId`.
 function scanRoadmapStatus(changeId) {
-  const idRe = new RegExp(`Change ID\\W{0,8}${escapeRegExp(changeId)}(?:\\W|$)`);
+  const idRe = changeIdLineRe(changeId);
   const locations = [];
   const files = new Map(); // abs path -> { lines, eol }
 
@@ -728,21 +734,26 @@ function scanRoadmapStatus(changeId) {
       }
     }
 
-    // 2) index table row(s)
+    // 2) index table row(s): the id must sit in the "Change ID" column of a table that also has a "状态"
+    //    column. A change that is merely mentioned elsewhere (e.g. in "前置依赖") is not its own row.
     for (let i = 0; i < lines.length; i++) {
       if (!/^\s*\|/.test(lines[i])) continue;
-      const parts = splitCells(lines[i]);
-      if (!parts.some((c) => c.replace(/`/g, "").trim() === changeId)) continue;
-      // header row of the same table
+      let idCol = -1;
       let col = -1;
       for (let j = i - 1; j >= 0 && /^\s*\|/.test(lines[j]); j--) {
-        const idx = splitCells(lines[j]).findIndex((c) => c.trim() === "状态");
-        if (idx >= 0) {
-          col = idx;
+        const header = splitCells(lines[j]).map((c) => c.trim());
+        const st = header.indexOf("状态");
+        const id = header.findIndex((c) => /^Change ID$/i.test(c));
+        if (st >= 0 && id >= 0) {
+          col = st;
+          idCol = id;
           break;
         }
       }
-      if (col < 0 || col >= parts.length) continue;
+      if (col < 0) continue;
+      const parts = splitCells(lines[i]);
+      if (idCol >= parts.length || col >= parts.length) continue;
+      if (parts[idCol].replace(/`/g, "").trim() !== changeId) continue;
       const cell = parts[col];
       const current = cell.includes("{{") ? null : (cell.match(STATUS_TOKEN_RE) || [])[1] || null;
       locations.push({ file, kind: "index", line: i, col, current, raw: cell.trim() });
