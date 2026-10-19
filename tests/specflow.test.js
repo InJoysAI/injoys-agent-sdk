@@ -549,3 +549,60 @@ test('roadmap-status --check reports statuses that lag behind the change directo
   assert.equal(specflow(dir, ['roadmap-status', 'feat-c', 'done']).status, 0);
   assert.equal(specflow(dir, ['roadmap-status', '--check']).status, 0);
 });
+
+// ---- roadmap-status: an id mentioned elsewhere, or a longer id with the same prefix, is not the same change ----
+
+function dependencyProject() {
+  const dir = project();
+  fs.mkdirSync(path.join(dir, 'openspec/changes/feat-plugin-skeleton'), { recursive: true });
+  fs.mkdirSync(path.join(dir, 'openspec/changes/feat-runner-waits'), { recursive: true });
+  fs.writeFileSync(
+    path.join(dir, 'openspec/proposal-roadmap.md'),
+    `# roadmap
+
+| Change ID | Phase | 标题 | 优先级 | 前置依赖 | 状态 | 详情 |
+|-----------|-------|------|:------:|----------|------|------|
+| \`feat-plugin-skeleton\` | 1 | t | P0 | - | in-progress | [p](./proposal-roadmap-Phase-1.md) |
+| \`feat-runner-waits\` | 1 | t | P0 | feat-plugin-skeleton | in-progress | [p](./proposal-roadmap-Phase-1.md) |
+| \`feat-plugin-skeleton-extra\` | 1 | t | P1 | - | done | [p](./proposal-roadmap-Phase-1.md) |
+`
+  );
+  const block = (id, st) => `### ${id}\n**Change ID:** \`${id}\`  \n**状态:** ${st}（proposed/in-progress/done）  \n\n`;
+  fs.writeFileSync(
+    path.join(dir, 'openspec/proposal-roadmap-Phase-1.md'),
+    block('feat-plugin-skeleton-extra', 'done') + block('feat-plugin-skeleton', 'in-progress') + block('feat-runner-waits', 'in-progress')
+  );
+  return dir;
+}
+
+test('roadmap-status ignores a change that is only named in another row\'s dependency column', () => {
+  const dir = dependencyProject();
+  const check = specflow(dir, ['roadmap-status', '--check', '--json']);
+  assert.equal(check.status, 0, check.stdout);
+
+  const res = specflow(dir, ['roadmap-status', 'feat-plugin-skeleton', 'done']);
+  assert.equal(res.status, 0, res.stdout);
+  const index = read(dir, 'proposal-roadmap.md');
+  assert.match(index, /`feat-plugin-skeleton` \| 1 \| t \| P0 \| - \| done \|/);
+  assert.match(index, /`feat-runner-waits` \| 1 \| t \| P0 \| feat-plugin-skeleton \| in-progress \|/, 'the dependent row is untouched');
+});
+
+test('roadmap-status does not confuse an id with a longer id that starts with it', () => {
+  const dir = dependencyProject();
+  assert.equal(specflow(dir, ['roadmap-status', 'feat-plugin-skeleton', 'done']).status, 0);
+  const phase = read(dir, 'proposal-roadmap-Phase-1.md');
+  const extra = phase.slice(phase.indexOf('### feat-plugin-skeleton-extra'), phase.indexOf('### feat-plugin-skeleton\n'));
+  assert.match(extra, /\*\*状态:\*\* done/);
+  const skeleton = phase.slice(phase.indexOf('### feat-plugin-skeleton\n'), phase.indexOf('### feat-runner-waits'));
+  assert.match(skeleton, /\*\*状态:\*\* done/);
+  const runner = phase.slice(phase.indexOf('### feat-runner-waits'));
+  assert.match(runner, /\*\*状态:\*\* in-progress/);
+});
+
+test('the change_kind cross-check reads the entry of the exact id, not one with the same prefix', () => {
+  const dir = project();
+  const roadmap =
+    ROADMAP('ok-change-extra', 'code', ['一', '二', '三']) + '\n' + ROADMAP('ok-change', 'docs-ops', ['一', '二', '三']);
+  const issues = structureCheck(dir, 'ok-change', { tasks: GOOD_TASKS('ok-change'), roadmap });
+  assert.deepEqual(issues, []);
+});
