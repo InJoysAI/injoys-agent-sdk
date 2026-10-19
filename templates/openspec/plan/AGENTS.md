@@ -129,6 +129,7 @@
 **总纲+分Phase**
 - 总纲：保留阶段总览（含提案数与链接）、全局依赖图、**提案索引**、「【总纲+分Phase 形态】」；**删除**「【单文件形态】」，**总纲里不写提案块**
 - Phase 文件：用 `proposal-roadmap-phase.md.template`，文件名 `openspec/proposal-roadmap-Phase-<N>.md`，`<N>` 与总纲阶段编号一致（Phase 0 → `Phase-0`）
+- **提案状态**初始为 `proposed`；之后由 `specflow roadmap-status` 维护（`proposal` 完成时 `in-progress`，`archive` 时 `done`），不手改。
 - **唯一来源**：提案详情只写在 Phase 文件；总纲索引只放 Change ID、Phase、标题、优先级、前置依赖、状态、链接，且必须与 Phase 文件一致，不得两处各写一套
 - 全局依赖图只在总纲维护；Phase 文件只写本 Phase 内的执行顺序与跨阶段前置/产出
 

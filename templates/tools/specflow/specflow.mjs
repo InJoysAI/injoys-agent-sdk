@@ -12,7 +12,8 @@
  * - instructions <artifact> --change <change-id> [--json]
  * - templates [--json]
  * - validate <change-id> [--strict] [--json]
- * - archive <change-id> [--yes] [--skip-specs] [--no-validate]
+ * - archive <change-id> [--yes] [--skip-specs] [--no-validate]   (also marks the roadmap entry done)
+ * - roadmap-status <change-id> <proposed|in-progress|done> | roadmap-status --check
  */
 
 import fs from "node:fs";
@@ -682,6 +683,186 @@ function writeMainSpec(plan) {
   }
 }
 
+// ---- roadmap status (proposed -> in-progress -> done) ----
+// The status of a proposal lives in two places that must agree: the proposal block
+// (`**状态:** …` in the Phase file, or in the roadmap itself for the single-file form)
+// and the "状态" column of the roadmap's proposal index table. This tool edits both.
+
+const ROADMAP_STATUSES = ["proposed", "in-progress", "done"];
+const STATUS_TOKEN_RE = /\b(proposed|in-progress|done)\b/;
+const statusRank = (v) => ROADMAP_STATUSES.indexOf(v);
+
+function splitCells(line) {
+  return line.split("|"); // parts[0] is the text before the first pipe
+}
+
+// All places in the roadmap files that carry the status of `changeId`.
+function scanRoadmapStatus(changeId) {
+  const idRe = new RegExp(`Change ID\\W{0,8}${escapeRegExp(changeId)}(?:\\W|$)`);
+  const locations = [];
+  const files = new Map(); // abs path -> { lines, eol }
+
+  for (const file of roadmapFiles()) {
+    const text = readText(file);
+    const lines = text.split(/\r?\n/);
+    const info = { lines, eol: text.includes("\r\n") ? "\r\n" : "\n", rel: path.relative(REPO_ROOT, file) };
+    let touched = false;
+
+    // 1) proposal block
+    const start = lines.findIndex((l) => idRe.test(l));
+    if (start >= 0) {
+      let end = lines.length;
+      for (let i = start + 1; i < lines.length; i++) {
+        if (/^#{1,3}\s/.test(lines[i]) || /Change ID\W{0,8}\S/.test(lines[i])) {
+          end = i;
+          break;
+        }
+      }
+      for (let i = start; i < end; i++) {
+        const m = lines[i].match(/^(\s*\*\*状态[:：]?\*\*[:：]?\s*)(.*)$/);
+        if (!m) continue;
+        const current = m[2].includes("{{") ? null : (m[2].match(STATUS_TOKEN_RE) || [])[1] || null;
+        locations.push({ file, kind: "block", line: i, current, raw: m[2].trim() });
+        touched = true;
+        break;
+      }
+    }
+
+    // 2) index table row(s)
+    for (let i = 0; i < lines.length; i++) {
+      if (!/^\s*\|/.test(lines[i])) continue;
+      const parts = splitCells(lines[i]);
+      if (!parts.some((c) => c.replace(/`/g, "").trim() === changeId)) continue;
+      // header row of the same table
+      let col = -1;
+      for (let j = i - 1; j >= 0 && /^\s*\|/.test(lines[j]); j--) {
+        const idx = splitCells(lines[j]).findIndex((c) => c.trim() === "状态");
+        if (idx >= 0) {
+          col = idx;
+          break;
+        }
+      }
+      if (col < 0 || col >= parts.length) continue;
+      const cell = parts[col];
+      const current = cell.includes("{{") ? null : (cell.match(STATUS_TOKEN_RE) || [])[1] || null;
+      locations.push({ file, kind: "index", line: i, col, current, raw: cell.trim() });
+      touched = true;
+    }
+
+    if (touched) files.set(file, info);
+  }
+  return { locations, files };
+}
+
+// Returns { result, ... }; result is one of
+// not-found | unrecognized | conflict | unchanged | no-downgrade | updated.
+function applyRoadmapStatus(changeId, target, { force = false } = {}) {
+  const { locations, files } = scanRoadmapStatus(changeId);
+  if (locations.length === 0) return { result: "not-found", locations };
+
+  const where = (l) => `${files.get(l.file).rel}:${l.line + 1} (${l.kind})`;
+  const bad = locations.filter((l) => !l.current);
+  if (bad.length > 0) return { result: "unrecognized", locations, detail: bad.map((l) => `${where(l)}: '${l.raw}'`) };
+
+  const currents = new Set(locations.map((l) => l.current));
+  if (currents.size > 1) {
+    return { result: "conflict", locations, detail: locations.map((l) => `${where(l)}: ${l.current}`) };
+  }
+
+  const current = locations[0].current;
+  if (current === target) return { result: "unchanged", current, locations };
+  if (statusRank(target) < statusRank(current) && !force) return { result: "no-downgrade", current, locations };
+
+  for (const l of locations) {
+    const info = files.get(l.file);
+    if (l.kind === "block") {
+      info.lines[l.line] = info.lines[l.line].replace(/^(\s*\*\*状态[:：]?\*\*[:：]?\s*)(.*)$/, (_m, a, b) => a + b.replace(STATUS_TOKEN_RE, target));
+    } else {
+      const parts = splitCells(info.lines[l.line]);
+      parts[l.col] = parts[l.col].replace(STATUS_TOKEN_RE, target);
+      info.lines[l.line] = parts.join("|");
+    }
+  }
+  const changedFiles = [];
+  for (const [file, info] of files) {
+    fs.writeFileSync(file, info.lines.join(info.eol), "utf8");
+    changedFiles.push(info.rel);
+  }
+  return { result: "updated", from: current, to: target, files: changedFiles, locations };
+}
+
+function cmdRoadmapStatus({ args, flags }) {
+  const json = !!flags.get("json");
+
+  if (flags.get("check")) {
+    const problems = [];
+    const changesDir = path.join(REPO_ROOT, "openspec", "changes");
+    const entries = fileExists(changesDir) ? fs.readdirSync(changesDir, { withFileTypes: true }).filter((d) => d.isDirectory()) : [];
+
+    const consider = (id, expectedRank, label) => {
+      if (!CHANGE_ID_RE.test(id)) return;
+      const r = applyRoadmapStatusDry(id);
+      if (!r) return;
+      if (r.conflict) problems.push({ changeId: id, problem: `roadmap status is inconsistent between its places: ${r.conflict}` });
+      else if (statusRank(r.current) < expectedRank) {
+        problems.push({ changeId: id, problem: `${label} but the roadmap says '${r.current}'`, fix: `roadmap-status ${id} ${ROADMAP_STATUSES[expectedRank]}` });
+      } else if (label === "change is active (not archived)" && r.current === "done") {
+        problems.push({ changeId: id, problem: "change is active (not archived) but the roadmap says 'done'" });
+      }
+    };
+
+    for (const d of entries) {
+      if (d.name === "archive") {
+        const archived = fs.readdirSync(path.join(changesDir, "archive"), { withFileTypes: true }).filter((x) => x.isDirectory());
+        for (const a of archived) consider(a.name.replace(/^\d{4}-\d{2}-\d{2}-/, ""), 2, "change is archived");
+      } else {
+        consider(d.name, 1, "change is active (not archived)");
+      }
+    }
+
+    if (json) process.stdout.write(JSON.stringify({ ok: problems.length === 0, problems }, null, 2) + "\n");
+    else if (problems.length === 0) process.stdout.write("✅ Roadmap statuses match the change directories\n");
+    else {
+      process.stdout.write("❌ Roadmap statuses are out of sync with the change directories:\n");
+      for (const p of problems) process.stdout.write(`- ${p.changeId}: ${p.problem}${p.fix ? ` (fix: ${p.fix})` : ""}\n`);
+    }
+    process.exit(problems.length === 0 ? 0 : 2);
+  }
+
+  const changeId = args[0];
+  const target = args[1];
+  if (!changeId || !target) die("Usage: specflow roadmap-status <change-id> <proposed|in-progress|done> [--force] [--json]\n       specflow roadmap-status --check [--json]");
+  assertChangeId(changeId);
+  if (!ROADMAP_STATUSES.includes(target)) die(`Invalid status '${target}'. Expected one of: ${ROADMAP_STATUSES.join(", ")}.`);
+
+  const r = applyRoadmapStatus(changeId, target, { force: !!flags.get("force") });
+  if (json) {
+    process.stdout.write(JSON.stringify({ changeId, target, result: r.result, from: r.from ?? r.current ?? null, files: r.files ?? [], detail: r.detail ?? [] }, null, 2) + "\n");
+  } else {
+    const msg = {
+      "not-found": `ℹ️ No roadmap entry for '${changeId}'; nothing to update.`,
+      unrecognized: `❌ Cannot read the current status of '${changeId}':\n${(r.detail || []).map((d) => `   - ${d}`).join("\n")}\n   Fix it by hand (use proposed / in-progress / done).`,
+      conflict: `❌ The status of '${changeId}' differs between places; resolve it by hand first:\n${(r.detail || []).map((d) => `   - ${d}`).join("\n")}`,
+      unchanged: `✅ '${changeId}' is already ${target}.`,
+      "no-downgrade": `ℹ️ '${changeId}' is ${r.current}; not moving back to ${target} (use --force to override).`,
+      updated: `✅ '${changeId}': ${r.from} -> ${r.to} (${(r.files || []).join(", ")})`,
+    }[r.result];
+    process.stdout.write(`${msg}\n`);
+  }
+  process.exit(r.result === "conflict" || r.result === "unrecognized" ? 2 : 0);
+}
+
+// Read-only view used by --check: { current } | { conflict } | null (no entry / unreadable).
+function applyRoadmapStatusDry(changeId) {
+  const { locations, files } = scanRoadmapStatus(changeId);
+  if (locations.length === 0 || locations.some((l) => !l.current)) return null;
+  const currents = new Set(locations.map((l) => l.current));
+  if (currents.size > 1) {
+    return { conflict: locations.map((l) => `${files.get(l.file).rel}:${l.line + 1}=${l.current}`).join(", ") };
+  }
+  return { current: locations[0].current };
+}
+
 function cmdTemplates({ flags }) {
   const templates = getTemplates();
   const json = !!flags.get("json");
@@ -893,6 +1074,17 @@ function cmdArchive({ args, flags }) {
     process.stdout.write(`- ${plan.capability}: ${plan.summary.length} change(s)\n`);
     for (const line of plan.summary) process.stdout.write(`    · ${line}\n`);
   }
+  // 4) The proposal is finished: mark it done in the roadmap (never blocks the archive).
+  try {
+    const r = applyRoadmapStatus(changeId, "done");
+    if (r.result === "updated") process.stdout.write(`Roadmap status: ${r.from} -> done (${r.files.join(", ")})\n`);
+    else if (r.result === "conflict" || r.result === "unrecognized") {
+      process.stdout.write(`⚠️ Roadmap status not updated (${r.result}); run: specflow roadmap-status ${changeId} done\n`);
+      for (const d of r.detail || []) process.stdout.write(`   - ${d}\n`);
+    }
+  } catch (e) {
+    process.stdout.write(`⚠️ Roadmap status not updated: ${e.message}\n`);
+  }
 }
 
 function main() {
@@ -914,7 +1106,9 @@ function main() {
         "  instructions <artifact> --change <change-id> [--kind <code|docs-ops|mixed>] [--json]",
         "  templates [--json]",
         "  validate <change-id> [--strict] [--json]",
-        "  archive <change-id> [--yes] [--skip-specs] [--no-validate]",
+        "  archive <change-id> [--yes] [--skip-specs] [--no-validate]   (also marks the roadmap entry done)",
+        "  roadmap-status <change-id> <proposed|in-progress|done> [--force] [--json]",
+        "  roadmap-status --check [--json]",
         "",
       ].join("\n"),
     );
@@ -928,6 +1122,7 @@ function main() {
     if (command === "instructions") return cmdInstructions({ args, flags });
     if (command === "validate") return cmdValidate({ args, flags });
     if (command === "archive") return cmdArchive({ args, flags });
+    if (command === "roadmap-status") return cmdRoadmapStatus({ args, flags });
     die(`Unknown command '${command}'. Use --help.`);
   } catch (e) {
     die(e?.stack || String(e));

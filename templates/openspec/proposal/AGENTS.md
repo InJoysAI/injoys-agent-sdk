@@ -363,7 +363,23 @@ node design/context-dev/tools/specflow/specflow.mjs validate <change-id> --stric
 
 **结果**：
 - ❌ 验证失败 → 根据常见错误提示修复，重新验证；修复前不得宣称完成
-- ✅ 验证通过 → 继续 Phase 5
+- ✅ 验证通过 → 先执行 4.1 更新 Roadmap 状态，再继续 Phase 5
+
+### 4.1 更新 Roadmap 状态（强制，提案内容完成且验证通过后）
+
+> 提案状态由工具维护，**不要手改** Roadmap 里的状态文字，也不要手改索引表。
+
+```bash
+node design/context-dev/tools/specflow/specflow.mjs roadmap-status <change-id> in-progress
+```
+
+该命令同时改**提案块**的 `**状态:**` 和总纲「提案索引」表的状态列（单文件形态只改提案块）。结果处理：
+- `updated` / `unchanged`：继续。
+- 提示 `No roadmap entry`（Roadmap 里没有这个 Change ID，如临时提案）：继续，并在交付报告里写明“Roadmap 无对应条目，状态未更新”。
+- 报 `differs between places` 或 `Cannot read the current status`：**停下来向用户确认**，说明具体文件与行号，不要自行猜测改法。
+- 当前已是 `done`：命令不会降级，保持原状并在报告中说明。
+
+> 归档时 `specflow archive` 会自动把状态置为 `done`，不需要手动处理。
 
 **常见错误**：
 - "Change must have at least one delta" → 检查 `specs/` 目录
@@ -530,6 +546,8 @@ $ node design/context-dev/tools/specflow/specflow.mjs validate <change-id> --str
 关联的 Context 资产:
 - .context/domain/business_rules.md（必含）
 - <proposal.md 关联 Context 资产表中的其他文件>
+
+Roadmap 状态: <proposed → in-progress（已更新的文件）/ 已是 in-progress / Roadmap 无对应条目，未更新>
 
 Roadmap 对齐:
 - source_primary: openspec/proposal-roadmap.md

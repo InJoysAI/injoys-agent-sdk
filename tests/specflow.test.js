@@ -426,3 +426,126 @@ test('tasks.md without the change_kind marker (legacy / hand-written) skips the 
   assert.ok(!issues.some((i) => i.file === 'tasks.md'));
   assert.ok(issues.some((i) => /archive step/.test(i.message)), 'the old hint still applies');
 });
+
+// ---- roadmap-status ----
+
+const INDEX = (rows) =>
+  `# roadmap\n\n## 📇 提案索引\n\n| Change ID | Phase | 标题 | 优先级 | 前置依赖 | 状态 | 详情 |\n|-----------|-------|------|:------:|----------|------|------|\n${rows
+    .map(([id, st]) => `| \`${id}\` | 1 | t | P0 | - | ${st} | [p](./proposal-roadmap-Phase-1.md) |`)
+    .join('\n')}\n`;
+
+const PHASE_BLOCK = (id, st) =>
+  `### 提案: ${id}\n\n**Change ID:** \`${id}\`  \n**优先级:** P0（P0/P1/P2）  \n**预计时间:** 1d  \n**状态:** ${st}（proposed/in-progress/done）  \n**变更类型（change_kind）:** code\n\n**关键任务**:\n1. a\n`;
+
+function roadmapProject(entries) {
+  const dir = project();
+  fs.mkdirSync(path.join(dir, 'openspec'), { recursive: true });
+  fs.writeFileSync(path.join(dir, 'openspec/proposal-roadmap.md'), INDEX(entries.map(([id, st]) => [id, st])));
+  fs.writeFileSync(
+    path.join(dir, 'openspec/proposal-roadmap-Phase-1.md'),
+    `# Phase 1\n\n${entries.map(([id, st, blockSt]) => PHASE_BLOCK(id, blockSt ?? st)).join('\n')}`
+  );
+  return dir;
+}
+const read = (dir, f) => fs.readFileSync(path.join(dir, 'openspec', f), 'utf8');
+
+test('roadmap-status updates the proposal block and the index row together, only for that change', () => {
+  const dir = roadmapProject([['feat-a', 'proposed'], ['feat-b', 'proposed']]);
+  const res = specflow(dir, ['roadmap-status', 'feat-a', 'in-progress']);
+  assert.equal(res.status, 0, res.stderr + res.stdout);
+  assert.match(res.stdout, /proposed -> in-progress/);
+
+  const index = read(dir, 'proposal-roadmap.md');
+  assert.match(index, /\| `feat-a` \| 1 \| t \| P0 \| - \| in-progress \|/);
+  assert.match(index, /\| `feat-b` \| 1 \| t \| P0 \| - \| proposed \|/);
+
+  const phase = read(dir, 'proposal-roadmap-Phase-1.md');
+  assert.match(phase, /Change ID:\*\* `feat-a`[\s\S]*?\*\*状态:\*\* in-progress（proposed\/in-progress\/done）/);
+  const b = phase.slice(phase.indexOf('`feat-b`'));
+  assert.match(b, /\*\*状态:\*\* proposed（/);
+});
+
+test('roadmap-status is idempotent, never downgrades without --force, and skips unknown entries', () => {
+  const dir = roadmapProject([['feat-a', 'proposed']]);
+  assert.equal(specflow(dir, ['roadmap-status', 'feat-a', 'in-progress']).status, 0);
+  assert.match(specflow(dir, ['roadmap-status', 'feat-a', 'in-progress']).stdout, /already in-progress/);
+
+  assert.equal(specflow(dir, ['roadmap-status', 'feat-a', 'done']).status, 0);
+  const down = specflow(dir, ['roadmap-status', 'feat-a', 'in-progress']);
+  assert.equal(down.status, 0);
+  assert.match(down.stdout, /not moving back/);
+  assert.match(read(dir, 'proposal-roadmap.md'), /\| done \|/);
+
+  assert.equal(specflow(dir, ['roadmap-status', 'feat-a', 'proposed', '--force']).status, 0);
+  assert.match(read(dir, 'proposal-roadmap.md'), /\| proposed \|/);
+
+  const none = specflow(dir, ['roadmap-status', 'feat-none', 'in-progress']);
+  assert.equal(none.status, 0);
+  assert.match(none.stdout, /No roadmap entry/);
+  assert.equal(specflow(dir, ['roadmap-status', 'feat-a', 'finished']).status, 1);
+});
+
+test('roadmap-status stops when the block and the index disagree or the status cannot be read', () => {
+  const dir = roadmapProject([['feat-a', 'proposed', 'in-progress']]);
+  const before = read(dir, 'proposal-roadmap.md') + read(dir, 'proposal-roadmap-Phase-1.md');
+  const res = specflow(dir, ['roadmap-status', 'feat-a', 'done']);
+  assert.equal(res.status, 2);
+  assert.match(res.stdout, /differs between places/);
+  assert.equal(read(dir, 'proposal-roadmap.md') + read(dir, 'proposal-roadmap-Phase-1.md'), before, 'nothing was written');
+
+  const dir2 = roadmapProject([['feat-a', '待开始']]);
+  const res2 = specflow(dir2, ['roadmap-status', 'feat-a', 'in-progress']);
+  assert.equal(res2.status, 2);
+  assert.match(res2.stdout, /Cannot read the current status/);
+});
+
+test('roadmap-status works on the single-file form (block inside proposal-roadmap.md, no index)', () => {
+  const dir = project();
+  fs.mkdirSync(path.join(dir, 'openspec'), { recursive: true });
+  fs.writeFileSync(path.join(dir, 'openspec/proposal-roadmap.md'), `# roadmap\n\n${PHASE_BLOCK('feat-solo', 'proposed')}\n${PHASE_BLOCK('feat-other', 'proposed')}`);
+  assert.equal(specflow(dir, ['roadmap-status', 'feat-solo', 'in-progress']).status, 0);
+  const text = read(dir, 'proposal-roadmap.md');
+  assert.match(text, /`feat-solo`[\s\S]*?\*\*状态:\*\* in-progress/);
+  assert.match(text.slice(text.indexOf('`feat-other`')), /\*\*状态:\*\* proposed/);
+});
+
+test('archive marks the roadmap entry done and still works without a roadmap', () => {
+  const dir = roadmapProject([['feat-a', 'in-progress']]);
+  const fx = (id) => {
+    const base = path.join(dir, 'openspec/changes', id);
+    fs.mkdirSync(path.join(base, 'specs/cap'), { recursive: true });
+    fs.writeFileSync(path.join(base, 'proposal.md'), '# p\n');
+    fs.writeFileSync(path.join(base, 'tasks.md'), '- [x] done\n');
+    fs.writeFileSync(path.join(base, 'specs/cap/spec.md'), SPEC('Thing'));
+  };
+  fx('feat-a');
+  const res = specflow(dir, ['archive', 'feat-a', '--yes', '--no-validate']);
+  assert.equal(res.status, 0, res.stderr + res.stdout);
+  assert.match(res.stdout, /Roadmap status: in-progress -> done/);
+  assert.match(read(dir, 'proposal-roadmap.md'), /\| done \|/);
+  assert.match(read(dir, 'proposal-roadmap-Phase-1.md'), /\*\*状态:\*\* done/);
+
+  fx('feat-unlisted');
+  const res2 = specflow(dir, ['archive', 'feat-unlisted', '--yes', '--no-validate']);
+  assert.equal(res2.status, 0, res2.stderr + res2.stdout);
+  assert.doesNotMatch(res2.stdout, /Roadmap status/);
+});
+
+test('roadmap-status --check reports statuses that lag behind the change directories', () => {
+  const dir = roadmapProject([['feat-a', 'proposed'], ['feat-b', 'in-progress'], ['feat-c', 'in-progress']]);
+  for (const id of ['feat-a', 'feat-b']) {
+    fs.mkdirSync(path.join(dir, 'openspec/changes', id), { recursive: true });
+  }
+  fs.mkdirSync(path.join(dir, 'openspec/changes/archive/2026-01-01-feat-c'), { recursive: true });
+
+  const res = specflow(dir, ['roadmap-status', '--check', '--json']);
+  assert.equal(res.status, 2);
+  const problems = JSON.parse(res.stdout).problems;
+  assert.deepEqual(problems.map((p) => p.changeId).sort(), ['feat-a', 'feat-c']);
+  assert.match(problems.find((p) => p.changeId === 'feat-a').problem, /roadmap says 'proposed'/);
+  assert.match(problems.find((p) => p.changeId === 'feat-c').problem, /archived but the roadmap says 'in-progress'/);
+
+  assert.equal(specflow(dir, ['roadmap-status', 'feat-a', 'in-progress']).status, 0);
+  assert.equal(specflow(dir, ['roadmap-status', 'feat-c', 'done']).status, 0);
+  assert.equal(specflow(dir, ['roadmap-status', '--check']).status, 0);
+});
