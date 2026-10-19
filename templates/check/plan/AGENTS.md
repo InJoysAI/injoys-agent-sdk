@@ -56,6 +56,7 @@
   - 总览中每个 Phase 都有文件，链接可达，编号与文件名一致
   - 索引 Change ID 集合 = Phase 文件提案块 Change ID 集合（无遗漏、无重复）
   - 索引中的优先级、前置依赖、状态与 Phase 文件逐条一致
+- **状态与变更目录一致**：运行 `node design/context-dev/tools/specflow/specflow.mjs roadmap-status --check`。已有 `openspec/changes/<id>/` 但 Roadmap 仍是 `proposed`、已归档但不是 `done`、或同一提案的多处状态不一致，均标 `[DESYNC]`（P2），修复建议为命令输出里的 `fix` 一栏；不自动修改。
 - 总纲不得残留形态标记标题（`【单文件形态】` / `【总纲+分Phase 形态】`）与模板的“生成规则/使用说明”块，残留标 `[DEVIATION]` P2
 - `规划形态` 与 `判定依据` 的数值（提案总数、Phase 数、单 Phase 最多提案数）与实际一致；形态与 `openspec/plan/AGENTS.md` §2.0 的阈值明显不符时给出提示（不判错：用户可指定）
 
