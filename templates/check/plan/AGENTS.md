@@ -57,6 +57,7 @@
   - 索引 Change ID 集合 = Phase 文件提案块 Change ID 集合（无遗漏、无重复）
   - 索引中的优先级、前置依赖、状态与 Phase 文件逐条一致
 - **状态与变更目录一致**：运行 `node design/context-dev/tools/specflow/specflow.mjs roadmap-status --check`。已有 `openspec/changes/<id>/` 但 Roadmap 仍是 `proposed`、已归档但不是 `done`、或同一提案的多处状态不一致，均标 `[DESYNC]`（P2），修复建议为命令输出里的 `fix` 一栏；不自动修改。
+- **UI 资产已生成但路线图无 UI 提案**：`generated_files.ui` 非空，而路线图（单文件看总纲；分 Phase 看各 Phase 文件）中没有任何提案的「关联 Context 资产」含 `.context/ui/`、Change ID 也不含 `-ui-`，标 `[DESYNC]` P2，修复建议 `.agents/workflows/context-openspec.md plan add ui [Phase-N 文件]`；不自动修改。例外：总纲「规划口径说明」已写明 UI 能力被阶段边界移出（含依据）时不报。
 - 总纲不得残留形态标记标题（`【单文件形态】` / `【总纲+分Phase 形态】`）与模板的“生成规则/使用说明”块，残留标 `[DEVIATION]` P2
 - `规划形态` 与 `判定依据` 的数值（提案总数、Phase 数、单 Phase 最多提案数）与实际一致；形态与 `openspec/plan/AGENTS.md` §2.0 的阈值明显不符时给出提示（不判错：用户可指定）
 
@@ -93,7 +94,7 @@
 | 资产 | 校验规则 |
 |------|---------|
 | `architecture/security_policy.md` | 涉及安全的功能应有相应提案 |
-| `ui/design_system.md` | 涉及 UI 的功能应有相应提案 |
+| `ui/design_system.md` | 涉及 UI 的功能应有相应提案（缺失的兜底检查见 Phase 2 的 `[DESYNC]` 项） |
 | `db/*.md` | 涉及数据库的功能应有相应提案 |
 
 **示例**：

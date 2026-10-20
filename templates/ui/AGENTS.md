@@ -263,4 +263,4 @@
 - ✅ 已生成的文件列表
 - ⏩ 跳过的文件及原因（源文档缺失/未覆盖）
 - 🔁 Manifest 更新状态（含 `pending_generation.ui` 清理、索引与目录树同步）
-- ➡️ 下一步：如需把 UI 工作纳入提案路线图，运行 `.agents/workflows/context-openspec.md plan add ui`（该命令随后续版本提供；不可用时告知用户即可）
+- ➡️ 下一步：如需把 UI 工作纳入提案路线图，运行 `.agents/workflows/context-openspec.md plan add ui`
