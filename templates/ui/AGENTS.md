@@ -244,6 +244,11 @@
 **更新内容**：
 1. 将本次生成的所有文件添加到 `generated_files.ui` 数组（该键不存在时先创建，不要预置空数组）
 2. 确认 `sources.UI_SPEC` 记录正确
+3. 将已生成的条目从 `pending_generation.ui` 移除；数组清空后删除 `ui` 键（`pending_generation` 为空对象时保留空对象即可）
+
+**生成后同步（⛔ 必须执行，因为 §0 Pre-step 的索引刷新发生在本模块生成之前，此时已过期）**：
+1. 执行 `@design/context-dev/tools/integration/AGENTS.md` Phase 2，重新刷新 `.context/openspec/integration.md` 的 `CONTEXT_ASSET_INDEX`（UI 行应反映新生成的文件）
+2. 按 `@design/context-dev/tools/manifest/AGENTS.md` 的目录树规则刷新 `.context/AGENTS.md` 中的 `ui/` 目录树（仅列真实存在的文件）
 
 **⚠️ Phase 2 完成后必须执行 ✅ 完成后 报告**
 
@@ -257,4 +262,5 @@
 汇报内容：
 - ✅ 已生成的文件列表
 - ⏩ 跳过的文件及原因（源文档缺失/未覆盖）
-- 🔁 Manifest 更新状态
+- 🔁 Manifest 更新状态（含 `pending_generation.ui` 清理、索引与目录树同步）
+- ➡️ 下一步：如需把 UI 工作纳入提案路线图，运行 `.agents/workflows/context-openspec.md plan add ui`（该命令随后续版本提供；不可用时告知用户即可）
