@@ -35,7 +35,10 @@
 | `legacy` | `@design/context-dev/legacy/AGENTS.md` | 生成 legacy 分析 |
 | `project` | `@design/context-dev/openspec/project/AGENTS.md` | 生成 config.yaml |
 | `plan` | `@design/context-dev/openspec/plan/AGENTS.md` | 按项目规模生成路线图：简单项目为单个 proposal-roadmap.md；复杂项目为 proposal-roadmap.md（总规划）+ proposal-roadmap-Phase-<N>.md（各阶段提案详情） |
+| `plan add ui [Phase-N 文件]` | `@design/context-dev/openspec/plan/add/AGENTS.md` | 路线图已存在时，把 UI 新增提案补进现有路线图并同步总纲（只增不改，目前只支持 `ui`；`Phase-N` 文件可省略，由 AI 建议落点，用户确认后才写） |
 | `proposal <change-id> [roadmap-doc]` | `@design/context-dev/openspec/proposal/AGENTS.md` | 创建并严格校验提案，基于实际证据动态生成三层评审 Prompt（主 roadmap 条目必需，`roadmap-doc` 仅补充） |
+
+> 路由按**最长匹配**：`plan add ...` 命中 `plan add` 行，不得落到 `plan`（否则会重新生成整份路线图）。`plan` 本身不接受额外参数。
 
 ---
 
