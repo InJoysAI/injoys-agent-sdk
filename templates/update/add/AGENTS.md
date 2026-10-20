@@ -63,7 +63,7 @@
 - `pending_generation.ui`：`[".context/ui/design_system.md"]`（已存在 `ui` 键时不重复添加）。
 - **不要**创建 `generated_files.ui`：此时还没有生成任何 UI 资产，键等 `context-openspec ui` 生成并登记时再创建。
 - 刷新 `.context/AGENTS.md` 的“目录结构”区块：只加入实际存在的 `ui/source/<文档>`，**不得**列出尚未生成的 `design_system.md` 等文件。
-- 把本次事件作为一条扁平 JSON 追加到 `.context/history/context-sync.jsonl`（字段规则见 `@design/context-dev/update/sync/AGENTS.md` “Manifest/历史写入规则”）：`event_type: "context_sync"`、`source: "context-update add ui"`、`workflow: "add"`、`mode: "apply"`、`updated_context_files`（实际归档的路径）；再更新 `last_context_sync`。
+- 把本次事件作为一条扁平 JSON 追加到 `.context/history/context-sync.jsonl`（字段规则见 `@design/context-dev/update/sync/AGENTS.md` “Manifest/历史写入规则”）：`event_type: "context_sync"`、`source: "context-update add ui"`、`workflow: ".agents/workflows/context-update.md add ui <path>"`（完整命令行，与 sync 记录一致）、`authority: "user-provided source"`、`mode: "apply"`、`updated_context_files`（实际归档的路径）；再更新 `last_context_sync`。
 - 不向 `.context/README.md`、`.context/AGENTS.md`、根 `AGENTS.md` 写入带日期的说明或状态（结构性的目录树更新除外）。
 - 执行 `bash design/context-dev/scripts/check-context-manifest.sh`，失败则不得报告完成。
 
