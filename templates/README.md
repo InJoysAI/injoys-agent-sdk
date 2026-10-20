@@ -24,7 +24,7 @@ templates/
 │   └── proposal/          # 创建并校验提案
 ├── start/                 # /context-start 实施流程
 ├── check/                 # /context-check 各子检查
-├── update/                # /context-update（sync roadmap|proposal）
+├── update/                # /context-update（sync roadmap|proposal、add ui）
 ├── tools/                 # 内部模块：docs / manifest / SSoT / ai-config / asset-reader / integration / specflow
 ├── commands/              # 工具无关的唯一 /context-* 命令源
 ├── scripts/
@@ -66,7 +66,7 @@ openspec/changes/<id>/  →  /context-start <id> 实施并归档
 | `commands/context-interview.md` | 设计 | 访谈并完善技术规格或用户指定文档 |
 | `commands/context-start.md` | 实施 | 校验提案、按 SSoT-first 流程实施并归档 |
 | `commands/context-check.md` | 检查 | 子命令: `env` / `manifest` / `commands` / `tasks` / `proposal` / `plan` / `project` / `review` |
-| `commands/context-update.md` | 维护 | `sync roadmap|proposal` 有工作流；`add` / `modify` / `delete` / `fix` 为接口草案 |
+| `commands/context-update.md` | 维护 | `sync roadmap|proposal`、`add ui` 有工作流；`modify` / `delete` / `fix` 为接口草案 |
 
 安装脚本首次只 bootstrap `context-init` 和 `context-check` 到项目级工具目录，并尝试安装 Codex 全局 prompts。初始化流程随后只将完整命令同步到 `.agents/workflows/`。若要为其他工具安装完整命令，运行 `design/context-dev/scripts/install-ai-commands.sh --tools claude,cursor,devin,qoder,grok`；Codex 使用独立的 `install-codex-prompts.sh`。
 
