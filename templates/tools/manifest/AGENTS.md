@@ -166,7 +166,7 @@
 计算方式任选其一：`sha256sum <file>`、`shasum -a 256 <file>`、`bash design/context-dev/scripts/context-gen.sh <file>`（输出中的 `SHA256`）。
 该字段可选（旧版 Manifest 没有），但存在时必须是合法的 SHA-256，`check-context-manifest.sh` 会校验格式。
 
-#### pending_generation 节点（init 之后、尚待 `/context-openspec` 生成的资产）：
+#### pending_generation 节点（init 之后、或 `context-update add ui` 补充文档之后，尚待 `/context-openspec` 生成的资产）：
 
 固定写法，避免每次初始化各写各的：
 

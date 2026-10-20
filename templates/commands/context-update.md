@@ -8,7 +8,8 @@ description: Update Context assets (sync/add/modify/delete/fix) and keep manifes
 >
 > - `archive <change-id>`：✅ 已落地（通过 `design/context-dev/tools/specflow/specflow.mjs`）
 > - `sync roadmap|proposal`：⚠️ 先按“工作流规范”执行；若仓库尚无独立脚本/AGENTS，可按本文档手工完成同步
-> - `add/modify/delete/fix`：⚠️ 目前仍处于初稿/接口设计阶段，可能未在此仓库中完整实现
+> - `add ui <source>`：✅ 已落地（`@design/context-dev/update/add/AGENTS.md`）；`add` 的其他类别尚未落地
+> - `modify/delete/fix`：⚠️ 目前仍处于初稿/接口设计阶段，可能未在此仓库中完整实现
 >
 > ⛔ 在执行任何会写入/删除文件的子命令前，必须先确认仓库中存在对应的可执行实现（AGENTS 或脚本）。
 > 若未找到实现：**STOP**，向用户说明“该子命令尚未落地”，并询问是否现在要你补齐实现或改为手工操作。
@@ -16,7 +17,7 @@ description: Update Context assets (sync/add/modify/delete/fix) and keep manifes
 Supported subcommands:
 - `sync roadmap [phase-or-file] [--mode review|apply]`: sync `proposal-roadmap*.md` into `.context/**`, related `source/` files, and manifest
 - `sync proposal <change-id> [--mode review|apply]`: sync `openspec/changes/<change-id>/` (or `openspec/changes/archive/YYYY-MM-DD-<change-id>/` if archived) into `.context/**`, related `source/` files, and manifest
-- `add <source>`: add a supplementary source doc into `.context/` (and update manifest)
+- `add ui <source>`: init 之后补充一份 UI 设计文档：归档到 `.context/ui/source/`（询问移动还是复制）并登记 Manifest；只归档，不生成总结（总结用 `context-openspec ui`）。其他类别暂不支持
 - `modify <scope>`: regenerate specific Context outputs after source changes
 - `delete <path>`: delete a Context file/dir (mark as deleted in manifest)
 - `fix <path>`: fix metadata/links/format only (no business-content change)
@@ -39,11 +40,21 @@ If the target project still uses separate commands (`.agents/workflows/context-a
 > - 在 `apply` 模式下同步 `.context/**`、`source/` 与 `context-manifest.json`
 
 ## add
-> ⚠️ 若仓库未实现该子命令：STOP（不要“按文档想象实现”直接改文件）。
-1. Require `<source>` (e.g. `@docs/Security.md`). Ask user where it should land (which `.context/**` file to merge into or create).
-2. Calculate SHA256 for the new source file and record it as `sources.<KEY>.content_hash` in `.context/context-manifest.json`.
-3. Update target Context file content + its Metadata `Source`.
-4. Update manifest `generated_files` for the touched outputs.
+
+**Execute**: `@design/context-dev/update/add/AGENTS.md`
+
+```bash
+.agents/workflows/context-update.md add ui <UI 文档路径>
+```
+
+> 目前只支持 `ui`；其他类别 STOP 并说明“尚未落地”。
+>
+> 该模块负责：
+> - 前置检查（项目已 init、源文档存在、`sources.UI_SPEC` 是否已存在）
+> - **询问移动（mv）还是复制（copy）**，规则与 `context-init` 一致
+> - 创建 `.context/ui/source/`、归档、记录 SHA-256
+> - 登记 `sources.UI_SPEC`、`pending_generation.ui`，刷新 `.context/AGENTS.md` 目录树，追加 `context-sync.jsonl`
+> - 结束提示下一步：`.agents/workflows/context-openspec.md ui`
 
 ## modify
 > ⚠️ 若仓库未实现该子命令：STOP（不要“按文档想象实现”直接改文件）。
