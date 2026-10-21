@@ -27,7 +27,7 @@ npx @injoysai/agent-sdk init
 curl -fsSL https://raw.githubusercontent.com/injoysai/injoys-agent-sdk/main/scripts/install.sh | bash
 ```
 
-The installer bootstraps `/context-init` and `/context-check` into the tool-agnostic project directory `.agents/workflows/`, and attempts to install them into Codex's global prompts. After `/context-init`, the full command set is synchronized only to the project's `.agents/workflows/`. Install the full set for other tools with `design/context-dev/scripts/install-ai-commands.sh --tools <tool-list>`; Codex prompts use `design/context-dev/scripts/install-codex-prompts.sh`.
+The installer bootstraps `/context-init` and `/context-check` into the tool-agnostic project directory `.agents/workflows/`. After `/context-init`, the full command set is synchronized only to the project's `.agents/workflows/` (re-sync any time with `design/context-dev/scripts/install-ai-commands.sh`). Other tools' command directories and Codex's global prompts are not managed.
 
 After installation, you'll see:
 - `design/context-dev/` — Context generation framework

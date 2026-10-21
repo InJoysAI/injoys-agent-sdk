@@ -27,7 +27,7 @@ npx @injoysai/agent-sdk init
 curl -fsSL https://raw.githubusercontent.com/injoysai/injoys-agent-sdk/main/scripts/install.sh | bash
 ```
 
-安装脚本会将 `/context-init` 和 `/context-check` bootstrap 到项目级 `.agents/workflows/`（不绑定具体工具），并尝试安装到 Codex 全局 prompts。运行 `/context-init` 后，完整命令集只同步到项目 `.agents/workflows/`。其他工具可通过 `design/context-dev/scripts/install-ai-commands.sh --tools <工具列表>` 安装完整命令；Codex 可运行 `design/context-dev/scripts/install-codex-prompts.sh`。
+安装脚本会将 `/context-init` 和 `/context-check` bootstrap 到项目级 `.agents/workflows/`（不绑定具体工具）。运行 `/context-init` 后，完整命令集只同步到项目 `.agents/workflows/`（可随时用 `design/context-dev/scripts/install-ai-commands.sh` 重新同步）。不管理其他工具的命令目录和 Codex 全局 prompts。
 
 安装完成后，你会看到：
 - `design/context-dev/` — 上下文生成框架

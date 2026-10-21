@@ -9,7 +9,7 @@ This document outlines the development roadmap for InJoys Agent SDK.
 **Template-Based Foundation**
 
 - [x] Context generation framework (.context/ structure)
-- [x] Multi-agent support (Claude Code, Cursor, Devin, Codex, Qoder)
+- [x] Tool-agnostic commands in `.agents/workflows/` (per-tool installers removed)
 - [x] Project Criterion and rule templates
 - [x] SSoT integration templates (Goose migrations, TypeSpec)
 - [x] Shell-based installation script
@@ -35,7 +35,6 @@ This document outlines the development roadmap for InJoys Agent SDK.
 **Interactive CLI Wizard**
 
 - [ ] Interactive `init` with prompts for project type
-- [ ] Auto-detect existing AI tool (Claude/Cursor/Devin/Codex/Qoder)
 - [ ] Context file selection wizard
 - [ ] Hash calculation and manifest generation
 

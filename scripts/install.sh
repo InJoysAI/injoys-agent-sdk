@@ -49,11 +49,9 @@ cp -r "$SCRIPT_DIR/templates/"* "$TARGET_DIR/design/context-dev/"
 # 2. Install AI Workflows (.agents/workflows only)
 # -----------------------------------------------------------------------------
 # Only the project-level `.agents/workflows/` is installed. No other tool directories
-# (.claude/.cursor/.devin/.qoder) and nothing outside the project (e.g. ~/.codex).
-# Command sources live in design/context-dev/commands/ (copied above); install
-# commands for other AI tools on demand:
-#   bash design/context-dev/scripts/install-ai-commands.sh --tools <list>
-#   bash design/context-dev/scripts/install-codex-prompts.sh   # Codex (global)
+# and nothing outside the project. Command sources live in design/context-dev/commands/
+# (copied above); re-sync the full set any time with:
+#   bash design/context-dev/scripts/install-ai-commands.sh
 echo "  - Installing AI workflows to .agents/workflows ..."
 mkdir -p "$TARGET_DIR/.agents/workflows"
 
@@ -83,7 +81,6 @@ fi
 # -----------------------------------------------------------------------------
 chmod +x "$TARGET_DIR/design/context-dev/scripts/context-gen.sh" 2>/dev/null || true
 chmod +x "$TARGET_DIR/design/context-dev/scripts/install-ai-commands.sh" 2>/dev/null || true
-chmod +x "$TARGET_DIR/design/context-dev/scripts/install-codex-prompts.sh" 2>/dev/null || true
 
 echo "✅ Installation complete!"
 echo ""
@@ -91,7 +88,3 @@ echo "Next steps:"
 echo "  1. Review 'design/context-dev/README.md' for context framework usage."
 echo "  2. Run '.agents/workflows/context-init.md' in your AI tool to generate initial context assets."
 echo "     (/context-init also creates a root AGENTS.md (plus a one-line CLAUDE.md that imports it) pointing the AI to .context/, .agents/ and openspec/.)"
-echo ""
-echo "Optional: install commands for other AI tools:"
-echo "  - bash design/context-dev/scripts/install-ai-commands.sh --tools claude,cursor,devin,qoder"
-echo "  - bash design/context-dev/scripts/install-codex-prompts.sh   # Codex (global prompts)"
