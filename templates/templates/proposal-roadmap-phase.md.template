@@ -2,7 +2,6 @@
 
 > **返回总纲**: [proposal-roadmap.md](./proposal-roadmap.md)
 > **文件名**: `proposal-roadmap-Phase-{{PHASE_NO}}.md`（`{{PHASE_NO}}` 与总纲阶段总览中的编号一致，Phase 0 → `Phase-0`）
-> **状态**: {{PHASE_STATUS}}
 > **来源**: {{SOURCE_DOCS}}
 > **预计工作量与周期**: {{PHASE_ESTIMATE_OR_PENDING}}
 
@@ -10,6 +9,7 @@
 > - 本模板用于「总纲+分Phase」形态：一个 Phase 一个文件，承载该阶段的**完整提案详情**；总纲只保留阶段总览、全局依赖图和提案索引。
 > - 下面的「提案详情」块同时是**单文件形态**下总纲各 Phase 详情的提案块结构，两种形态共用，不另写一套。
 > - 本文件中每个提案的 Change ID、优先级、前置依赖、状态必须与总纲「提案索引」一致；有变更时两处同步。
+> - **不要在头部（总纲 Metadata / 本文件头部）写提案状态汇总**（如“N 条 done、M 条 proposed”）：它是提案状态的派生数字，工具不维护、必然过期；状态以「提案索引」和各提案块为准。
 > - **提案状态由 `specflow roadmap-status` 维护**（`proposal` 完成时置 `in-progress`，`archive` 时置 `done`），初始写 `proposed`；不要手改状态，以免两处不一致。
 > - **变更类型 `change_kind`**（决定后续 `tasks.md` 用哪套模板，生成路线图时就要定，并写明一句判定依据）：
 >   - `code`：新增或修改业务代码（含对应测试）。

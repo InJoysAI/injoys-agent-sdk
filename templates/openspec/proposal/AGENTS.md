@@ -367,7 +367,7 @@ node design/context-dev/tools/specflow/specflow.mjs validate <change-id> --stric
 
 ### 4.1 更新 Roadmap 状态（强制，提案内容完成且验证通过后）
 
-> 提案状态由工具维护，**不要手改** Roadmap 里的状态文字，也不要手改索引表。
+> 提案状态由工具维护，**不要手改** Roadmap 里的状态文字，也不要手改索引表，也不要在 Roadmap 头部补写状态汇总。
 
 ```bash
 node design/context-dev/tools/specflow/specflow.mjs roadmap-status <change-id> in-progress

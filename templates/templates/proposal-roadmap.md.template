@@ -8,7 +8,6 @@
 > - **当前阶段**: {{CURRENT_PHASE}}
 > - **生成日期**: {{GENERATED_DATE}}
 > - **基于文档**: {{SOURCE_DOCS}}
-> - **任务状态**:（proposed/in-progress/done）
 
 > **规划口径说明（按需；`criterion.md` / 架构约束中有阶段边界、或有重要规划取舍时才写，否则整块删除）**
 > - **阶段边界**: {{STAGE_BOUNDARY}}（依据：{{STAGE_BOUNDARY_SOURCE}}）
