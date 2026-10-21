@@ -28,6 +28,8 @@ npx @injoysai/agent-sdk init
 
 `init` installs the same layout as Method 2 (`design/context-dev/` plus the `/context-init` and `/context-check` commands in `.agents/workflows/`). Existing files are kept unless you pass `--force`.
 
+**Upgrading**: run `scripts/upgrade.sh` (or `npx @injoysai/agent-sdk init --force`). For an already-initialized project (`.context/context-manifest.json` exists) this also refreshes every command copy in `.agents/workflows/`, so new subcommands reach the copies your AI runs; fresh projects still get only `/context-init` and `/context-check`. Without `--force`, `init` leaves the command copies untouched and prints how to refresh them. Check drift any time with `.agents/workflows/context-check.md commands`.
+
 | Option | Description |
 | --- | --- |
 | `--tools <list>` | Also bootstrap commands for these tools, in addition to `.agents/workflows` (`claude,cursor,devin,qoder,grok,all`; `.agents/workflows` is always installed) |

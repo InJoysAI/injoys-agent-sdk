@@ -156,6 +156,23 @@ function initCommand(args) {
     log.info(`${name}: ${relDir.split(path.sep).join('/')}`);
   }
 
+  // Upgrade: an initialized project (Manifest exists) has the full command set in
+  // .agents/workflows. With --force refresh every command copy, otherwise new
+  // subcommands never reach the copies the AI actually runs.
+  const initialized = fs.existsSync(path.join(target, '.context', 'context-manifest.json'));
+  if (initialized) {
+    const allCommands = fs.readdirSync(commandsDir).filter((n) => n.endsWith('.md'));
+    const stale = allCommands.filter((n) => !BOOTSTRAP_COMMANDS.includes(n));
+    if (options.overwrite) {
+      log.step('Existing project detected: refreshing all commands ...');
+      const res = copyFiles(commandsDir, path.join(target, WORKFLOWS_DIR), stale, options);
+      copied.push(...res.copied);
+      skipped.push(...res.skipped);
+    } else {
+      log.warn(`Existing project detected: only bootstrap commands are managed without --force. Re-run with --force (or bash ${INSTALL_DIR.split(path.sep).join('/')}/scripts/install-ai-commands.sh) to refresh the other commands in ${WORKFLOWS_DIR.split(path.sep).join('/')}.`);
+    }
+  }
+
   const legacy = path.join(target, LEGACY_WORKFLOWS_DIR);
   if (fs.existsSync(legacy)) {
     log.warn(`Legacy directory found: ${LEGACY_WORKFLOWS_DIR.split(path.sep).join('/')} — commands now live in ${WORKFLOWS_DIR.split(path.sep).join('/')}.`);
