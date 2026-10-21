@@ -62,6 +62,17 @@ mkdir -p "$TARGET_DIR/.agents/workflows"
 cp "$SCRIPT_DIR/templates/commands/context-init.md" "$TARGET_DIR/.agents/workflows/" 2>/dev/null || true
 cp "$SCRIPT_DIR/templates/commands/context-check.md" "$TARGET_DIR/.agents/workflows/" 2>/dev/null || true
 
+# Upgrade path: an already-initialized project (Manifest exists) has the full command
+# set synced into .agents/workflows by /context-init. Refresh every command copy from
+# the templates, otherwise new subcommands (e.g. `plan add ui`) never reach the copies
+# the AI actually runs. Fresh projects keep the minimal bootstrap above.
+if [[ -f "$TARGET_DIR/.context/context-manifest.json" ]]; then
+  echo "  - Existing project detected: refreshing all commands in .agents/workflows ..."
+  for f in "$SCRIPT_DIR/templates/commands/"*.md; do
+    cp "$f" "$TARGET_DIR/.agents/workflows/"
+  done
+fi
+
 if [[ -d "$TARGET_DIR/.agent/workflows" ]]; then
   echo "  ⚠️  Legacy .agent/workflows/ found. Commands now live in .agents/workflows/."
   echo "      Move or remove the old directory yourself to avoid two copies (nothing was deleted)."

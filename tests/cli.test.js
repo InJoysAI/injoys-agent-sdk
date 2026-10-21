@@ -153,3 +153,44 @@ test('init warns about a legacy .agent/workflows directory and does not delete i
   assert.equal(fs.readFileSync(path.join(legacy, 'context-init.md'), 'utf8'), 'old');
   assert.ok(fs.existsSync(path.join(dir, '.agents/workflows/context-init.md')));
 });
+
+function initializedProject() {
+  const dir = tmp();
+  fs.mkdirSync(path.join(dir, '.context'), { recursive: true });
+  fs.writeFileSync(path.join(dir, '.context/context-manifest.json'), '{}');
+  const wf = path.join(dir, '.agents/workflows');
+  fs.mkdirSync(wf, { recursive: true });
+  fs.writeFileSync(path.join(wf, 'context-openspec.md'), 'stale');
+  return { dir, wf };
+}
+
+test('init --force on an initialized project refreshes every command copy', () => {
+  const { dir, wf } = initializedProject();
+  const res = run(['init', dir, '--force']);
+  assert.equal(res.status, 0, res.stderr);
+  const fresh = fs.readFileSync(path.join(ROOT, 'templates/commands/context-openspec.md'), 'utf8');
+  assert.equal(fs.readFileSync(path.join(wf, 'context-openspec.md'), 'utf8'), fresh);
+  assert.ok(fs.existsSync(path.join(wf, 'context-update.md')), 'commands added in a new version are installed too');
+});
+
+test('init without --force on an initialized project keeps command copies and says how to refresh', () => {
+  const { dir, wf } = initializedProject();
+  const res = run(['init', dir]);
+  assert.equal(res.status, 0, res.stderr);
+  assert.equal(fs.readFileSync(path.join(wf, 'context-openspec.md'), 'utf8'), 'stale');
+  assert.match(res.stdout + res.stderr, /Existing project detected/);
+});
+
+test('scripts/install.sh (used by upgrade.sh) refreshes all commands on an initialized project only', () => {
+  const { dir, wf } = initializedProject();
+  const sh = path.join(ROOT, 'scripts/install.sh');
+  const r1 = require('node:child_process').spawnSync('bash', [sh, dir], { encoding: 'utf8' });
+  assert.equal(r1.status, 0, r1.stderr);
+  const fresh = fs.readFileSync(path.join(ROOT, 'templates/commands/context-openspec.md'), 'utf8');
+  assert.equal(fs.readFileSync(path.join(wf, 'context-openspec.md'), 'utf8'), fresh);
+
+  const fresh2 = tmp();
+  const r2 = require('node:child_process').spawnSync('bash', [sh, fresh2], { encoding: 'utf8' });
+  assert.equal(r2.status, 0, r2.stderr);
+  assert.ok(!fs.existsSync(path.join(fresh2, '.agents/workflows/context-openspec.md')), 'fresh projects keep the bootstrap only');
+});

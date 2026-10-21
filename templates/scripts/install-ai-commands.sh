@@ -68,8 +68,8 @@ copy_dir() {
 # Tool-agnostic project workflows: always installed.
 copy_dir "$COMMANDS_DIR" "$ROOT_DIR/.agents/workflows"
 
-if [[ -d "$ROOT_DIR/.agents/workflows" ]]; then
-  echo "⚠️  Legacy .agents/workflows/ exists. Commands now live in .agents/workflows/."
+if [[ -d "$ROOT_DIR/.agent/workflows" ]]; then
+  echo "⚠️  Legacy .agent/workflows/ exists. Commands now live in .agents/workflows/."
   echo "    Move or remove the old directory yourself to avoid two copies (nothing was deleted)."
 fi
 
