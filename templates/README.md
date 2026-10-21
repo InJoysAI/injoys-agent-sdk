@@ -29,8 +29,7 @@ templates/
 ├── commands/              # 工具无关的唯一 /context-* 命令源
 ├── scripts/
 │   ├── context-gen.sh             # Hash/引导脚本
-│   ├── install-ai-commands.sh     # 安装 /context-* 命令到 .agents/workflows（可选附加其他工具目录）
-│   ├── install-codex-prompts.sh   # 可选手动安装 Codex prompts
+│   ├── install-ai-commands.sh     # 同步 /context-* 命令到 .agents/workflows（仅此目录）
 │   └── check-context-manifest.sh  # Manifest 校验（需要 jq）
 └── templates/             # 各类文档/入口文件模板（PRD、TAD、roadmap、AI 工具入口等）
     └── README.md          # 占位符说明
@@ -68,7 +67,7 @@ openspec/changes/<id>/  →  /context-start <id> 实施并归档
 | `commands/context-check.md` | 检查 | 子命令: `env` / `manifest` / `commands` / `tasks` / `proposal` / `plan` / `project` / `review` |
 | `commands/context-update.md` | 维护 | `sync roadmap|proposal`、`add ui` 有工作流；`modify` / `delete` / `fix` 为接口草案 |
 
-安装脚本首次只 bootstrap `context-init` 和 `context-check` 到项目级工具目录，并尝试安装 Codex 全局 prompts。初始化流程随后只将完整命令同步到 `.agents/workflows/`。若要为其他工具安装完整命令，运行 `design/context-dev/scripts/install-ai-commands.sh --tools claude,cursor,devin,qoder,grok`；Codex 使用独立的 `install-codex-prompts.sh`。
+安装脚本首次只 bootstrap `context-init` 和 `context-check` 到项目级工具目录。初始化流程随后只将完整命令同步到 `.agents/workflows/`，可随时运行 `design/context-dev/scripts/install-ai-commands.sh` 重新同步。不管理其他工具的命令目录和 Codex 全局 prompts。
 
 ---
 

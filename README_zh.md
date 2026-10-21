@@ -15,7 +15,7 @@
 ## 功能特性
 
 -   **6 个命令文件**：`/context-init`、`/context-openspec`（含 proposal 子命令）、`/context-interview`、`/context-start`、`/context-check`、`/context-update`。
--   **共享命令源**：命令统一安装在项目级 `.agents/workflows/`（不绑定具体工具）；也可按需额外安装到 Claude Code、Cursor、Devin、Qoder 和 Grok；Codex prompts 通过独立脚本安装。
+-   **共享命令源**：命令只安装在项目级 `.agents/workflows/`（不绑定具体工具）。不再管理各工具专属命令目录和全局 prompts 目录（Claude Code、Cursor、Devin、Qoder、Grok、Codex）；工具需要时请自行复制命令。
 -   **SSoT 集成**：提供 Schema (Goose SQL 迁移) 和 API (TypeSpec) 的单一数据源（SSoT）集成模板。
 
 ## 安装指南
@@ -30,7 +30,6 @@ npx @injoysai/agent-sdk init
 
 | 选项 | 说明 |
 | --- | --- |
-| `--tools <list>` | 在 `.agents/workflows` 之外，额外为指定工具 bootstrap 命令（`claude,cursor,devin,qoder,grok,all`；`.agents/workflows` 始终安装） |
 | `--force` | 覆盖已存在的文件 |
 | `--dry-run` | 只显示将要写入的内容，不做任何修改 |
 

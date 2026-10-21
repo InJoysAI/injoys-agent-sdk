@@ -8,7 +8,7 @@ const { spawnSync } = require('node:child_process');
 const ROOT = path.join(__dirname, '..');
 const CLI = path.join(ROOT, 'bin', 'cli.js');
 const pkg = require('../package.json');
-const { copyDir, AI_TOOL_DIRS, WORKFLOWS_DIR } = require('../src');
+const { copyDir, WORKFLOWS_DIR } = require('../src');
 
 function run(args, cwd = ROOT) {
   return spawnSync(process.execPath, [CLI, ...args], { cwd, encoding: 'utf8' });
@@ -40,14 +40,13 @@ test('init installs templates to design/context-dev and bootstrap commands', () 
 
   const rel = WORKFLOWS_DIR;
   assert.equal(rel, path.join('.agents', 'workflows'));
-  assert.ok(!('antigravity' in AI_TOOL_DIRS), 'antigravity is no longer a supported tool');
   assert.ok(fs.existsSync(path.join(dir, rel, 'context-init.md')), `${rel}/context-init.md`);
   assert.ok(fs.existsSync(path.join(dir, rel, 'context-check.md')), `${rel}/context-check.md`);
   assert.ok(!fs.existsSync(path.join(dir, rel, 'context-start.md')), 'only bootstrap commands are installed');
 
-  // Other AI tools are opt-in: nothing is written outside .agents/workflows by default.
-  for (const [tool, other] of Object.entries(AI_TOOL_DIRS)) {
-    assert.ok(!fs.existsSync(path.join(dir, other)), `${other} must not be created by default`);
+  // Nothing is written outside .agents/workflows by default.
+  for (const other of ['.claude', '.cursor', '.devin', '.qoder', '.grok']) {
+    assert.ok(!fs.existsSync(path.join(dir, other)), `${other} must not be created`);
   }
 });
 
@@ -71,27 +70,12 @@ test('init --dry-run writes nothing', () => {
   assert.deepEqual(fs.readdirSync(dir), []);
 });
 
-test('init --tools adds extra AI tool directories on top of .agents/workflows', () => {
+test('init rejects the removed --tools option and a missing target', () => {
   const dir = tmp();
-  assert.equal(run(['init', dir, '--tools', 'claude']).status, 0);
-  assert.ok(fs.existsSync(path.join(dir, '.agents/workflows/context-init.md')));
-  assert.ok(fs.existsSync(path.join(dir, '.claude/commands/context-init.md')));
-  assert.ok(!fs.existsSync(path.join(dir, '.cursor')));
-});
-
-test('init --tools all installs every supported tool directory', () => {
-  const dir = tmp();
-  assert.equal(run(['init', dir, '--tools', 'all']).status, 0);
-  for (const rel of Object.values(AI_TOOL_DIRS)) {
-    assert.ok(fs.existsSync(path.join(dir, rel, 'context-init.md')), `${rel}/context-init.md`);
-  }
-});
-
-test('init rejects unknown tools and missing target', () => {
-  const dir = tmp();
-  const bad = run(['init', dir, '--tools', 'nope']);
+  const bad = run(['init', dir, '--tools', 'claude']);
   assert.equal(bad.status, 1);
-  assert.match(bad.stderr, /Unknown tool/);
+  assert.match(bad.stderr, /--tools was removed/);
+  assert.deepEqual(fs.readdirSync(dir), [], 'nothing is written when the option is rejected');
 
   const missing = run(['init', path.join(dir, 'does-not-exist')]);
   assert.equal(missing.status, 1);
@@ -193,4 +177,21 @@ test('scripts/install.sh (used by upgrade.sh) refreshes all commands on an initi
   const r2 = require('node:child_process').spawnSync('bash', [sh, fresh2], { encoding: 'utf8' });
   assert.equal(r2.status, 0, r2.stderr);
   assert.ok(!fs.existsSync(path.join(fresh2, '.agents/workflows/context-openspec.md')), 'fresh projects keep the bootstrap only');
+});
+
+test('install-ai-commands.sh syncs only .agents/workflows and rejects --tools', () => {
+  const dir = tmp();
+  assert.equal(run(['init', dir]).status, 0);
+  const script = path.join(dir, 'design/context-dev/scripts/install-ai-commands.sh');
+  const { spawnSync } = require('node:child_process');
+  const ok = spawnSync('bash', [script], { encoding: 'utf8' });
+  assert.equal(ok.status, 0, ok.stderr);
+  assert.ok(fs.existsSync(path.join(dir, '.agents/workflows/context-openspec.md')));
+  assert.ok(!fs.existsSync(path.join(dir, '.claude')));
+  const bad = spawnSync('bash', [script, '--tools', 'claude'], { encoding: 'utf8' });
+  assert.notEqual(bad.status, 0);
+  assert.ok(!fs.existsSync(path.join(dir, 'design/context-dev/scripts/install-codex-prompts.sh')));
+
+  const chk = spawnSync('bash', [path.join(dir, 'design/context-dev/scripts/check-ai-commands.sh'), dir], { encoding: 'utf8' });
+  assert.equal(chk.status, 0, chk.stderr + chk.stdout);
 });

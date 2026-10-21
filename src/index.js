@@ -17,14 +17,6 @@ const WORKFLOWS_DIR = path.join('.agents', 'workflows');
 /** Legacy workflow directory (before the rename to `.agents/workflows`). */
 const LEGACY_WORKFLOWS_DIR = path.join('.agent', 'workflows');
 
-/** Optional extra command directories of specific AI tools (relative to the project root). */
-const AI_TOOL_DIRS = {
-    claude: path.join('.claude', 'commands'),
-    cursor: path.join('.cursor', 'commands'),
-    devin: path.join('.devin', 'workflows'),
-    qoder: path.join('.qoder', 'commands')
-};
-
 /** Commands bootstrapped on install; the rest are installed after /context-init. */
 const BOOTSTRAP_COMMANDS = ['context-init.md', 'context-check.md'];
 
@@ -129,7 +121,6 @@ module.exports = {
     INSTALL_DIR,
     WORKFLOWS_DIR,
     LEGACY_WORKFLOWS_DIR,
-    AI_TOOL_DIRS,
     BOOTSTRAP_COMMANDS,
     calculateHash,
     copyDir,

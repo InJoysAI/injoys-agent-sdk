@@ -5,7 +5,6 @@ const fs = require('fs');
 const { spawnSync } = require('child_process');
 const {
   INSTALL_DIR,
-  AI_TOOL_DIRS,
   WORKFLOWS_DIR,
   LEGACY_WORKFLOWS_DIR,
   BOOTSTRAP_COMMANDS,
@@ -52,9 +51,6 @@ Commands:
   version           Show version
 
 Options for init:
-  --tools <list>    Also bootstrap commands for these AI tools, in addition to
-                    .agents/workflows (${Object.keys(AI_TOOL_DIRS).join(', ')}, all).
-                    Default: .agents/workflows only (always installed)
   --force           Overwrite files that already exist
   --dry-run         Show what would be written without changing anything
 
@@ -64,7 +60,7 @@ Global options:
 
 Examples:
   npx @injoysai/agent-sdk init
-  npx @injoysai/agent-sdk init ./my-project --tools claude
+  npx @injoysai/agent-sdk init ./my-project
   npx @injoysai/agent-sdk init --dry-run
   npx @injoysai/agent-sdk check-env
 `);
@@ -97,28 +93,16 @@ function parseArgs(argv, valueFlags = []) {
   return { positional, flags };
 }
 
-// `.agents/workflows` is always installed (tool-agnostic): it is where /context-init
-// syncs the full command set. Other tools' command directories are opt-in via --tools.
-const DEFAULT_TOOLS = [];
-
-function resolveTools(value) {
-  const all = Object.keys(AI_TOOL_DIRS);
-  if (!value) return DEFAULT_TOOLS;
-  if (value === 'all') return all;
-
-  const tools = value.split(',').map((t) => t.trim()).filter(Boolean);
-  const unknown = tools.filter((t) => !all.includes(t));
-  if (unknown.length > 0) {
-    throw new Error(`Unknown tool(s): ${unknown.join(', ')}. Supported: ${all.join(', ')}`);
-  }
-  return [...new Set([...DEFAULT_TOOLS, ...tools])];
-}
+// Commands are installed to the tool-agnostic `.agents/workflows` only. Per-tool
+// command directories and global prompt directories are not managed (`--tools` was removed).
 
 // Init command
 function initCommand(args) {
   const { positional, flags } = parseArgs(args, ['tools']);
   const target = path.resolve(positional[0] || '.');
-  const tools = resolveTools(flags.tools);
+  if (flags.tools !== undefined) {
+    throw new Error('--tools was removed: commands are installed to .agents/workflows only. Copy them to other tools yourself if needed.');
+  }
   const options = { overwrite: Boolean(flags.force), dryRun: Boolean(flags['dry-run']) };
   const rel = (p) => path.relative(target, p) || '.';
 
@@ -147,7 +131,7 @@ function initCommand(args) {
 
   // 2. Bootstrap commands for each selected AI tool
   log.step('Installing bootstrap commands (/context-init, /context-check) ...');
-  const targets = [['workflows', WORKFLOWS_DIR], ...tools.map((t) => [t, AI_TOOL_DIRS[t]])];
+  const targets = [['workflows', WORKFLOWS_DIR]];
   for (const [name, relDir] of targets) {
     const dest = path.join(target, relDir);
     const res = copyFiles(commandsDir, dest, BOOTSTRAP_COMMANDS, options);
@@ -211,8 +195,6 @@ function initCommand(args) {
   console.log('Next steps:');
   console.log('  1. Run /context-init in your AI tool to generate context from your docs');
   console.log(`  2. Read ${INSTALL_DIR.split(path.sep).join('/')}/README.md for the context framework usage`);
-  console.log(`  3. (Optional) Install commands for other AI tools: bash ${INSTALL_DIR.split(path.sep).join('/')}/scripts/install-ai-commands.sh --tools <list>`);
-  console.log(`  4. (Optional, Codex) Install prompts: bash ${INSTALL_DIR.split(path.sep).join('/')}/scripts/install-codex-prompts.sh`);
 }
 
 function runProvider(cmd, args, cwd) {

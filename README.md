@@ -15,7 +15,7 @@ It unifies two core capabilities:
 ## Features
 
 - **Six command files**: `/context-init`, `/context-openspec` (including the proposal subcommand), `/context-interview`, `/context-start`, `/context-check`, and `/context-update`.
-- **Shared command source**: Commands are installed to the tool-agnostic project directory `.agents/workflows/`; optionally also for Claude Code, Cursor, Devin, Qoder, and Grok. Codex prompts use a separate installer.
+- **Shared command source**: Commands are installed to the tool-agnostic project directory `.agents/workflows/` only. Tool-specific command directories and global prompt directories (Claude Code, Cursor, Devin, Qoder, Grok, Codex) are not managed; copy the commands there yourself if your tool needs them.
 - **SSoT Integration**: Templates for integrating Single Source of Truth (SSoT) definitions for Schema (Goose SQL migrations) and API (TypeSpec).
 
 ## Installation
@@ -32,7 +32,6 @@ npx @injoysai/agent-sdk init
 
 | Option | Description |
 | --- | --- |
-| `--tools <list>` | Also bootstrap commands for these tools, in addition to `.agents/workflows` (`claude,cursor,devin,qoder,grok,all`; `.agents/workflows` is always installed) |
 | `--force` | Overwrite files that already exist |
 | `--dry-run` | Show what would be written without changing anything |
 
@@ -46,7 +45,7 @@ Run the following command in your project root to install InJoys Agent SDK tools
 curl -fsSL https://raw.githubusercontent.com/injoysai/injoys-agent-sdk/main/scripts/install.sh | bash
 ```
 
-The installer bootstraps `/context-init` and `/context-check` into the project's `.agents/workflows/` only; it creates no other tool directories and writes nothing outside the project. After `/context-init`, the full command set is synchronized to `.agents/workflows/`, and a root `AGENTS.md` (with a summary of the key MUST NOT rules) plus a one-line `CLAUDE.md` that imports it are generated to point the AI at `.context/`, `.agents/` and `openspec/`. For other tools, run `design/context-dev/scripts/install-ai-commands.sh --tools <tool-list>`; for Codex, run `design/context-dev/scripts/install-codex-prompts.sh`.
+The installer bootstraps `/context-init` and `/context-check` into the project's `.agents/workflows/` only; it creates no other tool directories and writes nothing outside the project. After `/context-init`, the full command set is synchronized to `.agents/workflows/`, and a root `AGENTS.md` (with a summary of the key MUST NOT rules) plus a one-line `CLAUDE.md` that imports it are generated to point the AI at `.context/`, `.agents/` and `openspec/`. Re-sync the command copies any time with `design/context-dev/scripts/install-ai-commands.sh`. The `--tools` option and the Codex prompt installer were removed.
 
 ### Method 3: Manual Installation (For Development)
 

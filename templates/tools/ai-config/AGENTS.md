@@ -16,7 +16,7 @@
 3. 核对 `.agents/workflows/` 中的 `context-*.md` 与命令源对应；若脚本失败，报告错误，不把本步骤标为完成。
 4. 执行 `@design/context-dev/tools/manifest/AGENTS.md`（mode: update），记录本次命令安装结果。
 
-`context-init` **不询问 AI 工具类型**，也不向 `.cursor/commands/`、`.claude/commands/`、`.devin/workflows/`、`.qoder/commands/`、`.grok/commands/` 或全局 Codex prompts 安装命令。其他工具的手动安装脚本保留，但不属于初始化流程。
+`context-init` **不询问 AI 工具类型**，也不向 `.cursor/commands/`、`.claude/commands/`、`.devin/workflows/`、`.qoder/commands/`、`.grok/commands/` 或全局 Codex prompts 安装命令。各工具专属的安装脚本和 `--tools` 选项已移除，命令只安装到 `.agents/workflows/`。
 
 ## 完成后报告
 
