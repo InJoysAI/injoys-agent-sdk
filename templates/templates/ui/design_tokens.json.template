@@ -1,50 +1,47 @@
 {
-  "$schema": "https://design-tokens.github.io/community-group/format/",
-  "_meta": {
-    "source": "{{UI 规范文档路径}}",
-    "description": "三层 Design Token 架构模板 (Global → Alias → Component)"
+  "$description": "{{三层 Design Token：Global → Alias → Component；数值只能来自 UI 规范，没有依据的 Token 整个删除，不要写占位值}}",
+  "$extensions": {
+    "context.meta": {
+      "source": "{{UI 规范文档路径}}",
+      "platforms": "{{目标平台}}",
+      "basis": "{{Spec / Derived from PRD}}",
+      "generatedAt": "{{生成时间 YYYY-MM-DD HH:mm}}",
+      "generator": "Context-Agent v1.0"
+    }
   },
   "global": {
-    "_comment": "第一层：全局/基础 Tokens - 原始值，无语义",
+    "$description": "第一层：原始值，无语义。命名与分组按规范，下面只演示结构",
     "color": {
-      "blue": {
-        "500": { "value": "#{{2196F3}}", "type": "color" }
-      },
-      "gray": {
-        "50": { "value": "#{{FAFAFA}}", "type": "color" },
-        "900": { "value": "#{{212121}}", "type": "color" }
+      "{{色板名}}": {
+        "{{档位}}": { "$value": "{{色值，如 #RRGGBB}}", "$type": "color" }
       }
     },
     "spacing": {
-      "8": { "value": "8px", "type": "spacing" },
-      "16": { "value": "16px", "type": "spacing" }
+      "{{档位}}": { "$value": "{{数值 + 单位}}", "$type": "dimension" }
     },
-    "borderRadius": {
-      "sm": { "value": "4px", "type": "borderRadius" },
-      "md": { "value": "8px", "type": "borderRadius" }
+    "radius": {
+      "{{档位}}": { "$value": "{{数值 + 单位}}", "$type": "dimension" }
     }
   },
   "alias": {
-    "_comment": "第二层：语义 Tokens - 可映射 Light/Dark",
+    "$description": "第二层：语义 Token，引用 global。有多主题时在 $extensions.mode 里写各主题的引用；没有则删除 mode",
     "color": {
-      "primary": {
-        "default": { "value": "{global.color.blue.500}", "type": "color" }
-      },
-      "text": {
-        "primary": { "value": "{global.color.gray.900}", "type": "color" }
-      },
-      "surface": {
-        "default": { "value": "{global.color.gray.50}", "type": "color" }
+      "{{语义名，如 primary / text / surface}}": {
+        "$value": "{global.color.{{色板名}}.{{档位}}}",
+        "$type": "color",
+        "$extensions": {
+          "mode": {
+            "light": "{global.color.{{色板名}}.{{档位}}}",
+            "dark": "{global.color.{{色板名}}.{{档位}}}"
+          }
+        }
       }
     }
   },
   "component": {
-    "_comment": "第三层：组件覆写（按需添加）",
-    "button": {
-      "primary": {
-        "background": { "value": "{alias.color.primary.default}", "type": "color" }
-      }
+    "$description": "第三层：组件级覆写，按需添加；没有依据就整层保持空对象",
+    "{{组件名}}": {
+      "{{属性}}": { "$value": "{alias.color.{{语义名}}}", "$type": "color" }
     }
   }
 }
-

@@ -64,18 +64,28 @@
 
 ## 📋 UI 规范解析规则
 
-优先读取目标项目内的 `docs/UX_UI_Design_Guidelines.md`（若存在），否则按以下内置要点提取：
+从 `.context/ui/source/` 的源文档提取以下要点（项目内是否存在其他 UI 文档，不作为优先输入）：
 - 视觉基础：颜色、字体、间距、圆角、阴影
 - 布局：栅格/断点/密度
 - 组件：按钮、输入框、表单、卡片、导航、表格等
 - 交互：hover/pressed/disabled/loading/error/empty 等状态
-- 动效：duration/easing/motion-reduced
-- 无障碍：对比度、可聚焦、键盘导航、触控目标
-- 交付：Figma/切图/标注/组件绑定 tokens
+- 动效：duration/easing/减弱动效
+- 无障碍：目标标准、对比度、可聚焦、键盘导航、触控目标
+- 交付：设计稿/切图/标注/组件绑定 tokens
 
 > **仅有 PRD 时的处理**:
-> - 允许生成 `design_system.md` 的“最小可实施版本”（明确标注为 *Derived from PRD*，包含假设与待确认项）
-> - 其余文件按“缺失则跳过”策略，不要编造具体视觉 token
+> - 允许生成 `design_system.md` 的“最小可实施版本”（Metadata 的 Basis 写 `Derived from PRD`，并写出假设与待确认项）
+> - 其余文件按“缺失则跳过”策略；具体视觉数值一律 `N/A – 源文档未提供`，不要编造
+
+### 内容归属（避免重复）
+
+| 内容 | 唯一归属 | 其他文件 |
+|------|---------|---------|
+| Token 数值（颜色/字体/间距/圆角/阴影） | 生成了 `design_tokens.json` 时归它；否则归 `design_system.md` | 只写 Token 名称与用途，不写数值 |
+| 断点、栅格、响应规则 | `layout_grid.md` | 引用 |
+| 组件状态 | `interaction_states.md` | 引用 |
+| 动效时长/缓动 | `motion_tokens.md` | 引用 |
+| 组件分层与组成 | `atomic_components.md` | 引用 |
 
 ---
 
@@ -87,7 +97,11 @@
 
 **读取**：`.context/ui/source/` 目录下的所有文件
 
-### 0.2 关键词分析
+### 0.2 确认目标平台
+
+从源文档读取目标平台（Web / iOS / Android / 桌面 / 小程序等，可多个），记录到每个输出文件的 Metadata `Platforms`。源文档没有声明时，写 `N/A – 源文档未提供`，输出保持平台中立，**不要从其他文档或代码猜测**，也不要预设 HTML/CSS 或某个设计工具。
+
+### 0.3 关键词分析
 
 **依次检查以下关键词，记录是否存在**：
 
@@ -102,12 +116,15 @@
 | 交付规范 | Handoff, 切图, 标注, Figma | `handoff_checklist.md` | 可选 |
 | 多端适配 | iOS, Android, 多端, Platform | `platform_guidelines.md` | 可选 |
 
-### 0.3 输出生成计划
+### 0.4 输出生成计划
 
 **必须输出**：
 
 ```
 === 生成计划 ===
+目标平台（来自源文档）：{{平台列表 或 N/A}}
+依据：{{Spec / Derived from PRD}}
+
 必须生成：
 - design_system.md（核心设计系统 — 内部引用）
 
@@ -145,6 +162,12 @@
 
 ## Phase 1: 填充模板
 
+> **所有 Prompt 共用规则**：
+> - 只记录源文档已写出的内容；具体数值（色值、字号、间距、断点、时长、对比度等）必须来自源文档，否则 `N/A – 源文档未提供`
+> - 严格遵守模板内的「使用说明」：分层缺失规则、内容归属、平台中立；生成后删除「使用说明」与「示例」块
+> - 只为 Phase 0 确认的平台写实现形式；不预设 HTML/CSS 或设计工具
+> - **务必**保留 Metadata（JSON 在 `$extensions.context.meta`）
+
 ### 1. 填充 `design_system.md` (必须)
 
 **Prompt**:
@@ -153,13 +176,13 @@
 你是一位 Design System 设计师。
 
 # Task
-阅读 UI 设计规范，提取设计系统的“可实现约束”。
+阅读 UI 规范，提取设计系统的“可实现约束”，平台：{{Phase 0 确认的平台}}。
 
 # Requirements
-- 提取 Token（颜色、字体、间距、圆角）并给出 CSS 变量示例
-- 提取关键组件的样式约束（Button/Input 等）
-- 仅在源文档明确给出时才写具体色值/字号；否则写为待确认项（TODO）
-- **务必**添加 Metadata 区块到文件顶部
+- 颜色（含语义色、有主题时的浅/深色）、字体、间距、圆角与阴影
+- 关键组件的样式约束，引用 Token 名称
+- 生成了 design_tokens.json 时，本文件的值列写“见 design_tokens.json”
+- 仅有 PRD 时：Basis 写 Derived from PRD，数值 N/A，并列出假设与待确认项
 
 # Output Format
 使用 `design_system.md` 模板格式输出。
@@ -170,13 +193,12 @@
 **Prompt**:
 ```markdown
 # Task
-基于 UI 规范整理原子化设计组件分层清单。
+基于 UI 规范整理组件分层清单。
 
 # Requirements
-- 原子/分子/有机体/模板/页面五层
-- 对每个分子/有机体指出组成原子
-- 提供可实现的 HTML 结构示例
-- **务必**添加 Metadata 区块到文件顶部
+- 原子/分子/有机体/模板/页面（源文档用别的分层体系时按它的叫法）
+- 分子/有机体写明组成；不写颜色、字号等数值，只引用 Token
+- 没有依据的层保留标题 + 一行 N/A
 
 # Output Format
 使用 `atomic_components.md` 模板格式输出。
@@ -190,10 +212,9 @@
 提取响应式布局与栅格规范。
 
 # Requirements
-- 定义断点（Mobile/Tablet/Desktop）
-- 定义栅格配置（列数/Margin/Gutter）
-- 提供 CSS 变量或设计 Token 映射
-- **务必**添加 Metadata 区块到文件顶部
+- 断点、栅格（列数/Margin/Gutter）、响应规则
+- 非 Web 平台写窗口与最小尺寸
+- 间距引用 Token 名，不重复数值
 
 # Output Format
 使用 `layout_grid.md` 模板格式输出。
@@ -204,14 +225,13 @@
 **Prompt**:
 ```markdown
 # Task
-将 UI 规范转换为三层 Token 结构 JSON（Global → Alias → Component）。
+将 UI 规范转换为三层 Token JSON（Global → Alias → Component），采用 Design Tokens 标准写法（`$value` / `$type`）。
 
 # Requirements
-- Global: 原始值（无语义）
-- Alias: 语义映射（可含 Light/Dark）
-- Component: 组件级覆写
-- 仅在源文档明确给出时才写具体值；否则保留占位符或 TODO
-- **务必**在文件顶部或 _meta 中保留来源信息
+- Global：原始值；Alias：语义映射，有多主题时用 `$extensions.mode`；Component：组件覆写，没有依据保持空对象
+- 没有依据的 Token **整个删除**，不要写占位值；不得保留模板里的占位结构
+- 输出必须是合法 JSON（无注释、无多余逗号）
+- 保留 `$extensions.context.meta`
 
 # Output Format
 使用 `design_tokens.json` 模板格式输出。
@@ -222,16 +242,86 @@
 **Prompt**:
 ```markdown
 # Task
-定义交互组件的状态规范（hover/pressed/disabled/loading/error/empty 等）。
+定义交互组件的状态规范。
 
 # Requirements
-- 状态矩阵（组件 × 状态）
-- 每个状态给出视觉描述与实现建议（CSS/类名/组件 props）
-- **务必**添加 Metadata 区块到文件顶部
+- 状态矩阵只写源文档涉及的组件与状态，不预填；触屏平台没有的状态（如 Hover）不写
+- 每个状态给出视觉变化，颜色与间距引用 Token
 
 # Output Format
 使用 `interaction_states.md` 模板格式输出。
 ```
+
+### 6. 填充 `motion_tokens.md` (可选)
+
+**Prompt**:
+```markdown
+# Task
+提取动效规范。
+
+# Requirements
+- 时长、缓动、使用规则、减弱动效处理（按平台写，没有要求写 N/A）
+- 数值必须来自源文档
+
+# Output Format
+使用 `motion_tokens.md` 模板格式输出。
+```
+
+### 7. 填充 `accessibility_checklist.md` (可选)
+
+**Prompt**:
+```markdown
+# Task
+提取无障碍要求。
+
+# Requirements
+- 目标标准以源文档为准；源文档没写，不默认 AA
+- 检查项只保留适用于所声明平台、且有依据的；阈值来自源文档
+- 写明验证方式
+
+# Output Format
+使用 `accessibility_checklist.md` 模板格式输出。
+```
+
+### 8. 填充 `handoff_checklist.md` (可选)
+
+**Prompt**:
+```markdown
+# Task
+提取设计交付要求。
+
+# Requirements
+- 交付方式、资产规格以源文档为准，不预设设计工具
+- 清单项可检查，并与 Token/状态/栅格文件对应，不重复其内容
+
+# Output Format
+使用 `handoff_checklist.md` 模板格式输出。
+```
+
+### 9. 填充 `platform_guidelines.md` (可选)
+
+**Prompt**:
+```markdown
+# Task
+提取多端平台差异。
+
+# Requirements
+- 只为声明的平台建列，平台名按项目实际；单平台不生成
+- 只写源文档明确要求的差异与统一策略
+
+# Output Format
+使用 `platform_guidelines.md` 模板格式输出。
+```
+
+### 10. 自检（Phase 1 完成后、Phase 2 之前）
+
+- [ ] 生成的文件中没有“使用说明”“示例”块，没有残留 `{{...}}`
+- [ ] 每个文件 Metadata 的 Platforms、Basis 与 Phase 0 一致
+- [ ] 所有具体数值都能在源文档中找到；仅有 PRD 时没有出现任何具体色值/字号/间距
+- [ ] Token 数值只出现在归属文件，其他文件只引用名称
+- [ ] `design_tokens.json` 是合法 JSON，且没有占位 Token 残留
+- [ ] 没有预设 HTML/CSS、设计工具或未声明的平台
+- [ ] 缺失内容按分层规则处理，没有逐格 N/A 或 TODO
 
 ---
 
