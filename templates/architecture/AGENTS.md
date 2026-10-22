@@ -40,7 +40,7 @@
 使用 **源文档**（位于 `.context/architecture/source/` 目录），依次执行以下步骤。
 
 > **⚠️ 全局规则**:  
-> 1. 所有生成的文件都必须在顶部包含 Metadata 区块（Source, Generated At, Generator）。
+> 1. 所有生成的文件都必须在顶部包含 Metadata 区块（Source, Generated At, Generator）；ADR 文件使用 `adr_template` 自带的头部（状态、日期、决策者），不要求 Metadata。
 > 2. 生成结果必须登记到目标项目 `.context/context-manifest.json` 的 `generated_files`（路径相对于 `.context/` 根目录）。
 > 3. **输出边界**: 本命令生成的**总结资产**只能写入 `.context/architecture/**`（不含 `source/`）。除 §0 Pre-step 的集成资产（`.context/openspec/integration.md`）与本模块的 Manifest 登记（`.context/context-manifest.json`）之外，**不得写入其他目录**，也不得生成其他模块的总结。
 > 4. **源文档只读**: 谨慎修改 `source/` 目录中的文件。
@@ -55,17 +55,21 @@
 
 | 语义关键词 | 匹配模式 | 输出目标 |
 |-----------|---------|---------|
-| Goals / 目标 / Quality / 质量 | 介绍与目标 | `system_design.md` §系统概述 |
-| Constraints / 约束 / 限制 | 约束条件 | `system_design.md` §约束 |
-| Context / 上下文 / Boundary / 边界 | 上下文与范围 | `system_design.md` §系统边界 |
+| Goals / 目标 / Quality / 质量 | 介绍与目标 | `system_design.md` §系统概述（摘要）；`introduction_and_goals.md`（详细，若生成） |
+| Constraints / 约束 / 限制 | 约束条件 | `constraints.md`（若生成），摘要入 `system_design.md` |
+| Context / 上下文 / Boundary / 边界 | 上下文与范围 | `context_view.md`（若生成），摘要入 `system_design.md` §系统边界 |
 | Stack / 技术栈 / Technology | 解决方案策略 | `tech_stack.md` |
-| Container / 容器 / Component / 组件 | 构建块视图 | `system_design.md` §核心组件 |
-| Runtime / 运行时 / Sequence / 流程 | 运行时视图 | `system_design.md` §关键场景 |
-| Deployment / 部署 / Infra / 基础设施 | 部署视图 | `system_design.md` §部署拓扑 |
+| Container / 容器 / Component / 组件 | 构建块视图 | `system_design.md` §核心组件；`container_component_view.md`（详细，若生成） |
+| Runtime / 运行时 / Sequence / 流程 | 运行时视图 | `runtime_view.md`（若生成），场景列表入 `system_design.md` |
+| Deployment / 部署 / Infra / 基础设施 | 部署视图 | `deployment_view.md`（若生成），摘要入 `system_design.md` §部署拓扑 |
 | Security / 安全 / Auth / 认证 | 跨切面概念 | `security_policy.md` |
 | Risk / 风险 / Debt / 债务 | 风险与债务 | `risks_and_debt.md` |
 
-> **找不到对应内容时**：在输出文件对应小节标注 `N/A – 源文档未提供`。
+> **找不到对应内容时（分层处理，避免到处写 N/A）**：
+> - **字段未知** → 该单元格写 `N/A – 源文档未提供`
+> - **整行/整个条目没有依据** → **删除该行**，不要写“未声明 XX”
+> - **整节没有依据** → 保留标题，下面只写一行 `N/A – 源文档未提供`；模板标注“可选”的章节可以直接删除
+> - 模板里没有任何预设事实：技术、策略、数值、法规、环境、流程都必须来自源文档，不得保留或套用示例内容
 
 ---
 
@@ -157,19 +161,20 @@
 # Task
 从架构设计文档生成系统设计总览。
 
-# Requirements（固定小节，缺失内容标注 N/A）
-1. **系统概述** — 一句话描述 + 质量目标
-2. **系统边界** — C4 L1 系统上下文图（Mermaid）
-3. **外部依赖** — 外部系统/服务列表
-4. **核心组件** — 主要服务/模块及职责
-5. **数据存储** — 数据库/缓存/消息队列
-6. **关键接口/集成点** — API/事件/协议
-7. **NFR/SLO** — 性能/可用性/安全指标
-8. **部署拓扑** — 基础设施概览图
-9. **关键运行时场景** — 核心流程列表（指向序列图）
+# Requirements（固定小节；`system_design.md` 是总览，详细内容归属各详细文件）
+1. **系统概述** — 一句话描述
+2. **质量目标** — 一行摘要，指向 `introduction_and_goals.md`
+3. **系统边界** — C4 L1 图或摘要，指向 `context_view.md`（外部依赖在该文件）
+4. **核心组件** — 主要模块及职责（**必须保留此表**，路线图检查据此核对组件覆盖）
+5. **数据存储** — 摘要，指向 `data_architecture.md`
+6. **关键接口/集成点** — 名称与类型，指向 `api_strategy.md`
+7. **NFR/SLO** — 只写源文档明文给出的指标
+8. **部署拓扑** — 摘要，指向 `deployment_view.md`
+9. **关键运行时场景** — 场景列表，指向 `runtime_view.md`
 
 # Notes
-- 若源文档某小节无内容，标注 "N/A – 源文档未提供"
+- 对应详细文件**没有生成**时，才在本文件展开该节；生成了就只放摘要和链接，不重复
+- 缺失内容按「找不到对应内容时」的分层规则处理，不要逐格写 N/A；不得套用通用的网关/服务/数据库/队列结构或编造 SLA、QPS
 - **务必**添加 Metadata 区块到文件顶部
 
 # Output Format
@@ -253,9 +258,9 @@ Risk, Debt, 风险, 债务, 技术债, 隐患
 
 对 Phase 0 命中的 `api_strategy.md`、`deployment_view.md`、`data_architecture.md`、`runtime_view.md`、`cross_cutting_concepts.md`、`introduction_and_goals.md`、`constraints.md`、`context_view.md`、`container_component_view.md`、ADR：
 
-- 以「模板引用」表中的对应模板为结构，只填充源文档有依据的内容；无依据的小节标注 `N/A – 源文档未提供`
+- 以「模板引用」表中的对应模板为结构，只填充源文档有依据的内容；无依据的内容按「找不到对应内容时」的分层规则处理（删行 / 整节一行 N/A / 可选章节直接删除）
 - 不得为了凑齐文件而生成空壳；未命中的文件不生成
-- 与 `system_design.md` 重复的内容只保留摘要并指向详细文件，避免两处各写一套
+- **内容归属（只在归属文件写，其他文件引用）**：质量目标与质量场景 → `introduction_and_goals.md`；系统边界/外部系统/范围 → `context_view.md`；容器与组件 → `container_component_view.md`；数据存储与一致性 → `data_architecture.md`；部署/环境/IaC/CI-CD → `deployment_view.md`；运行时场景 → `runtime_view.md`；认证/授权/加密/合规 → `security_policy.md`；`system_design.md` 只放摘要和链接（核心组件表除外）
 - 每个文件顶部添加 Metadata 区块
 
 ### 6. 生成 `architecture/README.md`
@@ -305,5 +310,8 @@ Risk, Debt, 风险, 债务, 技术债, 隐患
 ## 执行备注
 
 - 输出保持简洁；优先使用表格和 Mermaid 图
-- **缺失内容标注 N/A**：若某小节在源文档中无对应内容，显式标注 "N/A – 源文档未提供" 而非留空
+- **缺失内容分层处理**：字段未知写 "N/A – 源文档未提供"；整行无依据删行；整节无依据保留标题加一行 N/A（可选章节直接删除）；不要逐格写 N/A，也不要写“未声明 XX”
 - 填充完成后检查各视图间的一致性
+- **模板残留自检（必须）**：每个生成文件不得残留 `{{...}}`、「使用说明（生成后删除本块）」块、「示例（仅演示写法，生成时删除）」块、HTML 注释里的格式提示；示例内容（示例实体、示例参数、示例工具）不得出现在输出里
+- **重复自检**：同一内容只在归属文件出现；`system_design.md` 里不得再展开已有详细文件的内容
+- 风险/债务看板不得带“更新日期”列
