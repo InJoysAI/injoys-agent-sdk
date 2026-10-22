@@ -2,211 +2,118 @@
 
 > **Metadata**
 > - **Source**: `{{数据库设计文档路径}}`
+> - **Engines**: `{{说明书声明的数据库引擎，多个用逗号分隔，并注明各自角色，如：PostgreSQL（主库）、SQLite（本地缓存）}}`
 > - **Generated At**: `{{生成时间 YYYY-MM-DD HH:mm}}`
 > - **Generator**: `Context-Agent v1.0`
 
 ---
 
+> ⚠️ **使用说明（生成后删除本块）**
+> - **迁移工具、目录路径以 `.context/criterion.md` 的数据层约定和数据库设计说明书为准**（如 Goose / Flyway / Alembic / Prisma 等）。本模板不预设任何工具或路径；说明书与 criterion 不一致时，不要自行裁决，标记待确认。
+> - **参考基线**：说明书声明的每个引擎，可参考 `design/context-dev/db/engines/<引擎>.md` 判断“该记录什么”。**基线不是项目约定**：只有说明书明文采纳的内容才能写进本文件，说明书没提的不补，也不得套用其他引擎的内容。
+> - **多引擎**：通用约定写在各节正文；只对某个引擎成立的内容，写在文末「引擎专项」中该引擎自己的小节，并标明各引擎的角色（如主库 / 本地存储 / 测试）。只为说明书声明的引擎建小节。
+> - **缺失内容的处理（分层）**：字段未知 → 写 `N/A – 源文档未提供`；整行没有依据 → **删除该行**；整节没有依据（或该引擎天然没有这类能力，如 SQLite 没有分区/复制）→ 保留标题，下面只写一行 `N/A – 源文档未提供` 或 `N/A – {{引擎}} 不具备该能力`；不要逐格写 N/A。
+> - 「示例」只演示写法，生成时删除；所有 `{{...}}` 必须替换。
+
+---
+
 ## 🎯 SSoT 原则
 
-> **Single Source of Truth**: `SSoT/schema/migrations/` 是数据库 Schema 的唯一真相源。
+> **Single Source of Truth**: `{{迁移文件目录，以 criterion 数据层约定为准}}` 是数据库 Schema 的唯一真相源。
 
 ### 禁止行为
 
 | ❌ 禁止 | ✅ 正确做法 |
-|--------|-----------| 
-| 直接在数据库执行 DDL | 创建 Goose SQL 迁移文件 |
-| 在生产库手动执行 DDL | 通过 CI/CD Pipeline 执行 `goose up` |
-| 多人同时修改 Schema | PR Review 合并迁移文件 |
+|--------|-----------|
+| {{禁止的做法，如直接在数据库执行 DDL}} | {{正确做法}} |
 
 ---
 
-## 🔧 Goose 工作流
+## 🔧 迁移工作流
+
+**工具**: {{迁移工具及版本}}
 
 ### 标准流程
 
 ```mermaid
 flowchart LR
-    A[创建迁移文件] --> B[goose create]
-    B --> C[编写 SQL]
-    C --> D[Review 迁移 SQL]
-    D --> E[PR 合并]
-    E --> F[CI: goose up]
-    F --> G[验证 Schema]
+    A["{{步骤 1}}"] --> B["{{步骤 2}}"] --> C["{{步骤 3}}"]
 ```
 
 ### 常用命令
 
-```bash
-# 创建新迁移文件（SQL 格式）
-goose -dir SSoT/schema/migrations create add_users_table sql
+| 目的 | 命令 |
+|------|------|
+| {{创建迁移 / 应用 / 查看状态 / 回滚}} | `{{命令}}` |
 
-# 应用迁移（开发环境）
-goose -dir SSoT/schema/migrations \
-  postgres "postgres://user:pass@localhost:5432/dev?sslmode=disable" up
-
-# 查看迁移状态
-goose -dir SSoT/schema/migrations \
-  postgres "postgres://..." status
-
-# 回滚最近一次迁移
-goose -dir SSoT/schema/migrations \
-  postgres "postgres://..." down
-
-# 使用环境变量
-export GOOSE_DRIVER=postgres
-export GOOSE_DBSTRING="postgres://user:pass@localhost:5432/dev?sslmode=disable"
-export GOOSE_MIGRATION_DIR=SSoT/schema/migrations
-goose up
-```
+> 命令中不得出现真实连接串或密码；连接信息写占位说明或环境变量名。
 
 ### 迁移文件格式
 
-```sql
--- +goose Up
-CREATE TABLE users (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    email VARCHAR(255) NOT NULL UNIQUE,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
-);
-
--- +goose Down
-DROP TABLE users;
-```
-
-### Go 迁移函数（复杂逻辑）
-
-对于需要程序逻辑的复杂迁移，可使用 Go 迁移函数：
-
-```go
-// 文件: SSoT/schema/migrations/00002_seed_data.go
-package migrations
-
-import (
-    "database/sql"
-    "github.com/pressly/goose/v3"
-)
-
-func init() {
-    goose.AddMigration(Up00002, Down00002)
-}
-
-func Up00002(tx *sql.Tx) error {
-    // 复杂数据迁移逻辑
-    _, err := tx.Exec(`INSERT INTO users (email) VALUES ('admin@example.com')`)
-    return err
-}
-
-func Down00002(tx *sql.Tx) error {
-    _, err := tx.Exec(`DELETE FROM users WHERE email = 'admin@example.com'`)
-    return err
-}
-```
-
-### 嵌入式自动迁移
-
-在 Go 应用启动时自动执行迁移：
-
-```go
-import (
-    "embed"
-    "github.com/pressly/goose/v3"
-)
-
-//go:embed SSoT/schema/migrations/*.sql
-var embedMigrations embed.FS
-
-func main() {
-    goose.SetBaseFS(embedMigrations)
-    if err := goose.Up(db, "SSoT/schema/migrations"); err != nil {
-        log.Fatal(err)
-    }
-}
-```
+{{说明书规定的文件命名、Up/Down 结构、是否允许代码型迁移、是否在应用启动时自动迁移}}
 
 ---
 
 ## 🔄 零停机迁移策略
 
-### Expand-Contract 模式
+> 说明书没有要求零停机时，整节写一行 N/A。
+
+### Expand-Contract
 
 | 阶段 | 操作 | 目的 |
 |------|------|------|
-| **Expand** | 添加新列/表（可空或有默认值） | 新旧代码兼容 |
-| **Migrate** | 后台数据迁移 | 填充新字段 |
-| **Switch** | 应用代码切换到新字段 | 读写新字段 |
-| **Contract** | 删除旧列/表 | 清理 |
-
-### 示例：重命名列
-
-```sql
--- ❌ 错误：直接重命名会导致宕机
-ALTER TABLE users RENAME COLUMN name TO full_name;
-
--- ✅ 正确：分阶段
--- Phase 1: Expand (00003_add_full_name.sql)
--- +goose Up
-ALTER TABLE users ADD COLUMN full_name TEXT;
-UPDATE users SET full_name = name WHERE full_name IS NULL;
-
--- +goose Down
-ALTER TABLE users DROP COLUMN full_name;
-
--- Phase 2: Switch (应用代码更新后)
--- Phase 3: Contract (00004_drop_name.sql)
--- +goose Up
-ALTER TABLE users DROP COLUMN name;
-
--- +goose Down
-ALTER TABLE users ADD COLUMN name TEXT;
-```
+| **Expand** | {{新增兼容的结构}} | {{目的}} |
+| **Migrate** | {{数据回填}} | {{目的}} |
+| **Switch** | {{应用切换}} | {{目的}} |
+| **Contract** | {{清理旧结构}} | {{目的}} |
 
 ---
 
-## ✅ 向后兼容变更（Safe）
+## ✅ 向后兼容变更
 
 | 变更类型 | 安全性 | 说明 |
 |---------|--------|------|
-| 添加可空列 | ✅ Safe | 不影响现有数据 |
-| 添加有默认值的列 | ✅ Safe | 需注意大表性能 |
-| 添加新表 | ✅ Safe | 无影响 |
-| 添加索引 (CONCURRENTLY) | ✅ Safe | 不阻塞读写 |
-| 添加外键约束 | ⚠️ Caution | 需 NOT VALID + VALIDATE |
+| {{变更类型}} | {{Safe / Caution}} | {{说明}} |
 
 ---
 
-## ❌ 生产环境禁止操作
+## ❌ 生产环境禁止或需审批的操作
 
 | 操作 | 风险 | 替代方案 |
-|------|------|---------| 
-| `DROP TABLE` / `DROP COLUMN` | 数据丢失 | 先重命名 + 保留 30 天 |
-| `ALTER TABLE ... RENAME` | 应用中断 | Expand-Contract |
-| `CREATE INDEX` (非 CONCURRENTLY) | 锁表 | `CREATE INDEX CONCURRENTLY` |
-| 修改列类型 | 全表锁 | 添加新列 + 数据迁移 |
-| `TRUNCATE` | 数据丢失 | 禁止，使用 DELETE + VACUUM |
+|------|------|---------|
+| {{操作}} | {{风险}} | {{替代方案；不得与“允许”的做法自相矛盾}} |
+
+---
+
+## 🧩 引擎专项
+
+### {{引擎名称}}（{{角色}}）
+
+> 如：DDL 是否可放入事务、在线变更方式、版本升级时已有数据的处理。只写说明书采纳的内容；没有则删除。
+
+- {{引擎特有约定}}
 
 ---
 
 ## 📋 迁移 Checklist
 
-```markdown
-## 迁移 PR Checklist
+- [ ] {{检查项 1（如：迁移文件放在约定目录）}}
+- [ ] {{检查项 2（如：包含回滚方案）}}
+- [ ] {{检查项 3（如：验证向后兼容）}}
 
-- [ ] 创建了 Goose 迁移文件（`SSoT/schema/migrations/`）
-- [ ] 迁移文件包含 `-- +goose Up` 和 `-- +goose Down`
-- [ ] Review 迁移 SQL 内容
-- [ ] 验证向后兼容性
-- [ ] 大表变更使用 CONCURRENTLY
-- [ ] 回滚脚本准备（Down 迁移）
-- [ ] 更新相关文档
-```
+---
+
+> **示例（仅演示写法，生成时删除）**
+> ```
+> 禁止行为: 在生产库手动执行 DDL | 通过发布流水线执行迁移
+> 生产禁止操作: 直接删除仍被应用引用的列 | 先停止引用，发布后的下一个版本再删除
+> ```
 
 ---
 
 ## AI 引用指南
 
 当 AI 生成数据库变更时：
-1. **禁止直接输出 SQL** — 必须创建 Goose 迁移文件到 `SSoT/schema/migrations/`
-2. 遵循 Expand-Contract 模式
-3. 索引变更使用 CONCURRENTLY
-4. 不安全操作需分阶段或人工确认
+1. 按本文件与 `criterion.md` 的数据层约定创建迁移文件，**不要直接输出可在生产库执行的裸 SQL**
+2. 遵循本文件记录的兼容性与零停机规则
+3. 遇到本文件标记为“禁止/需审批”的操作，分阶段处理或先征得用户确认

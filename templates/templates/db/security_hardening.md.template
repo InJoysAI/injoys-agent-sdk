@@ -1,194 +1,112 @@
-# PostgreSQL 安全加固模板 (Security Hardening Template)
+# 安全加固模板 (Security Hardening Template)
 
 > **Metadata**
 > - **Source**: `{{数据库设计文档路径}}`
+> - **Engines**: `{{说明书声明的数据库引擎，多个用逗号分隔，并注明各自角色}}`
 > - **Generated At**: `{{生成时间 YYYY-MM-DD HH:mm}}`
 > - **Generator**: `Context-Agent v1.0`
 
 ---
 
-> **⚠️ 权威说明**  
-> 本文件为 **DB 视角**安全约束。最终权威归档于 `architecture/security_policy.md`。
+> ⚠️ **使用说明（生成后删除本块）**
+> - 本文件是 **DB 视角**的安全约束，只记录说明书已写出的内容；应用层认证授权、密钥管理、合规等以 `architecture/security_policy.md` 为准，本文件不重复，只在必要处写一行指向。
+> - 审计日志的采集与告警属于 `observability.md`，这里只写“要审计什么”。
+> - **参考基线**：说明书声明的每个引擎，可参考 `design/context-dev/db/engines/<引擎>.md` 判断“该记录什么”。**基线不是项目约定**：只有说明书明文采纳的内容才能写进本文件；版本相关的项，说明书没写版本就标“需确认版本”。
+> - **多引擎**：通用约定写正文；只对某个引擎成立的内容写进文末「引擎专项」中该引擎自己的小节。只为说明书声明的引擎建小节。
+> - **缺失内容的处理（分层）**：字段未知 → 写 `N/A – 源文档未提供`；整行没有依据 → **删除该行**；整节没有依据（或该引擎天然没有这类能力）→ 保留标题，下面只写一行 `N/A – 源文档未提供` 或 `N/A – {{引擎}} 不具备该能力`；不要逐格写 N/A。
+> - 「示例」只演示写法，生成时删除；所有 `{{...}}` 必须替换；示例与正文中不得出现真实账号、密码、IP 或连接串。
 
 ---
 
-## 🔐 认证加固
-
-### 废弃 MD5，强制 SCRAM-SHA-256
-
-```ini
-# postgresql.conf
-password_encryption = scram-sha-256
-```
-
-```bash
-# 更新现有用户密码（使用新加密）
-ALTER USER app_user SET password_encryption = 'scram-sha-256';
-ALTER USER app_user PASSWORD 'new_secure_password';
-```
-
-### 认证方式比较
-
-| 方式 | 安全级别 | 说明 |
-|------|---------|------|
-| `trust` | ❌ 禁止 | 无密码，仅限本地调试 |
-| `md5` | ❌ 废弃 | 易受重放攻击 |
-| `scram-sha-256` | ✅ 推荐 | 现代标准 |
-| `cert` | ✅✅ 最佳 | mTLS 客户端证书 |
+> **⚠️ 权威说明**
+> 本文件为 **DB 视角**安全约束。最终权威归档于 `architecture/security_policy.md`；两者冲突时以后者为准并标记待确认。
 
 ---
 
-## 📋 pg_hba.conf 规范
+## 🔐 认证
 
-### 生产环境配置原则
+| 项 | 约定 | 说明 |
+|----|------|------|
+| {{认证方式 / 密码策略 / 凭据来源与轮换}} | {{约定}} | {{说明}} |
 
-| 规则 | 说明 |
-|------|------|
-| **白名单优先** | 仅允许已知应用服务器 IP |
-| **禁止 trust** | 任何环境都不使用 |
-| **强制 hostssl** | 禁止非加密连接 |
-| **按角色分离** | 不同应用使用不同用户 |
-
-### 配置示例
-
-```
-# TYPE  DATABASE        USER            ADDRESS                 METHOD
-
-# 本地连接（仅管理员）
-local   all             postgres                                scram-sha-256
-
-# 应用服务器（严格白名单）
-hostssl app_db          app_user        10.0.1.0/24             scram-sha-256
-hostssl app_db          app_user        10.0.2.0/24             scram-sha-256
-
-# 监控系统（只读账户）
-hostssl all             monitor_user    10.0.10.5/32            scram-sha-256
-
-# 禁止其他所有连接
-hostssl all             all             0.0.0.0/0               reject
-```
+> 凭据只写获取方式（如环境变量名、密钥服务），**不写真实值**。
 
 ---
 
-## 🔒 TLS 配置
+## 🌐 网络与访问控制
 
-### 服务端配置
-
-```ini
-# postgresql.conf
-ssl = on
-ssl_cert_file = '/path/to/server.crt'
-ssl_key_file = '/path/to/server.key'
-ssl_ca_file = '/path/to/ca.crt'
-
-# 最低协议版本
-ssl_min_protocol_version = 'TLSv1.2'
-
-# 推荐密码套件
-ssl_ciphers = 'HIGH:MEDIUM:+3DES:!aNULL'
-```
-
-### mTLS（双向认证）
-
-```
-# pg_hba.conf - 要求客户端证书
-hostssl all             all             0.0.0.0/0               cert clientcert=verify-ca
-```
-
-| 模式 | 说明 |
-|------|------|
-| `clientcert=verify-ca` | 验证客户端证书由指定 CA 签发 |
-| `clientcert=verify-full` | 额外验证 CN 与用户名匹配 |
-
----
-
-## 👤 最小权限原则
-
-### 角色分离
-
-| 角色 | 权限 | 用途 |
+| 规则 | 约定 | 说明 |
 |------|------|------|
-| `app_user` | 仅 CONNECT + 表 CRUD | 应用程序 |
-| `migration_user` | 临时 DDL 权限 | CI/CD 迁移 |
-| `monitor_user` | pg_monitor | 监控系统 |
-| `backup_user` | pg_read_all_data | 备份任务 |
-| `postgres` | SUPERUSER | 紧急运维 |
-
-### 授权示例
-
-```sql
--- 应用用户：仅表级 CRUD
-GRANT CONNECT ON DATABASE app_db TO app_user;
-GRANT USAGE ON SCHEMA public TO app_user;
-GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO app_user;
-ALTER DEFAULT PRIVILEGES IN SCHEMA public 
-  GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO app_user;
-
--- 禁止 TRUNCATE 和 DDL
-REVOKE TRUNCATE ON ALL TABLES IN SCHEMA public FROM app_user;
-
--- 监控用户：只读系统视图
-GRANT pg_monitor TO monitor_user;
-```
+| {{来源白名单 / 监听范围 / 是否允许远程访问}} | {{约定}} | {{说明}} |
 
 ---
 
-## 🔏 敏感数据处理
+## 🔒 传输与存储加密
 
-### 字段级加密（应用层）
+| 层面 | 约定 | 说明 |
+|------|------|------|
+| {{传输加密（TLS 版本/证书）}} | {{约定}} | {{说明}} |
+| {{静态加密（磁盘/文件/列）}} | {{约定}} | {{说明}} |
 
-| 数据类型 | 加密方式 | 说明 |
+---
+
+## 👥 角色与权限（最小权限）
+
+| 角色 | 用途 | 权限范围 |
+|------|------|---------|
+| {{角色}} | {{应用 / 只读 / 迁移 / 运维 / 监控}} | {{权限范围}} |
+
+| 原则 | 约定 |
+|------|------|
+| {{最小权限 / 账号分离 / 禁止共享账号 / 默认权限回收}} | {{约定}} |
+
+---
+
+## 🛡️ 数据保护
+
+| 数据类别 | 保护措施 | 说明 |
 |---------|---------|------|
-| 密码哈希 | bcrypt/argon2 | 不可逆 |
-| 信用卡号 | AES-256-GCM | 应用层加密 |
-| 个人身份信息 | AES-256-GCM | 按需脱敏 |
-
-### 数据脱敏视图
-
-```sql
--- 创建脱敏视图供分析/客服使用
-CREATE VIEW users_masked AS
-SELECT 
-    id,
-    CONCAT(LEFT(email, 3), '***@***') AS email_masked,
-    CONCAT(LEFT(phone, 3), '****', RIGHT(phone, 4)) AS phone_masked,
-    created_at
-FROM users;
-
-GRANT SELECT ON users_masked TO analyst_user;
-```
+| {{敏感字段（个人信息 / 凭证 / 金融等）}} | {{脱敏 / 加密 / 访问限制 / 保留期}} | {{说明}} |
 
 ---
 
-## 📊 安全审计
+## 📋 审计要求
 
-### 开启日志
+| 审计对象 | 内容 | 保留期 |
+|---------|------|--------|
+| {{登录 / DDL / 特权操作 / 数据访问}} | {{记录内容}} | {{保留期}} |
 
-```ini
-# postgresql.conf
-log_connections = on
-log_disconnections = on
-log_statement = 'ddl'  # 记录所有 DDL
-log_line_prefix = '%m [%p] %u@%d '
-```
+---
 
-### pgAudit 扩展（高合规需求）
+## 🧩 引擎专项
 
-```sql
--- 安装 pgAudit
-CREATE EXTENSION pgaudit;
+### {{引擎名称}}（{{角色}}）
 
--- 配置审计
-ALTER SYSTEM SET pgaudit.log = 'write, ddl';
-ALTER SYSTEM SET pgaudit.log_catalog = off;
-```
+> 只写该引擎特有、且说明书采纳的内容（如认证机制、访问控制配置文件、行级安全、文件权限；SQLite 等无服务端的引擎通常只有文件权限与加密）。没有则删除该小节。
+
+- {{引擎特有约定}}
+
+---
+
+## ✅ 安全 Checklist
+
+- [ ] {{检查项 1（如：生产环境无无密码访问）}}
+- [ ] {{检查项 2（如：应用账号无 DDL 权限）}}
+- [ ] {{检查项 3（如：传输加密已启用）}}
+
+---
+
+> **示例（仅演示写法，生成时删除）**
+> ```
+> 角色: 应用账号 | 业务读写 | 仅业务表 DML，无 DDL（来源 §7.1）
+> 认证: 应用凭据 | 从密钥服务读取 | 不写入代码与配置仓库
+> ```
 
 ---
 
 ## AI 引用指南
 
-当 AI 生成数据库安全配置时：
-1. 认证必须使用 SCRAM-SHA-256
-2. pg_hba.conf 严格白名单
-3. 强制 TLS 加密
-4. 遵循最小权限原则
+当 AI 生成涉及数据库安全的代码或配置时：
+1. 连接信息一律从配置/密钥服务读取，**不得硬编码**，示例中也不出现真实凭据
+2. 按本文件的角色划分选择账号，不用管理员账号跑业务
+3. 涉及应用层安全的问题，以 `architecture/security_policy.md` 为准
