@@ -171,7 +171,8 @@ IPC 契约的核心不只是“数据结构”，还包括**命令与事件**：
 填充规则：
 - 从架构文档提取核心数据模型（users, sessions 等）
 - 使用 `-- +goose Up` 和 `-- +goose Down` 注解
-- 模板中的 `gen_random_uuid()` 为 PostgreSQL 函数；其他数据库按实际数据库改写
+- 模板是 **PostgreSQL 写法的示例**（如 `gen_random_uuid()`、`TIMESTAMPTZ`）；数据库引擎以数据库设计说明书的声明为准（见 `@design/context-dev/db/AGENTS.md` 的引擎确认），其他引擎必须改写类型与函数；说明书未声明引擎时不要猜，标注待确认
+- 示例表只演示结构，必须替换为架构文档中的真实数据模型；不得写入种子账号、默认密码
 
 ### 2.3 默认模板：TypeSpec → OpenAPI3（API 层）
 
