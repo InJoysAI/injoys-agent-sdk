@@ -1,7 +1,8 @@
 # DB 总结生成入口
 
 > **用途**: 从数据库设计文档生成结构化的数据库设计总结。  
-> **迁移工具**: 以 `.context/criterion.md` §7 记录的为准；`migrations_and_ssot.md` 模板中的 Goose 内容是默认示例，实际工具不同时按所选工具改写。  
+> **数据库引擎**: 必须由数据库设计说明书**明确声明**（一种或多种）；参考基线见 `design/context-dev/db/engines/`（内置 PostgreSQL / MySQL / SQLite）。  
+> **迁移工具**: 以 `.context/criterion.md` §7 与说明书为准，模板不预设工具或路径。  
 > **触发**: `.agents/workflows/context-openspec.md db`，或由 `.agents/workflows/context-openspec.md`（无参数一键模式）按顺序调用。`/context-init` 只归档源文档，不会生成本模块的总结。
 
 ---
@@ -48,27 +49,31 @@
 
 ## 📋 数据库文档解析规则
 
-优先读取目标项目内的 `docs/PostgreSQL_Design_Guidelines.md`（若存在），否则按以下内置映射解析。
-
-### 语义匹配策略（容错）
+### 语义匹配策略（容错，引擎无关）
 
 | 语义关键词 | 匹配模式 | 输出目标 |
 |-----------|---------|---------|
 | Schema / 模型 / 表设计 / Entity | 逻辑模型 | `schema_design.md` |
-| Index / 索引 / B-Tree / GIN | 索引策略 | `schema_design.md` §索引 |
-| Partition / 分区 | 分区策略 | `schema_design.md` §分区 |
-| UUID / 主键 / Identity | 主键策略 | `schema_design.md` §主键 |
-| JSONB / JSON / 非结构化 | JSONB 使用 | `schema_design.md` §JSONB |
-| Migration / 迁移 / Goose / SSoT | 迁移策略 | `migrations_and_ssot.md` |
-| Tuning / 调优 / 参数 | 参数配置 | `performance_tuning.md` |
-| Storage / 存储 / WAL / Huge Pages | 基础设施 | `performance_tuning.md` §基础设施 |
-| Connection / 连接池 / PgBouncer | 连接管理 | `performance_tuning.md` §连接池 |
-| HA / 高可用 / Patroni | 高可用 | `ha_and_dr.md` |
-| Backup / 备份 / DR / PITR | 灾难恢复 | `ha_and_dr.md` |
-| Security / 安全 / TLS / 认证 / pg_hba | 安全加固 | `security_hardening.md` |
-| Monitor / 监控 / pg_stat / Vacuum | 可观测性 | `observability.md` |
+| Index / 索引 | 索引策略 | `schema_design.md` §索引 |
+| Partition / 分区 / 分表 | 分区策略 | `schema_design.md` §分区 |
+| 主键 / ID / Identity / UUID | 主键策略 | `schema_design.md` §主键 |
+| JSON / 半结构化 | 半结构化数据 | `schema_design.md` §半结构化 |
+| Migration / 迁移 / SSoT | 迁移策略 | `migrations_and_ssot.md` |
+| Tuning / 调优 / 参数 / 缓存 / 连接池 | 参数配置 | `performance_tuning.md` |
+| Storage / 存储 / 持久化 / 内存 | 基础设施 | `performance_tuning.md` §基础设施 |
+| HA / 高可用 / 复制 / 故障切换 | 高可用 | `ha_and_dr.md` |
+| Backup / 备份 / DR / PITR / 恢复 | 灾难恢复 | `ha_and_dr.md` |
+| Security / 安全 / TLS / 认证 / 权限 / 加密 | 安全加固 | `security_hardening.md` |
+| Monitor / 监控 / 慢查询 / 告警 / 日志 | 可观测性 | `observability.md` |
 
-> **找不到对应内容时**：在输出文件对应小节标注 `N/A – 源文档未提供`。
+> **找不到对应内容时**：按模板的分层规则处理（字段未知 → `N/A – 源文档未提供`；整行无依据 → 删除；整节无依据 → 保留标题 + 一行 N/A）。
+
+### 引擎参考基线
+
+`design/context-dev/db/engines/<引擎>.md` 只是“该记录什么”的**参考基线**：
+- 只有说明书**明文采纳**的内容才能写进输出；说明书没写的不补，也不得套用其他引擎的内容
+- 基线里与版本相关的项，说明书没写版本就标“需确认版本”
+- 基线中的“常见起点/示例”不是项目配置
 
 ---
 
@@ -80,30 +85,47 @@
 
 **读取**：`.context/db/source/` 目录下的所有文件
 
-### 0.2 关键词分析
+### 0.2 确认数据库引擎（必须）
+
+数据库设计说明书**必须明确声明**所用数据库引擎，可以是一种或多种（例如“主库 PostgreSQL，本地缓存 SQLite”）。
+
+| 情况 | 处理 |
+|------|------|
+| 说明书明确声明了引擎 | 记录每个引擎及其角色（主库 / 缓存 / 测试 / 本地存储等），继续 |
+| **没有声明任何引擎** | ⛔ **停止**，请用户在说明书中补充声明（或直接告知）；**不要**从其他文档、代码或关键词猜测 |
+| 声明了内置基线之外的引擎（如 Oracle） | 告知用户该引擎没有参考基线，询问是否仅用通用骨架生成（只记录说明书内容）；用户确认前不继续 |
+| 声明了多个引擎 | 通用约定写正文，引擎特有内容分别写入各文件的「引擎专项」小节，并标明角色 |
+
+对声明的内置引擎，读取 `@design/context-dev/db/engines/<引擎>.md`（`postgresql` / `mysql` / `sqlite`），作为参考基线（规则见上）。
+
+### 0.3 关键词分析
 
 **依次检查以下关键词，记录是否存在**：
 
 | 检查项 | 关键词 | 若存在则生成 | 优先级 |
 |--------|--------|-------------|--------|
-| 安全加固 | Security, TLS, 认证, pg_hba, SCRAM | `security_hardening.md` | 推荐 |
-| 可观测性 | Monitor, 监控, pg_stat, Vacuum, 日志 | `observability.md` | 推荐 |
-| 高可用/灾备 | HA, 高可用, Patroni, Backup, 备份, DR, PITR | `ha_and_dr.md` | 可选 |
+| 安全加固 | Security, TLS, 认证, 权限, 加密 | `security_hardening.md` | 推荐 |
+| 可观测性 | Monitor, 监控, 慢查询, 告警, 日志 | `observability.md` | 推荐 |
+| 高可用/灾备 | HA, 高可用, 复制, Backup, 备份, DR, PITR | `ha_and_dr.md` | 可选 |
 
-### 0.3 输出生成计划
+### 0.4 输出生成计划
 
 **必须输出**：
 
 ```
 === 生成计划 ===
+数据库引擎（来自说明书）：
+- {{引擎 1}}（{{角色}}）
+- {{引擎 2}}（{{角色}}）  # 若有
+
 必须生成：
 - schema_design.md（Schema/索引/分区）
-- performance_tuning.md（参数/连接池/基础设施）
-- migrations_and_ssot.md（Goose 迁移/SSoT 约束）
+- performance_tuning.md（参数/连接/基础设施）
+- migrations_and_ssot.md（迁移工具以 criterion §7 / 说明书为准）
 
 推荐生成（关键词匹配）：
-- security_hardening.md（检测到：TLS, 认证）
-- observability.md（检测到：pg_stat, Vacuum）
+- security_hardening.md（检测到：{{关键词}}）
+- observability.md（检测到：{{关键词}}）
 
 跳过（未检测到相关内容）：
 - ha_and_dr.md
@@ -124,9 +146,15 @@
 | `observability.md` | `templates/db/observability.md.template` |
 | `ha_and_dr.md` | `templates/db/ha_and_dr.md.template` |
 
-> 模板路径相对于 `design/context-dev/`
+> 模板路径相对于 `design/context-dev/`。模板为引擎无关骨架，引擎差异写在各文件的「引擎专项」小节（每个声明的引擎一节）。
 
 ## Phase 1: 填充模板
+
+> **所有 Prompt 共用规则**：
+> - 只记录说明书已写出的内容；引擎只限 Phase 0 确认的引擎
+> - 参考基线仅用于判断“该记录什么”，不得把基线内容当作项目约定
+> - 命令、示例中不得出现真实账号、密码、IP、连接串
+> - 严格遵守模板内的「使用说明」与分层缺失规则；生成后删除「使用说明」与「示例」块
 
 ### 1. 填充 `schema_design.md` (必须)
 
@@ -136,16 +164,17 @@
 你是一位数据库架构师。
 
 # Task
-从数据库设计文档生成 Schema 设计规范。
+从数据库设计文档生成 Schema 设计规范，引擎为：{{Phase 0 确认的引擎及角色}}。
 
-# Requirements（固定小节，缺失标注 N/A）
-1. **主键策略** — UUIDv7 vs BIGSERIAL 选择及原因
+# Requirements
+1. **主键策略** — 方案与原因
 2. **核心实体 ER 图** — Mermaid ERD
 3. **表设计规范** — 命名约定、字段类型
-4. **索引策略** — B-Tree/GIN/BRIN 使用场景
-5. **分区策略** — 分区条件、pg_partman 配置
-6. **JSONB 使用规范** — 何时用、何时提取为独立列
-7. **约束规则** — FK/CHECK/EXCLUSION
+4. **索引策略** — 类型、适用场景、维护
+5. **分区/分表策略** — 引擎不支持或说明书没有时整节 N/A
+6. **半结构化数据** — 何时用、何时提取为独立列
+7. **约束规则**
+8. **引擎专项** — 每个声明的引擎一个小节，只写说明书采纳的引擎特有约定
 
 # Output Format
 使用 `schema_design.md` 模板格式输出。
@@ -156,17 +185,20 @@
 **Prompt**:
 ```markdown
 # Role
-你是一位 PostgreSQL DBA。
+你是一位数据库性能工程师。
 
 # Task
-从数据库设计文档生成性能调优指南。
+从数据库设计文档生成性能调优指南，引擎为：{{Phase 0 确认的引擎及角色}}。
 
-# Requirements（固定小节，缺失标注 N/A）
-1. **基础设施前置条件** — 存储分离、文件系统、预读、Huge Pages、CPU/NUMA
-2. **内存配置** — shared_buffers, work_mem, maintenance_work_mem
-3. **WAL/Checkpoint** — checkpoint_timeout, max_wal_size
-4. **Autovacuum** — 触发阈值、执行能力
-5. **连接池** — PgBouncer 配置、max_connections
+# Requirements
+1. **基础设施前置条件** — 存储、内存、运行环境
+2. **内存与缓存**、**写入与持久化**
+3. **维护作业** — 清理/统计信息/碎片整理
+4. **连接管理** — 连接池、并发限制
+5. **查询优化约定**
+6. **引擎专项** — 每个声明的引擎一个小节
+
+参数值必须来自说明书。监控指标、告警阈值、慢查询分析**不写在本文件**，留给 `observability.md`。
 
 # Output Format
 使用 `performance_tuning.md` 模板格式输出。
@@ -180,14 +212,15 @@
 你是一位数据库 DevOps 工程师。
 
 # Task
-生成 Schema 迁移与 SSoT 约束规范。
+生成 Schema 迁移与 SSoT 约束规范，引擎为：{{Phase 0 确认的引擎及角色}}。
 
-# Requirements（固定小节，缺失标注 N/A）
-1. **SSoT 原则** — `SSoT/schema/migrations/` 为唯一真相源
-2. **Goose 工作流** — goose create → goose up → verify
-3. **零停机迁移** — 分阶段变更策略（expand-contract）
-4. **兼容性规则** — 向后兼容变更类型
-5. **禁止操作** — 生产环境禁止的 DDL
+# Requirements
+1. **SSoT 原则** — 迁移文件目录为唯一真相源（目录与工具以 `.context/criterion.md` §7 与说明书为准；两者不一致时标记待确认，不自行裁决）
+2. **迁移工作流** — 工具、标准流程、命令
+3. **零停机迁移** — expand-contract（说明书没有要求时整节 N/A）
+4. **兼容性规则**
+5. **禁止/需审批操作** — 不得与“允许”的做法自相矛盾
+6. **引擎专项** — 如 DDL 事务性、在线变更方式
 
 # Output Format
 使用 `migrations_and_ssot.md` 模板格式输出。
@@ -201,14 +234,14 @@
 你是一位数据库安全工程师。
 
 # Task
-从数据库设计文档生成 PostgreSQL 安全加固指南。
+从数据库设计文档生成安全加固指南，引擎为：{{Phase 0 确认的引擎及角色}}。
 
-# Requirements（固定小节，缺失标注 N/A）
-1. **认证加固** — SCRAM-SHA-256（废弃 MD5）
-2. **pg_hba.conf** — 白名单、禁止 trust、强制 hostssl
-3. **TLS 配置** — 证书、最低协议版本、mTLS
-4. **最小权限** — 角色分离、仅授予必要权限
-5. **敏感数据** — 列加密、数据脱敏
+# Requirements
+1. **认证**、**网络与访问控制**、**传输与存储加密**
+2. **角色与权限** — 最小权限、账号分离
+3. **数据保护** — 敏感字段
+4. **审计要求** — 只写“审计什么”，采集与告警归 `observability.md`
+5. **引擎专项** — 每个声明的引擎一个小节（无服务端的引擎通常只有文件权限与加密）
 
 # Authority Note
 > 本文件为 DB 视角安全约束。最终权威归档于 `architecture/security_policy.md`。
@@ -225,15 +258,14 @@
 你是一位数据库可靠性工程师。
 
 # Task
-从数据库设计文档生成 PostgreSQL 可观测性规范。
+从数据库设计文档生成可观测性规范，引擎为：{{Phase 0 确认的引擎及角色}}。
 
-# Requirements（固定小节，缺失标注 N/A）
-1. **关键指标与阈值** — 可用性、性能、复制、风险、存储
-2. **Transaction ID 回卷监控** — xid_age > 15 亿极高危
-3. **pg_stat_statements** — 配置与慢查询分析
-4. **Vacuum 健康检查** — dead_tup、last_autovacuum
-5. **日志配置** — log_min_duration_statement
-6. **采集与告警** — Prometheus/Grafana 集成建议
+# Requirements
+1. **关键指标与告警阈值**（本文件独占）
+2. **采集与展示**
+3. **慢查询**、**日志约定**
+4. **告警分级与响应**
+5. **引擎专项** — 引擎特有高危指标；指标名随版本变化，说明书没写版本就标“需确认版本”
 
 # Output Format
 使用 `observability.md` 模板格式输出。
@@ -247,18 +279,31 @@
 你是一位数据库可靠性工程师。
 
 # Task
-从数据库设计文档生成高可用与灾难恢复规范。
+从数据库设计文档生成高可用与灾难恢复规范，引擎为：{{Phase 0 确认的引擎及角色}}。
 
-# Requirements（固定小节）
-1. **HA 架构** — Patroni/流量路由/复制模式
-2. **备份策略** — pgBackRest 配置、备份周期
-3. **PITR** — 时间点恢复流程
-4. **防勒索** — 不可变备份(S3 Object Lock)
-5. **RTO/RPO 目标**
+# Requirements
+1. **RPO/RTO 目标**
+2. **高可用架构与故障切换**（单机/嵌入式整节 N/A）
+3. **复制**
+4. **备份与恢复**（含 PITR 是否支持）
+5. **演练**
+6. **引擎专项** — 每个声明的引擎一个小节
+
+监控与告警不在本文件重复，引用 `observability.md`。
 
 # Output Format
 使用 `ha_and_dr.md` 模板格式输出。
 ```
+
+### 7. 自检（Phase 1 完成后、Phase 2 之前）
+
+- [ ] 生成的文件中没有“使用说明”“示例”块，没有残留 `{{...}}`
+- [ ] 每个文件 Metadata 的 Engines 与说明书声明一致；没有为未声明的引擎建小节，也没有套用其他引擎的内容
+- [ ] 所有具体参数值、阈值都能在说明书中找到；基线里的“常见起点”没有被当作项目配置
+- [ ] 监控/阈值/慢查询只出现在 `observability.md`；其他文件只引用，不重复
+- [ ] 迁移工具与目录与 criterion §7 / 说明书一致，未预设工具
+- [ ] 示例与正文中没有真实账号、密码、IP、连接串
+- [ ] 缺失内容按分层规则处理，没有逐格 N/A
 
 ---
 
@@ -290,6 +335,7 @@
 
 ## 执行备注
 
-- **缺失内容标注 N/A**：若某小节在源文档中无对应内容，标注 "N/A – 源文档未提供"
+- **缺失内容分层处理**：字段未知 → `N/A – 源文档未提供`；整行无依据 → 删除；整节无依据 → 保留标题 + 一行 N/A
 - 优先使用表格和 Mermaid 图
-- 安全内容同步至 `architecture/security_policy.md`
+- 安全内容的最终权威在 `architecture/security_policy.md`，本模块只写 DB 视角
+- 已生成的 `.context/db` 不会自动更新；需要按新模板重新执行 `context-openspec db`
