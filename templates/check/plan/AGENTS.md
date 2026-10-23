@@ -58,6 +58,9 @@
   - 索引中的优先级、前置依赖、状态与 Phase 文件逐条一致
 - **状态与变更目录一致**：运行 `node design/context-dev/tools/specflow/specflow.mjs roadmap-status --check`。已有 `openspec/changes/<id>/` 但 Roadmap 仍是 `proposed`、已归档但不是 `done`、或同一提案的多处状态不一致，均标 `[DESYNC]`（P2），修复建议为命令输出里的 `fix` 一栏；不自动修改。
 - **UI 资产已生成但路线图无 UI 提案**：`generated_files.ui` 非空，而路线图（单文件看总纲；分 Phase 看各 Phase 文件）中没有任何提案的「关联 Context 资产」含 `.context/ui/`、Change ID 也不含 `-ui-`，标 `[DESYNC]` P2，修复建议 `.agents/workflows/context-openspec.md plan add ui [Phase-N 文件]`；不自动修改。例外：总纲「规划口径说明」已写明 UI 能力被阶段边界移出（含依据）时不报。
+- **输入基线可达**：提案「关联 Context 资产」中的「（输入基线）」行（`plan add source` 导入的外部文档）路径在磁盘上不存在，标 `[DESYNC]` P2，修复建议恢复该文档或更新引用路径；输入基线文档未登记进 Manifest `sources` 属正常，不报。
+- **用户裁决可追溯**：Phase 文件或总纲出现「按 <日期> 用户决定 / 用户确认 / 用户选择」等表述，但对应内容在输入基线文档（或 `.context/**`、`history/context-sync.jsonl`）中查不到，标 `[AMBIGUOUS]` P1，修复建议按 `openspec/plan/add/AGENTS.md` §2.4 回写来源文档后改为引用其编号；不自动修改。
+- **来源草案重复**：输入基线文档中仍保留与 Phase 文件重复的提案清单（Change ID 集合重合），标 `[DESYNC]` P2，修复建议按 `plan/add` Phase 4「来源文档去重」处理；路线图引用了来源文档的规划草案章节而非决策编号时，同样标 `[DESYNC]` P2。
 - **头部不应有提案状态汇总**：总纲 Metadata 或 Phase 文件头部出现“N 条提案中 X 条已 done、Y 条 proposed”“任务状态”“阶段状态”等派生汇总文字，标 `[DEVIATION]` P2，建议删除（`roadmap-status` 不维护它们，必然过期；状态以「提案索引」为准）；不自动修改。
 - 总纲不得残留形态标记标题（`【单文件形态】` / `【总纲+分Phase 形态】`）与模板的“生成规则/使用说明”块，残留标 `[DEVIATION]` P2
 - `规划形态` 与 `判定依据` 的数值（提案总数、Phase 数、单 Phase 最多提案数）与实际一致；形态与 `openspec/plan/AGENTS.md` §2.0 的阈值明显不符时给出提示（不判错：用户可指定）

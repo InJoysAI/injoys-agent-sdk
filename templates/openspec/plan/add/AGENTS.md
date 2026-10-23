@@ -1,59 +1,119 @@
 # Plan Add 指令
 
-> 当 `.agents/workflows/context-openspec.md plan add <scope> [Phase-N 文件]` 被调用时执行此文件。
+> 当 `.agents/workflows/context-openspec.md plan add <scope> ...` 被调用时执行此文件。
 
 ---
 
 ## 🎯 执行指令
 
-用途：路线图已经存在之后，Context 里新增了一类资产（目前只有 UI），把对应的**新增提案**补进现有路线图，**不重做整份路线图**。
+用途：路线图已经存在之后，把一批**新增提案**补进现有路线图，**不重做整份路线图**。提案的数据来源由 `scope` 决定：
 
-当前**只启用 `ui`**：
+| scope | 调用形式 | 数据来源 | 适用场景 |
+|-------|---------|---------|---------|
+| `ui` | `plan add ui [Phase-N 文件]` | Manifest `generated_files.ui`（`.context/ui/` 总结） | init 之后新增了 UI 资产 |
+| `source` | `plan add source <文档路径> [Phase-N 文件]` | 一份**不登记进 `.context`** 的需求/方案文档（通常在 `docs/`，如访谈定稿、外部契约） | 已立项的新功能，需求结论在 Context 之外，尚未进入 PRD/TAD |
 
 ```bash
-.agents/workflows/context-openspec.md plan add ui                 # 由 AI 建议放哪个 Phase，用户确认后才写
-.agents/workflows/context-openspec.md plan add ui Phase-2         # 也接受 `2`、`proposal-roadmap-Phase-2.md`、完整路径
+.agents/workflows/context-openspec.md plan add ui                                              # 由 AI 建议放哪个 Phase，用户确认后才写
+.agents/workflows/context-openspec.md plan add ui Phase-2                                      # 也接受 `2`、`proposal-roadmap-Phase-2.md`、完整路径
+.agents/workflows/context-openspec.md plan add source docs/tunnel-app-ingress-interview.md      # 由 AI 建议落点
+.agents/workflows/context-openspec.md plan add source docs/xxx.md Phase-7                      # 指定落点（文件不存在时询问是否新建）
 ```
 
-> ⛔ 其他 scope（`db`、`legacy` 等）**尚未启用**：STOP，告诉用户“目前 `plan add` 只支持 `ui`”，不得按 UI 的流程自行推广。
+> ⛔ 其他 scope（`db`、`legacy` 等）**尚未启用**：STOP，告诉用户“目前 `plan add` 只支持 `ui` 与 `source`”，不得套用已有 scope 的流程自行推广。
 >
-> ⛔ **只增不改**：不得修改、删除、重排**已有提案**（含其状态、优先级、依赖）；不得生成或修改 `config.yaml`；不得重新规划已有 Phase。
+> ⛔ **只增不改**（所有 scope）：不得修改、删除、重排**已有提案**（含其状态、优先级、依赖）；不得生成或修改 `config.yaml`；不得重新规划已有 Phase。
+>
+> ⛔ **`source` 不写 Context**：本模块只改路线图。来源文档**不移动、不复制、不登记**进 Manifest `sources`，也不改 `.context/**` 任何总结或 `source/`。文档结论在各提案实施归档时经 `context-update sync proposal <change-id> --mode apply` 进入 `.context/**` 与 PRD/TAD 源文档——这保证 Context 只记录已实施或已确认的事实。
 
-> **通用规则（后续新增 scope 沿用，仅数据来源不同）**：Phase 0 检查前置 → Phase 1 读该 scope 的资产 → Phase 2 拟定提案并确认落点 → Phase 3 写入 → Phase 4 同步总纲与 Manifest。
+> **通用流程**：Phase 0 检查前置 → Phase 1 读该 scope 的资产 → Phase 2 拟定提案并确认落点 → Phase 3 写入 → Phase 4 同步总纲与 Manifest。各 Phase 先写通用规则，再写 scope 专属规则。
 
 ---
 
 ## Phase 0: 前置检查（任一不满足就 STOP）
 
+### 0.1 通用
+
 | 检查 | 不满足时 |
 |------|---------|
 | `openspec/proposal-roadmap.md` 存在 | STOP：先运行 `.agents/workflows/context-openspec.md plan` |
-| scope 为 `ui` | STOP：见上 |
-| Manifest 的 `generated_files.ui` 存在且非空，且文件在磁盘上存在 | STOP：先运行 `.agents/workflows/context-openspec.md ui`（若 `sources.UI_SPEC` 也不存在，先 `context-update add ui <文档>`） |
+| scope 为 `ui` 或 `source` | STOP：见上 |
 | 读取总纲 Metadata 的 `规划形态` | 缺失按 `单文件` 处理并给出警告 |
+
+### 0.2 scope = `ui`
+
+| 检查 | 不满足时 |
+|------|---------|
+| Manifest 的 `generated_files.ui` 存在且非空，且文件在磁盘上存在 | STOP：先运行 `.agents/workflows/context-openspec.md ui`（若 `sources.UI_SPEC` 也不存在，先 `context-update add ui <文档>`） |
 
 **已有 UI 提案检测**：扫描路线图（单文件看总纲，分 Phase 看各 Phase 文件）中「关联 Context 资产」含 `.context/ui/` 的提案，或 Change ID 含 `-ui-`。若已存在：列出这些提案，询问用户是「补充新增」还是「已覆盖，无需处理」；用户未明确选择不得继续。
 
+### 0.3 scope = `source`
+
+| 检查 | 不满足时 |
+|------|---------|
+| 提供了 `<文档路径>` | 询问用户要导入哪份文档；不得自行挑选 |
+| 文档存在且是单个文件 | STOP：报告路径不存在；不接受目录或通配符 |
+| 文档**不在** `.context/` 或 `openspec/` 下 | STOP：`.context/**/source/` 是 PRD/TAD/UI 权威源，其变更走 `context-update`（`sync`/`modify`）；`openspec/` 是规划产物，不能作为来源 |
+| 文档自身状态为**已定稿**：不含未关闭的评审 FAIL、`[AMBIGUOUS]`，或标明“草稿/讨论中”的结论 | STOP：先用 `.agents/workflows/context-interview.md` 完善该文档；只把“待确认”表格里**已注明归属阶段**（如“提案 design 阶段”）的事项视为可带入 |
+| **立项决定已由用户明确给出**，包括：是否立项、优先级、与现有 Phase 的先后/并行关系 | 文档写明“尚未立项”或未写立项结论时，**询问用户**；未得到明确答复不得继续，不得从文档内容推断立项 |
+
+**已导入检测**：在路线图（总纲 + 全部 Phase 文件）中搜索该文档路径。若已有提案引用它作为输入基线：列出这些提案，询问用户是「补充新增」还是「已覆盖，无需处理」；用户未明确选择不得继续。
+
 ---
 
-## Phase 1: 读取 UI 资产
+## Phase 1: 读取资产
+
+### 1.1 scope = `ui`
 
 **执行**: `@design/context-dev/tools/asset-reader/AGENTS.md`（scope: ui，只读 `generated_files.ui`；跳过 README.md、`source/`）
 
-同时读取 `criterion.md` 与架构约束中的**阶段边界**条款（口径同 `plan` §2.1 第 6 条）：属于未到阶段的 UI 能力不排入，列入总纲「规划口径说明」的移出清单；拿不准的写入「待决事项」，不自行裁决。
+### 1.2 scope = `source`
+
+1. **完整读取来源文档**（按 offset 分段读完，不得只读摘要），建立四张清单：
+   - **已决策**：决策表、规则、数值（保留文档自身的编号，如 `D13`、`R1`，作为追溯锚点）
+   - **待确认**：文档中的待确认/待定项及其写明的归属阶段（`提案 design`、`部署阶段`、`立项评审`、`二期` 等）
+   - **否决方案**：写入相关提案的 `❌ Out`，避免实施时复活
+   - **后续阶段能力**（文档标为二期/后续/暂不做）：不排入，列入总纲「规划口径说明」的移出清单
+2. **执行**: `@design/context-dev/tools/asset-reader/AGENTS.md`（全部 scope），用于两件事：确定每个提案的「关联 Context 资产」（即该提案归档同步时要更新的 `.context/**` 文件）；在 §2.2 中检查来源与 Context 是否冲突。
+3. 读取路线图「明确不纳入本路线图」与「规划口径说明」：来源文档的能力若命中其中条目，列入 §2.2 冲突清单。
+
+### 1.3 通用
+
+同时读取 `criterion.md` 与架构约束中的**阶段边界**条款（口径同 `plan` §2.1 第 6 条）：属于未到阶段的能力不排入，列入总纲「规划口径说明」的移出清单；拿不准的写入「待决事项」，不自行裁决。
 
 ---
 
 ## Phase 2: 拟定提案并确认落点（⛔ 用户确认前不得写任何文件）
 
-### 2.1 拟定 UI 提案
+### 2.1 拟定提案
 
-- 依据 `design_system.md`、`atomic_components.md`、`layout_grid.md`、`design_tokens.json`、`interaction_states.md` 等资产，按 `plan` §2.1 的原子化规则拟定提案（粒度 1-3 人日，> 5 人日必须拆分或写明不拆理由）
-- Change ID 用 `feat-ui-<功能>`（缺陷对齐用 `fix-ui-<问题>`）；每个提案必须有「关联 Context 资产」且指向 `.context/ui/` 下的具体文件
-- 依赖：只写真实依赖（如依赖已有的基础设施/前端骨架提案），Change ID 必须存在于现有路线图；**不得**为凑依赖而改动已有提案
-- 设计令牌/基础组件类提案排在页面级 UI 提案之前
+**通用规则**
+
+- 按 `plan` §2.1 的原子化规则拟定提案（粒度 1-3 人日，> 5 人日必须拆分或写明不拆理由）
 - 每个提案块用 `proposal-roadmap-phase.md.template` 的「提案详情」结构，**必须填 `变更类型`（`change_kind`）**，状态初始 `proposed`
+- 依赖：只写真实依赖，Change ID 必须存在于现有路线图或本次新增清单；**不得**为凑依赖而改动已有提案
 - 没有来源依据的按需项整块不写，不得编造
+
+**scope = `ui`**
+
+- 依据 `design_system.md`、`atomic_components.md`、`layout_grid.md`、`design_tokens.json`、`interaction_states.md` 等资产拟定
+- Change ID 用 `feat-ui-<功能>`（缺陷对齐用 `fix-ui-<问题>`）；每个提案必须有「关联 Context 资产」且指向 `.context/ui/` 下的具体文件
+- 设计令牌/基础组件类提案排在页面级 UI 提案之前
+
+**scope = `source`**
+
+- Change ID 用 `feat-<模块>-<功能>`；同一来源的提案共用一个模块前缀（如 `feat-tunnel-*`），便于追溯
+- 按 SSoT-first 排序：数据迁移 / 错误码类提案排在使用它们的业务提案之前；需要对外部系统做串行/一致性控制的核心组件排在调用方之前；运维/部署类提案（`docs-ops`）单列，不混进代码提案
+- 「关联 Context 资产」必须同时包含：
+  - `.context/criterion.md`
+  - 该提案归档同步时**将被更新**的 `.context/**` 具体文件（如 `domain/business_rules.md`、`architecture/security_policy.md`）
+  - 一行**输入基线**：`| （输入基线） | \`<文档路径>\` | <对应章节与决策编号>（非 .context 生成资产） |`
+- 每个提案的业务目标、关键任务、验证标准必须能追溯到**来源文档的决策编号或章节**，或**既有 Context 资产的具体条款**（如 `criterion.md` 某节、`data_architecture.md` 的备份口径）；两者都没有的内容属于「规划补充」，不得直接写入，须在 §2.3 确认清单中单列标出，由用户逐条确认或删除
+- 引用来源文档时只引**决策编号与需求章节**；不得引用来源文档中的规划草案章节（如提案拆分表），避免草案移除后引用失效（见 Phase 4「来源文档去重」）
+- 「待确认」项按文档写明的归属处理：归 `提案 design` 的写进对应提案的 `[!NOTE]`（由 `proposal` 阶段在 design 中定）；归 `部署阶段` 的写进部署类提案；归 `立项评审`/产品决策的写进 Phase 文件「待决事项」并注明负责人；**不在路线图里替用户裁决**
+- 来源文档声明的外部协同前置（如另一个产品需配合发布）写进对应提案「依赖 → 约束」，不当成已具备
+- 涉及新接口时，在关键任务中写明按 `criterion.md` 规定的 API 契约来源补登记（未启用 TypeSpec 的项目通常是架构文档中的接口附录），不假设契约工具
 
 ### 2.2 冲突检查（⛔ 必须在确认落点之前完成）
 
@@ -62,9 +122,10 @@
 | 检查项 | 判定 | 处理 |
 |--------|------|------|
 | 范围重叠 | 已有提案的范围**或关键任务**已包含拟新增提案的部分或全部内容（如已有提案各自带有“样式令牌化”任务、顺带做了基础组件或同一页面） | 给出重叠点与建议：合并、缩小拟新增提案范围，或改为依赖该已有提案；**不得**改已有提案的范围 |
-| 依赖顺序 | 拟新增提案的依赖排在它**之后**（后面的 Phase，或同一 Phase 里执行顺序在后） | 调整落点 Phase，或调整依赖；无法调整时列入冲突清单交用户决定 |
+| 依赖顺序 | 拟新增提案的依赖排在它**之后**（后面的 Phase，或同一 Phase 里执行顺序在后） | 调整落点 Phase，或调整依赖；无法调整时列入冲突清单交用户决定。用户确认“与某 Phase 并行”时，Phase 编号只是归档标签，并行关系以依赖边与「执行顺序与依赖」说明表达：只要依赖的已有提案已 `done` 或排在其前，不视为顺序冲突 |
 | 循环依赖 | 新增依赖边后依赖图出现环 | 去掉不必要的依赖边；仍成环则列入冲突清单 |
-| 影响已有提案 | UI 约束可能要求已有页面类 / 前端类提案补充验收标准 | **只报告**（提案 ID + 受影响点 + 建议），不改已有提案 |
+| 影响已有提案 | 新约束可能要求已有提案补充验收标准 | **只报告**（提案 ID + 受影响点 + 建议），不改已有提案 |
+| 约束冲突（`source`） | 来源文档的决策违反 `criterion.md` 的 MUST / MUST NOT，或与 `.context/**` 已有规则、路线图「明确不纳入本路线图」语义相反 | 列入冲突清单：双方原文 + 位置。criterion 优先，但**不得自行改写来源结论**；由用户决定修订来源文档、调整提案范围，或先走 criterion 变更 |
 
 > 检查结果（无冲突也要写明“已核对 N 个已有提案，无冲突”）与拟新增提案清单**一起**交给用户确认。冲突清单不为空时，不得默认按某一方案写入，必须由用户选择。
 
@@ -76,7 +137,7 @@
 |------|------|
 | 带参数，文件存在 | 参数接受 `Phase-N` / `N` / 文件名 / 完整路径；归一为 `openspec/proposal-roadmap-Phase-<N>.md`（兼容旧名 `Phase<N>`）。向用户展示拟追加的提案清单并确认后，**追加**到该文件「提案详情」末尾 |
 | 带参数，文件不存在 | 询问用户是否新建该 Phase 文件；同意才新建（用 `proposal-roadmap-phase.md.template`，编号取参数中的 `N`），并同步总纲「阶段总览」新增该 Phase 行 |
-| 不带参数 | AI 依据依赖关系与阶段边界**建议**一个落点（已有 Phase，或建议新建一个 Phase），说明理由；用户确认或改选后才写 |
+| 不带参数 | AI 依据依赖关系、阶段边界与用户的立项决定**建议**一个落点（已有 Phase，或建议新建一个 Phase），说明理由；用户确认或改选后才写。`source` 的提案主题独立于已有 Phase 时，优先建议新建 Phase（编号取现有最大编号 + 1） |
 | 参数无法解析 | STOP：列出现有 Phase 文件并询问 |
 
 **单文件形态**
@@ -84,7 +145,17 @@
 - Phase 文件参数不适用：忽略并告知用户；提案块追加到总纲对应 Phase 的详情下（带 `Phase-N` 且该阶段存在则放入该阶段；否则按“不带参数”流程建议落点并确认）
 - **不自动切换形态**：即使追加后 `M`/`P`/`K` 超过 `plan` §2.0 阈值，也只在报告里提示“可考虑改为总纲+分Phase”，由用户决定
 
-> 展示给用户确认的内容至少包含：目标文件、每个提案的 Change ID / 标题 / 优先级 / 预计人日 / 依赖，以及 §2.2 的冲突检查结果。用户修改清单后按修改结果执行。
+> 展示给用户确认的内容至少包含：目标文件、每个提案的 Change ID / 标题 / 优先级 / 预计人日 / 依赖 / `change_kind`，以及 §2.2 的冲突检查结果；`source` 另附「待确认项 → 归属提案或待决事项」的分配表、移出清单与「规划补充」清单（§2.1）。用户修改清单后按修改结果执行。
+
+### 2.4 规划裁决回写来源文档（仅 `source`，⛔ 写路线图之前完成）
+
+来源文档是后续 `proposal` 的输入基线。规划过程中（§2.2 冲突处理、§2.3 确认、写入后的复核）由用户作出的**新裁决**、新发现的**待决事项**与用户确认的**处理方式**，若只留在路线图里，`proposal` 读输入基线时就看不到，路线图也会出现无法追溯的「用户决定」。因此：
+
+1. 列出本次规划新产生、来源文档中**没有**的条目，分三类：新决策（如新增 `D<n>`）、新待确认项、处理方式（如「未覆盖条款归档时补登记」）
+2. 向用户展示拟回写的位置与原文，经同意后写入来源文档：新决策进决策表并标「规划补录，用户已确认」；新待确认项进待确认表并写明归属；处理方式进立项/规划章节；同步来源文档 Metadata 的修订记录
+3. 路线图中引用这些条目时**只引来源文档的编号或章节**，不写「按 YYYY-MM-DD 用户决定」这类无出处的表述
+4. 用户不同意回写的条目：在 Phase 文件「待决事项」中标为「未回写来源，状态待确认」，不得当作已决策
+5. 写入路线图后的复核又产生新条目时，重复本节
 
 ---
 
@@ -92,7 +163,8 @@
 
 - 只在确认的文件中**追加**，不改动文件里已有内容
 - 提案之间的 `### 提案 N` 序号接在该文件已有序号之后
-- 写完后自检：无 `{{...}}` 残留；每个 Change ID 在整个路线图中唯一；依赖的 Change ID 均存在且排序、无环（与 §2.2 结论一致）；预计时间 > 5 人日的已拆分或写明理由
+- 新建 Phase 文件（`source`）时：头部 `来源` 写来源文档路径与用户的立项决定（日期、优先级、与哪个 Phase 并行）；「阶段目标与范围」的 Out 写入来源文档的后续阶段能力与否决方案摘要
+- 写完后自检：无 `{{...}}` 残留；每个 Change ID 在整个路线图中唯一；依赖的 Change ID 均存在且排序、无环（与 §2.2 结论一致）；预计时间 > 5 人日的已拆分或写明理由；`source` 提案的输入基线行路径可达
 
 ---
 
@@ -103,32 +175,37 @@
 | 内容 | 处理 |
 |------|------|
 | 提案索引（分 Phase 形态） | 为每个新提案追加一行：Change ID、Phase、标题、优先级、前置依赖、状态（`proposed`）、详情链接；与 Phase 文件逐项一致 |
+| 提案主条目指针（若总纲有此节） | 为每个新提案追加一行，格式与已有行一致 |
 | 阶段总览 | 更新受影响 Phase 的「提案数」（新建 Phase 则新增一行）；预计周期若原为估算，只在能由新增人日直接累加时更新，否则保持原值并在报告中提示 |
-| Metadata `判定依据` | 只更新其中的数值 `提案总数 / Phase 数 / 单 Phase 最多提案数`，**不改** `规划形态` 与文字依据 |
+| Metadata `判定依据` | 只更新其中的数值 `提案总数 / Phase 数 / 单 Phase 最多提案数`；Metadata 另有 `提案总数`（含优先级分布）行时同步数值。**不改** `规划形态` 与文字依据 |
+| Metadata `基于文档`（`source`） | 追加来源文档路径并注明“输入基线，非 .context 资产” |
 | 状态汇总 | **不写**。总纲 Metadata / Phase 头部若已有历史遗留的汇总文字，不改，在报告中提示由用户处理 |
+| 覆盖追溯（`source`，若总纲有此节） | 追加一行：来源文档的决策编号范围 → 主提案 |
 | 依赖关系图 | 把新提案节点与依赖边追加到 Mermaid 图，不改动已有节点 |
-| 规划口径说明 | 有被阶段边界移出的 UI 能力时，追加到「已移出本路线图的能力」 |
+| 规划口径说明 | 有被阶段边界或来源文档标为后续阶段的能力时，追加到「已移出本路线图的能力」（或总纲「明确不纳入本路线图」），写明依据 |
 
-**目标 Phase 文件的「执行顺序与依赖」**（分 Phase 形态写 Phase 文件；单文件形态写总纲对应 Phase 下的同名位置）：只**追加**新增提案的执行线与跨阶段前置（一条或几条，写明谁先谁后、依赖哪些已有提案），不改原有条目；该节不存在时不新建。若新增提案与已有提案存在 §2.2 的范围重叠或顺序问题且用户选择“暂不处理”，在这里追加一条“待协调”说明（提案 ID + 问题），不改已有提案。
+**目标 Phase 文件的「执行顺序与依赖」**（分 Phase 形态写 Phase 文件；单文件形态写总纲对应 Phase 下的同名位置）：只**追加**新增提案的执行线与跨阶段前置（一条或几条，写明谁先谁后、依赖哪些已有提案、与哪个 Phase 并行），不改原有条目；该节不存在时（且非新建文件）不新建。若新增提案与已有提案存在 §2.2 的范围重叠或顺序问题且用户选择“暂不处理”，在这里追加一条“待协调”说明（提案 ID + 问题），不改已有提案。
 
 **目标 Phase 文件头部的「预计工作量与周期」**（分 Phase 形态；单文件形态无此项）：与总纲「阶段总览」的周期口径一致——只在能由新增人日直接累加时更新数值，并在括号里注明构成（如“其中 19 人日来自原提案，17.5 人日来自 `plan add ui` 追加的提案”）；原值非人日估算、无法直接累加时保持原值并在报告中提示。**只改这一行的数值与构成说明**，不动该文件其他已有内容。
 
-**Manifest**：把新建的 Phase 文件登记进 `generated_files.openspec`（去重，不覆盖其他条目；口径见 `tools/manifest/AGENTS.md`）；仅追加到已有文件时无需登记。
+**Manifest**：把新建的 Phase 文件登记进 `generated_files.openspec`（去重，不覆盖其他条目；口径见 `tools/manifest/AGENTS.md`）；仅追加到已有文件时无需登记。`source` 的来源文档**不登记**进 `sources`。
+
+**来源文档去重（仅 `source`）**：来源文档若含有本次已写入路线图的提案草案（如提案拆分表），经用户同意后改为一行指向 Phase 文件的指针，保留文档自有的范围结论（移出清单、外部协同前置等）；提案详情只以 Phase 文件为唯一来源。去重前确认路线图中没有引用该草案章节（§2.1 已禁止此类引用）。
 
 **刷新索引**：按 `@design/context-dev/tools/integration/AGENTS.md` Phase 2 刷新 `CONTEXT_ASSET_INDEX`（若新建了 Phase 文件）。
 
-**校验**：运行 `node design/context-dev/tools/specflow/specflow.mjs roadmap-status --check`，确认新提案没有被误判；有 `[DESYNC]` 就按其 `fix` 栏修正索引或 Phase 文件。
+**校验**：运行 `node design/context-dev/tools/specflow/specflow.mjs roadmap-status --check`，确认新提案没有被误判；有 `[DESYNC]` 就按其 `fix` 栏修正索引或 Phase 文件。若新建了 Phase 文件，另运行 `bash design/context-dev/scripts/check-context-manifest.sh`。
 
 ---
 
 ## ✅ 完成后
 
-> ⛔ 本模块只新增 UI 提案并同步总纲，完成后向路由层报告并**停止**，不得继续创建提案（`proposal`）或执行其他模块。
+> ⛔ 本模块只新增提案并同步总纲，完成后向路由层报告并**停止**，不得继续创建提案（`proposal`）或执行其他模块。
 
 报告：
 - ✅ 新增的提案（Change ID / 标题 / 落点文件）
 - ✅ 总纲同步内容（索引、阶段总览、数值、依赖图）与目标 Phase 文件「执行顺序与依赖」的追加
 - ⚠️ 冲突检查结果与用户的处理选择；对已有提案的影响提示（只报告）
-- ⚠️ 被阶段边界移出 / 待决的 UI 能力
+- ⚠️ 被阶段边界移出 / 待决的能力；`source` 另报告待确认项的分配结果、§2.4 回写来源文档的条目（及用户拒绝回写的条目）、「规划补充」的确认结果与来源文档去重情况
 - ⚠️ 形态阈值提示（若有）
-- ➡️ 下一步：`.agents/workflows/context-check.md plan` 复核路线图，再用 `.agents/workflows/context-openspec.md proposal <change-id>` 逐个创建提案
+- ➡️ 下一步：`.agents/workflows/context-check.md plan` 复核路线图，再用 `.agents/workflows/context-openspec.md proposal <change-id> [Phase-N 文件]` 逐个创建提案；`source` 提示：各提案归档时运行 `.agents/workflows/context-update.md sync proposal <change-id> --mode apply`，把来源文档的已实施结论写入 `.context/**` 与 PRD/TAD 源文档

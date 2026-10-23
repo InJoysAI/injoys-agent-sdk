@@ -38,6 +38,9 @@
 **状态:** {{STATUS}}（proposed/in-progress/done）  
 **变更类型（change_kind）:** {{CHANGE_KIND}}（`code` / `docs-ops` / `mixed`；判定依据：{{CHANGE_KIND_REASON}}）
 
+**开发与验收环境（按需）**:
+- {{DEV_ACCEPTANCE_ENV_OR_REFERENCE}}（项目约定每个提案说明执行环境时填写；同 Phase 共用时写「见本文件『阶段开发与验收环境』」并只补差异。用粗体标签，**不要**写成 `###` 标题——它与 `### 提案 N` 同级会打乱大纲）
+
 **业务目标（Business Goal）**:
 - {{BUSINESS_GOAL_1}}
 - {{BUSINESS_GOAL_2}}
